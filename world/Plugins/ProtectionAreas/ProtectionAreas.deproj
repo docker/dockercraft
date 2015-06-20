@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <file>
+    <filename>CommandHandlers.lua</filename>
+  </file>
+  <file>
+    <filename>CommandState.lua</filename>
+  </file>
+  <file>
+    <filename>Config.lua</filename>
+  </file>
+  <file>
+    <filename>CurrentLng.lua</filename>
+  </file>
+  <file>
+    <filename>HookHandlers.lua</filename>
+  </file>
+  <file>
+    <filename>Info.lua</filename>
+  </file>
+  <file>
+    <filename>InfoReg.lua</filename>
+  </file>
+  <file>
+    <filename>PlayerAreas.lua</filename>
+  </file>
+  <file>
+    <filename>ProtectionAreas.lua</filename>
+  </file>
+  <file>
+    <filename>Storage.lua</filename>
+  </file>
+</project>

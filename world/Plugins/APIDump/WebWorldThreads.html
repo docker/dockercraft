@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MCServer - Webserver vs World threads</title>
+		<link rel="stylesheet" type="text/css" href="main.css" />
+		<link rel="stylesheet" type="text/css" href="prettify.css" />
+		<script src="prettify.js"></script>
+		<script src="lang-lua.js"></script>
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<div id="content">
+			<h1>Webserver vs World threads</h1>
+			<p>
+			This article will explain the threading issues that arise between the webserver and world threads are of concern to plugin authors.</p>
+			<p>
+			Generally, plugins that provide webadmin pages should be quite careful about their interactions. Most operations on MCServer objects requires synchronization, that MCServer provides automatically and transparently to plugins - when a block is written, the chunkmap is locked, or when an entity is being manipulated, the entity list is locked. Each plugin also has a mutex lock, so that only one thread at a time may be executing plugin code.</p>
+			<p>
+			This locking can be a source of deadlocks for plugins that are not written carefully.</p>
+
+			<h2>Example scenario</h2>
+			<p>Consider the following example. A plugin provides a webadmin page that allows the admin to kick players off the server. When the admin presses the "Kick" button, the plugin calls cWorld:DoWithPlayer() with a callback to kick the player. Everything seems to be working fine now.</p>
+			<p>
+			A new feature is developed in the plugin, now the plugin adds a new in-game command so that the admins can kick players while they're playing the game. The plugin registers a command callback with cPluginManager.AddCommand(). Now there are problems bound to happen.</p>
+			<p>
+			Suppose that two admins are in, one is using the webadmin and the other is in-game. Both try to kick a player at the same time. The webadmin locks the plugin, so that it can execute the plugin code, but right at this moment the OS switches threads. The world thread locks the world so that it can access the list of in-game commands, receives the in-game command, it tries to lock the plugin. The plugin is already locked, so the world thread is put on hold. After a while, the webadmin thread is woken up again and continues processing. It tries to lock the world so that it can traverse the playerlist, but the lock is already held by the world thread. Now both threads are holding one lock each and trying to grab the other lock, and are therefore deadlocked.</p>
+
+			<h2>How to avoid the deadlock</h2>
+			<p>
+			There are two main ways to avoid such a deadlock. The first approach is using tasks: Everytime you need to execute a task inside a world, instead of executing it, queue it, using <a href="cWorld.html">cWorld</a>:QueueTask(). This handy utility can will call the given function inside the world's TickThread, thus eliminating the deadlock, because now there's only one thread. However, this approach will not let you get data back. You cannot query the player list, or the entities, or anything - because when the task runs, the webadmin page has already been served to the browser.</p>
+			<p>
+			To accommodate this, you'll need to use the second approach - preparing and caching data in the tick thread, possibly using callbacks. This means that the plugin will have global variables that will store the data, and update those variables when the data changes; then the webserver thread will only read those variables, instead of calling the world functions. For example, if a webpage was to display the list of currently connected players, the plugin should maintain a global variable, g_WorldPlayers, which would be a table of worlds, each item being a list of currently connected players. The webadmin handler would read this variable and create the page from it; the plugin would use HOOK_PLAYER_JOINED and HOOK_DISCONNECT to update the variable.</p>
+
+			<h2>What to avoid</h2>
+			<p>
+			Now that we know what the danger is and how to avoid it, how do we know if our code is susceptible?</p>
+			<p>
+			The general rule of thumb is to avoid calling any functions that read or write lists of things in the webserver thread. This means most ForEach() and DoWith() functions. Only <a href="cRoot.html">cRoot</a>:ForEachWorld() is safe - because the list of worlds is not expected to change, so it is not guarded by a mutex. Getting and setting world's blocks is, naturally, unsafe, as is calling other plugins, or creating entities.</p>
+
+			<h2>Example</h2>
+			The Core has the facility to kick players using the web interface. It used the following code for the kicking (inside the webadmin handler):
+<pre class="prettyprint lang-lua">
+local KickPlayerName = Request.Params["players-kick"]
+local FoundPlayerCallback = function(Player)
+	if (Player:GetName() == KickPlayerName) then
+	Player:GetClientHandle():Kick("You were kicked from the game!")
+	end
+end
+cRoot:Get():FindAndDoWithPlayer(KickPlayerName, FoundPlayerCallback)
+</pre>
+The cRoot:FindAndDoWithPlayer() is unsafe and could have caused a deadlock. The new solution is queue a task; but since we don't know in which world the player is, we need to queue the task to all worlds:
+<pre class="prettyprint lang-lua">
+cRoot:Get():ForEachWorld(    -- For each world...
+	function(World)
+	World:QueueTask(         -- ... queue a task...
+		function(a_World)
+		a_World:DoWithPlayer(KickPlayerName,  -- ... to walk the playerlist...
+			function (a_Player)
+			a_Player:GetClientHandle():Kick("You were kicked from the game!")  -- ... and kick the player
+			end
+		)
+		end
+	)
+	end
+)
+</pre>
+			<script>
+				prettyPrint();
+			</script>
+		</div>
+	</body>
+</html>

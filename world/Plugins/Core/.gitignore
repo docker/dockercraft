@@ -1,0 +1,4 @@
+*.ini
+*.deuser
+@EnableMobDebug.lua
+forum_info.txt
