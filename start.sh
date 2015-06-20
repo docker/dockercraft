@@ -1,2 +1,3 @@
-/srv/MCServer/MCServer -d
+cd /srv/world
+../MCServer/MCServer -d
 /bin/bash
