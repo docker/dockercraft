@@ -1,7 +1,43 @@
 -- local PLUGIN = nil
 
+
 Ground = 63
-DContainer = {displayed = false, x = 0, z = 0}
+DContainer = {displayed = false, x = 0, z = 0, name=""}
+
+CONTAINER_START_X = 0
+CONTAINER_OFFSET_X = -6
+CONTAINER_START_Z = 4
+
+Containers = {}
+
+function startContainer(name,imageRepo,imageTag)
+
+	x = 0
+
+	for i=0, table.getn(Containers)
+	do
+		if Containers[i] == nil
+		then
+			container = DContainer
+			container:init(x,CONTAINER_START_Z)
+			container:display()
+
+			Containers[i] = container
+			return
+		end
+
+		x = x + CONTAINER_OFFSET_X
+	end
+
+	container = DContainer
+	container:init(x,CONTAINER_START_Z)
+	container:display()
+
+	table.insert(Containers, container)
+
+end
+
+
 
 function DContainer:init(x,z)
 	self.x = x
@@ -44,7 +80,6 @@ function DContainer:display()
 			cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
 		end
 
-
 		for px=self.x, self.x+3
 		do
 			for pz=self.z, self.z+4
@@ -52,9 +87,12 @@ function DContainer:display()
 				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 4,pz,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
 			end	
 		end
-
 	end
 end
+
+
+
+
 
 function Initialize(Plugin)
 	Plugin:SetName("Docker")
@@ -79,23 +117,6 @@ function Initialize(Plugin)
 		end
 	end
 
-	container = DContainer
-	container:init(0,4)
-	container:display()
-
-	container = DContainer
-	container:init(-6,4)
-	container:display()
-
-	container = DContainer
-	container:init(-12,4)
-	container:display()
-
-	container = DContainer
-	container:init(-18,4)
-	container:display()
-
-
 	return true
 end
 
@@ -108,24 +129,17 @@ function HandleRequest_Docker(Request)
 
 		action = Request.PostParams["action"]
 
-		if action == "buildColumn"
+		if action == "startContainer"
 		then
-			x = Request.PostParams["x"]
-			z = Request.PostParams["z"]
+			name = Request.PostParams["name"]
+			imageRepo = Request.PostParams["imageRepo"]
+			imageTag = Request.PostParams["imageTag"]
 
-			for y=0,150
-			do
-				cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
-			end
-
-			content = content .. "{action:\"" .. action .. "\",x:" .. x .. ",z:" .. z .. "}"
-
-		else
-
-			content = content .. "{action:\"" .. action .. "\"}"
-
-
+			
+			startContainer(name,imageRepo,imageTag)
 		end
+
+		content = content .. "{action:\"" .. action .. "\"}"
 
 	else
 		content = content .. "{error:\"action requested\"}"
