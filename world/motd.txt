@@ -1,0 +1,3 @@
+@6Welcome to the MCServer test server!
+@6http://www.mc-server.org/
+@6Type /help for all commands

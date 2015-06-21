@@ -1,1 +1,7 @@
 .DS_Store
+world/banlist.sqlite
+world/itemblacklist
+world/logs/*
+world/players
+world/whitelist.sqlite
+world/world/stats/Pixowl.json
