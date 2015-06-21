@@ -1,6 +1,12 @@
 # minecraft-docker-client
 A simple Minecraft docker client, to visualize and run containers.
 
+Build the image:
+
+```
+docker build -t mcclient .
+```
+
 Run the container:
 
 ```
