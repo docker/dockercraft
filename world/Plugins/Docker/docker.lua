@@ -11,6 +11,19 @@ CONTAINER_START_Z = 4
 Containers = {}
 SignsToUpdate = {}
 
+function updateSigns(World)
+
+	for i=1,table.getn(SignsToUpdate)
+	do					
+		sign = SignsToUpdate[i]
+
+		LOG("update sign: " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
+
+		cRoot:Get():GetDefaultWorld():SetSignLines(sign.x,sign.y,sign.z,sign.line1,sign.line2,sign.line3,sign.line4)
+	end
+	SignsToUpdate = {}
+end
+
 function startContainer(id,name,imageRepo,imageTag)
 
 	x = 0
@@ -21,6 +34,7 @@ function startContainer(id,name,imageRepo,imageTag)
 		then
 			container = DContainer
 			container:init(x,CONTAINER_START_Z)
+			container:setInfos(id,name,imageRepo,imageTag)
 			container:display()
 
 			Containers[i] = container
@@ -32,11 +46,8 @@ function startContainer(id,name,imageRepo,imageTag)
 
 	container = DContainer
 	container:init(x,CONTAINER_START_Z)
+	container:setInfos(id,name,imageRepo,imageTag)
 	container:display()
-	container.id = id
-	container.name = name
-	container.imageRepo = imageRepo
-	container.imageTag = imageTag
 
 	table.insert(Containers, container)
 
@@ -50,14 +61,19 @@ function DContainer:init(x,z)
 	self.displayed = false
 end
 
+function DContainer:setInfos(id,name,imageRepo,imageTag)
+	self.id = id
+	self.name = name
+	self.imageRepo = imageRepo
+	self.imageTag = imageTag
+end
+
 function DContainer:display()
 	if self.displayed == false 
 	then
 		self.displayed = true
 
 		cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 1,self.z - 1,E_BLOCK_SIGN_POST,8)
-		
-		local c = self
 
 		sign = {}
 		sign.x = self.x
@@ -68,22 +84,25 @@ function DContainer:display()
 		sign.line3 = self.imageRepo
 		sign.line4 = self.imageTag
 
+		LOG("schedule update sign: x:" .. tostring(sign.x) .. ", " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
+
+
 		table.insert(SignsToUpdate,sign)
 
-		cRoot:Get():GetDefaultWorld():ScheduleTask(20,
+		cRoot:Get():GetDefaultWorld():ScheduleTask(20,updateSigns)
 
-			function(World)
-				for i=1,table.getn(SignsToUpdate) do
+		-- 	function(World)
+		-- 		for i=1,table.getn(SignsToUpdate) do
 					
-					local sign = SignsToUpdate[i]
+		-- 			local sign = SignsToUpdate[i]
 
-					LOG("update sign: " .. sign.line1)
+		-- 			LOG("update sign: " .. sign.line1)
 
-					cRoot:Get():GetDefaultWorld():SetSignLines(self.x,Ground + 1,self.z - 1,sign.line1,sign.line2,sign.line3,sign.line4)
-				end
-				SignsToUpdate = {}
-			end
-		)
+		-- 			cRoot:Get():GetDefaultWorld():SetSignLines(self.x,Ground + 1,self.z - 1,sign.line1,sign.line2,sign.line3,sign.line4)
+		-- 		end
+		-- 		SignsToUpdate = {}
+		-- 	end
+		-- )
 		
 		for px=self.x, self.x+3
 		do
