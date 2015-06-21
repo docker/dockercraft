@@ -24,7 +24,26 @@ function HandleRequest_Docker(Request)
 	if Request.PostParams["action"] ~= nil then
 
 		action = Request.PostParams["action"]
-		content = content .. "{action:\"" .. action .. "\"}"
+
+		if action == "buildColumn"
+		then
+			x = Request.PostParams["x"]
+			z = Request.PostParams["z"]
+
+			for y=0,150
+			do
+				cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+			-- 	cRoot:GetDefaultWorld().SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+			end
+
+			content = content .. "{action:\"" .. action .. "\",x:" .. x .. ",z:" .. z .. "}"
+
+		else
+
+			content = content .. "{action:\"" .. action .. "\"}"
+
+
+		end
 
 	else
 		content = content .. "{error:\"action requested\"}"
