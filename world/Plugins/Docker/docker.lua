@@ -13,6 +13,17 @@ function Initialize(Plugin)
 	Plugin:AddWebTab("Docker",HandleRequest_Docker)
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+
+	y = 63
+	for x=-40,40
+	do
+		for z=-40,40
+		do
+			cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
+		end
+	end
+
+
 	return true
 end
 
@@ -33,7 +44,6 @@ function HandleRequest_Docker(Request)
 			for y=0,150
 			do
 				cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
-			-- 	cRoot:GetDefaultWorld().SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
 			end
 
 			content = content .. "{action:\"" .. action .. "\",x:" .. x .. ",z:" .. z .. "}"
