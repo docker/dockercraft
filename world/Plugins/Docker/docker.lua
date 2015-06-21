@@ -97,8 +97,10 @@ end
 function Initialize(Plugin)
 	Plugin:SetName("Docker")
 	Plugin:SetVersion(1)
-	
+
 	-- Hooks
+
+	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
 	
 	-- PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
 	
@@ -108,7 +110,13 @@ function Initialize(Plugin)
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
-	y = 63
+	return true
+end
+
+
+function WorldStarted()
+
+	y = Ground
 	for x=-40,40
 	do
 		for z=-40,40
@@ -117,7 +125,6 @@ function Initialize(Plugin)
 		end
 	end
 
-	return true
 end
 
 
@@ -128,6 +135,11 @@ function HandleRequest_Docker(Request)
 	if Request.PostParams["action"] ~= nil then
 
 		action = Request.PostParams["action"]
+
+		if action == "generateGround"
+		then
+			WorldStarted()
+		end
 
 		if action == "startContainer"
 		then
