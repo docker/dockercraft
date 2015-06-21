@@ -2,15 +2,16 @@
 
 
 Ground = 63
-DContainer = {displayed = false, x = 0, z = 0, name=""}
+DContainer = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag=""}
 
 CONTAINER_START_X = 0
 CONTAINER_OFFSET_X = -6
 CONTAINER_START_Z = 4
 
 Containers = {}
+SignsToUpdate = {}
 
-function startContainer(name,imageRepo,imageTag)
+function startContainer(id,name,imageRepo,imageTag)
 
 	x = 0
 
@@ -32,6 +33,10 @@ function startContainer(name,imageRepo,imageTag)
 	container = DContainer
 	container:init(x,CONTAINER_START_Z)
 	container:display()
+	container.id = id
+	container.name = name
+	container.imageRepo = imageRepo
+	container.imageTag = imageTag
 
 	table.insert(Containers, container)
 
@@ -50,6 +55,36 @@ function DContainer:display()
 	then
 		self.displayed = true
 
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 1,self.z - 1,E_BLOCK_SIGN_POST,8)
+		
+		local c = self
+
+		sign = {}
+		sign.x = self.x
+		sign.y = Ground + 1
+		sign.z = self.z - 1
+		sign.line1 = self.id
+		sign.line2 = self.name
+		sign.line3 = self.imageRepo
+		sign.line4 = self.imageTag
+
+		table.insert(SignsToUpdate,sign)
+
+		cRoot:Get():GetDefaultWorld():ScheduleTask(20,
+
+			function(World)
+				for i=1,table.getn(SignsToUpdate) do
+					
+					local sign = SignsToUpdate[i]
+
+					LOG("update sign: " .. sign.line1)
+
+					cRoot:Get():GetDefaultWorld():SetSignLines(self.x,Ground + 1,self.z - 1,sign.line1,sign.line2,sign.line3,sign.line4)
+				end
+				SignsToUpdate = {}
+			end
+		)
+		
 		for px=self.x, self.x+3
 		do
 			for pz=self.z, self.z+4
@@ -101,6 +136,7 @@ function Initialize(Plugin)
 	-- Hooks
 
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
+
 	
 	-- PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
 	
@@ -146,9 +182,10 @@ function HandleRequest_Docker(Request)
 			name = Request.PostParams["name"]
 			imageRepo = Request.PostParams["imageRepo"]
 			imageTag = Request.PostParams["imageTag"]
+			id = Request.PostParams["id"]
 
 			
-			startContainer(name,imageRepo,imageTag)
+			startContainer(id,name,imageRepo,imageTag)
 		end
 
 		content = content .. "{action:\"" .. action .. "\"}"
