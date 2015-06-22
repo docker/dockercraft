@@ -29,7 +29,7 @@ func main() {
 		name := info.Name[1:]
 		fmt.Println("id:", id)
 
-		data := url.Values{"action": {"startContainer"}, "id": {id} "name": {name}, "imageRepo": {"<imageName>"}, "imageTag": {"<imageTag>"}}
+		data := url.Values{"action": {"startContainer"}, "id": {id}, "name": {name}, "imageRepo": {"<imageName>"}, "imageTag": {"<imageTag>"}}
 		req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		req.SetBasicAuth("admin", "admin")
