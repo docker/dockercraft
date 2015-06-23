@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 // Callback used to listen to Docker's events
@@ -42,43 +41,39 @@ func main() {
 	// Init the client
 	docker, _ := dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
 
-	// Get only running containers
-	containers, err := docker.ListContainers(false, false, "")
-	if err != nil {
-		// log.Fatal(err)
-		fmt.Println("ERROR:", err.Error())
-	}
-
-	client := &http.Client{}
-
-	// list the "already created" containers
-
-	for i := 0; i < len(containers); i++ {
-
-		id := containers[i].Id
-		info, _ := docker.InspectContainer(id)
-		name := info.Name[1:]
-		fmt.Println("id:", id)
-
-		data := url.Values{"action": {"startContainer"}, "id": {id}, "name": {name}, "imageRepo": {"<imageName>"}, "imageTag": {"<imageTag>"}}
-		req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		req.SetBasicAuth("admin", "admin")
-		client.Do(req)
-	}
-
-	// connect to docker daemon events and send needed requests to the MC Server
-
-	// TODO:
-	// - test for container creation
-	// - test for container removal
-	// - test for container status change (started, paused, stopped)
-
-	// Listen to events
+	// Monitor events
 	docker.StartMonitorEvents(eventCallback, nil)
 
-	// Hold the execution to look at the events coming
-	time.Sleep(3600 * time.Second)
+	// wait for interruption
+	<-make(chan int)
+
+	// Get only running containers
+	/*
+		containers, err := docker.ListContainers(false, false, "")
+		if err != nil {
+			fmt.Println("ERROR:", err.Error())
+		}
+
+		client := &http.Client{}
+
+		// list the "already created" containers
+
+		for i := 0; i < len(containers); i++ {
+
+			id := containers[i].Id
+			info, _ := docker.InspectContainer(id)
+			name := info.Name[1:]
+			fmt.Println("id:", id)
+
+			data := url.Values{"action": {"startContainer"}, "id": {id}, "name": {name}, "imageRepo": {"<imageName>"}, "imageTag": {"<imageTag>"}}
+			req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req.SetBasicAuth("admin", "admin")
+			client.Do(req)
+		}
+	*/
+
+	// connect to docker daemon events and send needed requests to the MC Server
 }
 
 //

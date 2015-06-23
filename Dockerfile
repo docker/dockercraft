@@ -9,6 +9,7 @@ ADD ./world /srv/world
 ADD start.sh /srv/start.sh
 
 ADD ./goproxy /go/src/goproxy
-RUN cd /go/src/goproxy; go get -d; go build
+RUN cd /go/src/goproxy; go get -d
+RUN cd /go/src/goproxy; go build
 
 CMD ["/bin/bash","/srv/start.sh"]
