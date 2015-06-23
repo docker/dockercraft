@@ -6,7 +6,36 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
+
+// Callback used to listen to Docker's events
+func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}) {
+	fmt.Println("---")
+	fmt.Printf("%+v\n", *event)
+
+	id := event.Id
+
+	switch event.Status {
+	case "create":
+		//fmt.Println("create event")
+	case "start":
+		client := &http.Client{}
+		data := url.Values{"action": {"startContainer"}, "id": {id}, "name": {"<name>"}, "imageRepo": {"<imageName>"}, "imageTag": {"<imageTag>"}}
+		req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.SetBasicAuth("admin", "admin")
+		client.Do(req)
+	case "stop":
+		//fmt.Println("")
+	case "restart":
+		//fmt.Println("")
+	case "kill":
+		//fmt.Println("")
+	case "die":
+		//fmt.Println("")
+	}
+}
 
 func main() {
 
@@ -22,6 +51,8 @@ func main() {
 
 	client := &http.Client{}
 
+	// list the "already created" containers
+
 	for i := 0; i < len(containers); i++ {
 
 		id := containers[i].Id
@@ -36,6 +67,18 @@ func main() {
 		client.Do(req)
 	}
 
+	// connect to docker daemon events and send needed requests to the MC Server
+
+	// TODO:
+	// - test for container creation
+	// - test for container removal
+	// - test for container status change (started, paused, stopped)
+
+	// Listen to events
+	docker.StartMonitorEvents(eventCallback, nil)
+
+	// Hold the execution to look at the events coming
+	time.Sleep(3600 * time.Second)
 }
 
 //
