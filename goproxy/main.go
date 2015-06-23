@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/samalba/dockerclient"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -36,7 +37,38 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 	}
 }
 
+func listContainers(w http.ResponseWriter, r *http.Request) {
+
+	docker, _ := dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
+	containers, err := docker.ListContainers(false, false, "")
+
+	if err != nil {
+		io.WriteString(w, err.Error())
+		return
+	}
+
+	client := &http.Client{}
+
+	for i := 0; i < len(containers); i++ {
+
+		id := containers[i].Id
+		info, _ := docker.InspectContainer(id)
+		name := info.Name[1:]
+
+		data := url.Values{"action": {"containerInfos"}, "id": {id}, "name": {name}, "imageRepo": {"<imageName>"}, "imageTag": {"<imageTag>"}}
+		req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.SetBasicAuth("admin", "admin")
+		client.Do(req)
+	}
+
+	io.WriteString(w, "OK")
+}
+
 func main() {
+
+	http.HandleFunc("/containers", listContainers)
+	http.ListenAndServe(":8000", nil)
 
 	// Init the client
 	docker, _ := dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
@@ -75,18 +107,3 @@ func main() {
 
 	// connect to docker daemon events and send needed requests to the MC Server
 }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
