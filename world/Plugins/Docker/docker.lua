@@ -61,7 +61,7 @@ function startContainer(id,name,imageRepo,imageTag)
 		then
 			table.insert(Containers, container)
 		else
-			Containers[i] = container
+			Containers[index] = container
 	end
 
 end
@@ -168,6 +168,7 @@ function Initialize(Plugin)
 	-- Hooks
 
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
 
 	
 	-- PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
@@ -191,8 +192,14 @@ function WorldStarted()
 		do
 			cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
 		end
-	end
+	end	
+end
 
+function PlayerJoined(Player)
+	-- refresh containers
+	LOG("player joined")
+	r = os.execute("/go/src/goproxy/goproxy containers")
+	LOG("executed: /go/src/goproxy/goproxy containers -> " .. tostring(r))
 end
 
 
@@ -210,6 +217,7 @@ function HandleRequest_Docker(Request)
 		end
 
 		-- receiving informations about one container
+		
 		if action == "containerInfos"
 		then
 			name = Request.PostParams["name"]
@@ -218,10 +226,7 @@ function HandleRequest_Docker(Request)
 			id = Request.PostParams["id"]
 			running = Request.PostParams["running"]
 
-			LOG("containerInfos running: " .. running)
-
 			startContainer(id,name,imageRepo,imageTag)
-
 		end
 
 		if action == "startContainer"

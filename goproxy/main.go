@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -61,56 +62,74 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 func listContainers(w http.ResponseWriter, r *http.Request) {
 
-	containers, err := DOCKER_CLIENT.ListContainers(false, false, "")
-
-	if err != nil {
-		io.WriteString(w, err.Error())
-		return
-	}
-
-	images, err := DOCKER_CLIENT.ListImages()
-
-	if err != nil {
-		io.WriteString(w, err.Error())
-		return
-	}
-
-	client := &http.Client{}
-
-	for i := 0; i < len(containers); i++ {
-
-		id := containers[i].Id
-		info, _ := DOCKER_CLIENT.InspectContainer(id)
-		name := info.Name[1:]
-		//image := strings.Split(info.Image, ":")
-		imageRepo := ""
-		imageTag := ""
-
-		for _, image := range images {
-			if image.Id == info.Image {
-				if len(image.RepoTags) > 0 {
-					imageRepo, imageTag = splitRepoAndTag(image.RepoTags[0])
-				}
-				break
-			}
-		}
-
-		data := url.Values{
-			"action":    {"containerInfos"},
-			"id":        {id},
-			"name":      {name},
-			"imageRepo": {imageRepo},
-			"imageTag":  {imageTag},
-			"running":   {strconv.FormatBool(info.State.Running)},
-		}
-
-		MCServerRequest(data, client)
-	}
-
+	// answer right away to avoid dead locks in LUA
 	io.WriteString(w, "OK")
+
+	go func() {
+		containers, err := DOCKER_CLIENT.ListContainers(false, false, "")
+
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+
+		images, err := DOCKER_CLIENT.ListImages()
+
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+
+		client := &http.Client{}
+
+		for i := 0; i < len(containers); i++ {
+
+			id := containers[i].Id
+			info, _ := DOCKER_CLIENT.InspectContainer(id)
+			name := info.Name[1:]
+			//image := strings.Split(info.Image, ":")
+			imageRepo := ""
+			imageTag := ""
+
+			for _, image := range images {
+				if image.Id == info.Image {
+					if len(image.RepoTags) > 0 {
+						imageRepo, imageTag = splitRepoAndTag(image.RepoTags[0])
+					}
+					break
+				}
+			}
+
+			data := url.Values{
+				"action":    {"containerInfos"},
+				"id":        {id},
+				"name":      {name},
+				"imageRepo": {imageRepo},
+				"imageTag":  {imageTag},
+				"running":   {strconv.FormatBool(info.State.Running)},
+			}
+
+			MCServerRequest(data, client)
+		}
+	}()
 }
 
 func main() {
+
+	// If there's an argument
+	// It will be considered as a path for an HTTP GET request
+	// That's a way to communicate with goproxy daemon
+	if len(os.Args) > 1 {
+		reqPath := "http://127.0.0.1:8000/" + os.Args[1]
+
+		resp, err := http.Get(reqPath)
+		if err != nil {
+			fmt.Println("Error on request:", reqPath, "ERROR:", err.Error())
+		} else {
+			fmt.Println("Request sent", reqPath, "StatusCode:", resp.StatusCode)
+		}
+		return
+	}
 
 	// Init the client
 	DOCKER_CLIENT, _ = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
