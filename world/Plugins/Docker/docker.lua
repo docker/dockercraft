@@ -28,20 +28,28 @@ function startContainer(id,name,imageRepo,imageTag)
 
 	x = 0
 
+	index = -1
+
 	for i=0, table.getn(Containers)
 	do
-		if Containers[i] == nil
+		-- use first empty location
+		if index == -1 and Containers[i] == nil
 		then
-			container = DContainer
-			container:init(x,CONTAINER_START_Z)
-			container:setInfos(id,name,imageRepo,imageTag)
-			container:display()
-
-			Containers[i] = container
-			return
+			index = i
+		else 
+			if Containers[i].id == id
+			then
+				LOG("container already started")
+				return 
+			end
 		end
 
-		x = x + CONTAINER_OFFSET_X
+		-- increment position only location
+		-- has not already been reserved
+		if index == -1
+		then
+			x = x + CONTAINER_OFFSET_X
+		end
 	end
 
 	container = DContainer
@@ -49,7 +57,12 @@ function startContainer(id,name,imageRepo,imageTag)
 	container:setInfos(id,name,imageRepo,imageTag)
 	container:display()
 
-	table.insert(Containers, container)
+	if index == -1
+		then
+			table.insert(Containers, container)
+		else
+			Containers[i] = container
+	end
 
 end
 
@@ -196,6 +209,21 @@ function HandleRequest_Docker(Request)
 			WorldStarted()
 		end
 
+		-- receiving informations about one container
+		if action == "containerInfos"
+		then
+			name = Request.PostParams["name"]
+			imageRepo = Request.PostParams["imageRepo"]
+			imageTag = Request.PostParams["imageTag"]
+			id = Request.PostParams["id"]
+			running = Request.PostParams["running"]
+
+			LOG("containerInfos running: " .. running)
+
+			startContainer(id,name,imageRepo,imageTag)
+
+		end
+
 		if action == "startContainer"
 		then
 			name = Request.PostParams["name"]
@@ -203,7 +231,6 @@ function HandleRequest_Docker(Request)
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			
 			startContainer(id,name,imageRepo,imageTag)
 		end
 
@@ -217,7 +244,6 @@ function HandleRequest_Docker(Request)
 	content = content .. "[/dockerclient]"
 
 	return content
-
 end
 
 

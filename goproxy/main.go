@@ -96,13 +96,12 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := url.Values{
-			"action": {"startContainer"},
-			//"action":    {"containerInfos"},
+			"action":    {"containerInfos"},
 			"id":        {id},
 			"name":      {name},
 			"imageRepo": {imageRepo},
 			"imageTag":  {imageTag},
-			"status":    {strconv.FormatBool(info.State.Running)},
+			"running":   {strconv.FormatBool(info.State.Running)},
 		}
 
 		MCServerRequest(data, client)
