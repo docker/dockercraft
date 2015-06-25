@@ -71,7 +71,6 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageTag":  {tag}}
 
 		// Monitor stats
-		fmt.Println("monitoring container", id)
 		DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
 
 		MCServerRequest(data, client)
@@ -194,11 +193,13 @@ func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...in
 
 	client := &http.Client{}
 
+	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
+
 	data := url.Values{
 		"action": {"stats"},
 		"id":     {id},
 		"cpu":    {"** %"},
-		"ram":    {string(stat.MemoryStats.Usage)}}
+		"ram":    {strconv.FormatFloat(memPercent, 'f', 2, 64) + "%"}}
 
 	MCServerRequest(data, client)
 }
@@ -252,6 +253,11 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 			}
 
 			MCServerRequest(data, client)
+
+			if info.State.Running {
+				// Monitor stats
+				DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
+			}
 		}
 	}()
 }

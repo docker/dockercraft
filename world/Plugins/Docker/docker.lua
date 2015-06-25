@@ -397,8 +397,6 @@ function HandleRequest_Docker(Request)
 			cpu = Request.PostParams["cpu"]
 			ram = Request.PostParams["ram"]
 
-			LOG("received stats for " .. id .. ": " .. cpu .. " - " .. ram)
-
 			updateStats(id,ram,cpu)
 		end
 
