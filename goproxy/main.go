@@ -195,10 +195,20 @@ func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...in
 
 	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
 
+	var cpuPercent float64 = 0.0
+
+	if preCPUStats, exists := previousCPUStats[id]; exists {
+
+		cpuPercent = calculateCPUPercent(preCPUStats, &stat.CpuStats)
+
+	}
+
+	previousCPUStats[id] = &CPUStats{TotalUsage: stat.CpuStats.CpuUsage.TotalUsage, SystemUsage: stat.CpuStats.SystemUsage}
+
 	data := url.Values{
 		"action": {"stats"},
 		"id":     {id},
-		"cpu":    {"** %"},
+		"cpu":    {strconv.FormatFloat(cpuPercent, 'f', 2, 64) + "%"},
 		"ram":    {strconv.FormatFloat(memPercent, 'f', 2, 64) + "%"}}
 
 	MCServerRequest(data, client)
@@ -262,7 +272,31 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 	}()
 }
 
+func calculateCPUPercent(previousCPUStats *CPUStats, newCPUStats *dockerclient.CpuStats) float64 {
+	var (
+		cpuPercent = 0.0
+		// calculate the change for the cpu usage of the container in between readings
+		cpuDelta = float64(newCPUStats.CpuUsage.TotalUsage - previousCPUStats.TotalUsage)
+		// calculate the change for the entire system between readings
+		systemDelta = float64(newCPUStats.SystemUsage - previousCPUStats.SystemUsage)
+	)
+
+	if systemDelta > 0.0 && cpuDelta > 0.0 {
+		cpuPercent = (cpuDelta / systemDelta) * float64(len(newCPUStats.CpuUsage.PercpuUsage)) * 100.0
+	}
+	return cpuPercent
+}
+
+type CPUStats struct {
+	TotalUsage  uint64
+	SystemUsage uint64
+}
+
+var previousCPUStats map[string]*CPUStats
+
 func main() {
+
+	previousCPUStats = make(map[string]*CPUStats)
 
 	// If there's an argument
 	// It will be considered as a path for an HTTP GET request
