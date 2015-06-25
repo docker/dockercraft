@@ -258,6 +258,16 @@ function WorldStarted()
 end
 
 function PlayerJoined(Player)
+
+	-- make all players admin
+
+	playerUUID = Player:GetUUID()
+	LOG("player UUID: " .. playerUUID)
+	playerName = cRankManager:GetPlayerName(playerUUID)
+	LOG("player name: " .. playerName)
+	cRankManager:SetPlayerRank(playerUUID,playerName,"Admin")
+
+
 	-- refresh containers
 	LOG("player joined")
 	r = os.execute("/go/src/goproxy/goproxy containers")
