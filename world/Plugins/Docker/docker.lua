@@ -97,24 +97,6 @@ function DContainer:display(running)
 	then
 		self.displayed = true
 
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 1,self.z - 1,E_BLOCK_SIGN_POST,8)
-
-		sign = {}
-		sign.x = self.x
-		sign.y = Ground + 1
-		sign.z = self.z - 1
-		sign.line1 = self.id
-		sign.line2 = self.name
-		sign.line3 = self.imageRepo
-		sign.line4 = self.imageTag
-
-		LOG("schedule update sign: x:" .. tostring(sign.x) .. ", " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
-
-
-		table.insert(SignsToUpdate,sign)
-
-		cRoot:Get():GetDefaultWorld():ScheduleTask(20,updateSigns)
-
 		
 		for px=self.x, self.x+3
 		do
@@ -155,6 +137,25 @@ function DContainer:display(running)
 				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
 			end	
 		end
+
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+
+		sign = {}
+		sign.x = self.x+3
+		sign.y = Ground + 2
+		sign.z = self.z - 1
+		sign.line1 = self.id
+		sign.line2 = self.name
+		sign.line3 = self.imageRepo
+		sign.line4 = self.imageTag
+
+		LOG("schedule update sign: x:" .. tostring(sign.x) .. ", " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
+
+		table.insert(SignsToUpdate,sign)
+
+		cRoot:Get():GetDefaultWorld():ScheduleTask(10,updateSigns)
+
 	end
 end
 
