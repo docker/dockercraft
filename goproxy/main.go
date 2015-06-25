@@ -98,10 +98,99 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 	case "restart":
 		fmt.Println("restart event")
+		//  same as start event
+		repo, tag := splitRepoAndTag(event.From)
+
+		containerName := "<name>"
+
+		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+
+		if err != nil {
+			fmt.Print("InspectContainer error:", err.Error())
+		} else {
+			containerName = containerInfo.Name
+		}
+
+		data := url.Values{
+			"action":    {"startContainer"},
+			"id":        {id},
+			"name":      {containerName},
+			"imageRepo": {repo},
+			"imageTag":  {tag}}
+
+		MCServerRequest(data, client)
+
 	case "kill":
 		fmt.Println("kill event")
+		// same as stop event
+		repo, tag := splitRepoAndTag(event.From)
+
+		containerName := "<name>"
+
+		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+
+		if err != nil {
+			fmt.Print("InspectContainer error:", err.Error())
+		} else {
+			containerName = containerInfo.Name
+		}
+
+		data := url.Values{
+			"action":    {"stopContainer"},
+			"id":        {id},
+			"name":      {containerName},
+			"imageRepo": {repo},
+			"imageTag":  {tag}}
+
+		MCServerRequest(data, client)
+
 	case "die":
 		fmt.Println("die event")
+		// same as stop event
+		repo, tag := splitRepoAndTag(event.From)
+
+		containerName := "<name>"
+
+		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+
+		if err != nil {
+			fmt.Print("InspectContainer error:", err.Error())
+		} else {
+			containerName = containerInfo.Name
+		}
+
+		data := url.Values{
+			"action":    {"stopContainer"},
+			"id":        {id},
+			"name":      {containerName},
+			"imageRepo": {repo},
+			"imageTag":  {tag}}
+
+		MCServerRequest(data, client)
+
+	case "destroy":
+		fmt.Println("destroy event")
+
+		repo, tag := splitRepoAndTag(event.From)
+
+		containerName := "<name>"
+
+		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+
+		if err != nil {
+			fmt.Print("InspectContainer error:", err.Error())
+		} else {
+			containerName = containerInfo.Name
+		}
+
+		data := url.Values{
+			"action":    {"destroyContainer"},
+			"id":        {id},
+			"name":      {containerName},
+			"imageRepo": {repo},
+			"imageTag":  {tag}}
+
+		MCServerRequest(data, client)
 	}
 }
 

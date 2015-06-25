@@ -23,6 +23,23 @@ function updateSigns(World)
 	SignsToUpdate = {}
 end
 
+
+function destroyContainer(id,name,imageRepo,imageTag,running)
+
+	for i=1, table.getn(Containers)
+	do
+		-- use first empty location
+		if Containers[i] ~= nil and Containers[i].id == id
+		then
+			LOG("destroyContainer: found!")
+			Containers[i]:destroy()
+			Containers[i] = nil
+			break
+		end
+	end
+
+end
+
 function addContainer(id,name,imageRepo,imageTag,running)
 
 	x = 0
@@ -90,6 +107,7 @@ function newDContainer()
 	dc.init = DContainer.init
 	dc.setInfos = DContainer.setInfos
 	dc.display = DContainer.display
+	dc.destroy = DContainer.destroy
 	return dc
 end
 
@@ -105,6 +123,22 @@ function DContainer:setInfos(id,name,imageRepo,imageTag)
 	self.imageRepo = imageRepo
 	self.imageTag = imageTag
 end
+
+
+function DContainer:destroy(running)
+
+	for py = Ground+1, Ground+4
+	do
+		for px=self.x-1, self.x+4
+		do
+			for pz=self.z-1, self.z+5
+			do
+				cRoot:Get():GetDefaultWorld():DigBlock(px,py,pz)
+			end	
+		end
+	end
+end
+
 
 function DContainer:display(running)
 
@@ -316,6 +350,17 @@ function HandleRequest_Docker(Request)
 
 			addContainer(id,name,imageRepo,imageTag,false)
 		end
+
+		if action == "destroyContainer"
+		then
+			name = Request.PostParams["name"]
+			imageRepo = Request.PostParams["imageRepo"]
+			imageTag = Request.PostParams["imageTag"]
+			id = Request.PostParams["id"]
+
+			destroyContainer(id,name,imageRepo,imageTag,false)
+		end
+
 
 		content = content .. "{action:\"" .. action .. "\"}"
 
