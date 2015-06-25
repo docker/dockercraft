@@ -2,7 +2,6 @@
 
 
 Ground = 63
-DContainer = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag=""}
 
 CONTAINER_START_X = 0
 CONTAINER_OFFSET_X = -6
@@ -32,8 +31,11 @@ function addContainer(id,name,imageRepo,imageTag,running)
 
 	-- first pass, to see if container
 	-- already displayed (maybe with another state)
-	for i=0, table.getn(Containers)
+	for i=1, table.getn(Containers)
 	do
+		LOG("Containers[" .. tostring(i) .."].id" .. " = " .. Containers[i].id)
+		LOG("id = " .. id)
+
 		-- use first empty location
 		if Containers[i] ~= nil and Containers[i].id == id
 		then
@@ -51,11 +53,12 @@ function addContainer(id,name,imageRepo,imageTag,running)
 	then
 		x = 0
 
-		for i=0, table.getn(Containers)
+		for i=1, table.getn(Containers)
 		do
 			-- use first empty location
 			if Containers[i] == nil
 			then
+				LOG("Found empty location: Containers[" .. tostring(i) .. "]")
 				index = i
 				break
 			end
@@ -64,7 +67,7 @@ function addContainer(id,name,imageRepo,imageTag,running)
 		end
 	end
 
-	container = DContainer
+	container = newDContainer()
 	container:init(x,CONTAINER_START_Z)
 	container:setInfos(id,name,imageRepo,imageTag)
 	container:display(running)
@@ -72,12 +75,23 @@ function addContainer(id,name,imageRepo,imageTag,running)
 	if index == -1
 		then
 			table.insert(Containers, container)
+			LOG("*** Containers insert. new size: " .. tostring(table.getn(Containers)))
 		else
 			Containers[index] = container
+			LOG("*** Containers index: " .. tostring(index))
 	end
 end
 
 
+DContainer = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag=""}
+
+function newDContainer()
+	dc = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag=""}
+	dc.init = DContainer.init
+	dc.setInfos = DContainer.setInfos
+	dc.display = DContainer.display
+	return dc
+end
 
 function DContainer:init(x,z)
 	self.x = x
@@ -281,6 +295,16 @@ function HandleRequest_Docker(Request)
 			id = Request.PostParams["id"]
 
 			addContainer(id,name,imageRepo,imageTag,true)
+		end
+
+		if action == "createContainer"
+		then
+			name = Request.PostParams["name"]
+			imageRepo = Request.PostParams["imageRepo"]
+			imageTag = Request.PostParams["imageTag"]
+			id = Request.PostParams["id"]
+
+			addContainer(id,name,imageRepo,imageTag,false)
 		end
 
 		if action == "stopContainer"

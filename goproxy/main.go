@@ -26,6 +26,28 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 	switch event.Status {
 	case "create":
 		fmt.Println("create event")
+
+		repo, tag := splitRepoAndTag(event.From)
+
+		containerName := "<name>"
+
+		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+
+		if err != nil {
+			fmt.Print("InspectContainer error:", err.Error())
+		} else {
+			containerName = containerInfo.Name
+		}
+
+		data := url.Values{
+			"action":    {"createContainer"},
+			"id":        {id},
+			"name":      {containerName},
+			"imageRepo": {repo},
+			"imageTag":  {tag}}
+
+		MCServerRequest(data, client)
+
 	case "start":
 		fmt.Println("start event")
 
