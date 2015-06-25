@@ -10,6 +10,25 @@ CONTAINER_START_Z = 4
 Containers = {}
 SignsToUpdate = {}
 
+
+function updateSign(x,y,z,line1,line2,line3,line4)
+	
+	sign = {}
+	sign.x = x
+	sign.y = y
+	sign.z = z
+	sign.line1 = line1
+	sign.line2 = line2
+	sign.line3 = line3
+	sign.line4 = line4
+
+	table.insert(SignsToUpdate,sign)
+
+	cRoot:Get():GetDefaultWorld():ScheduleTask(10,updateSigns)
+
+end
+
+
 function updateSigns(World)
 
 	for i=1,table.getn(SignsToUpdate)
@@ -23,6 +42,20 @@ function updateSigns(World)
 	SignsToUpdate = {}
 end
 
+function updateStats(id,mem,cpu)
+
+	for i=1, table.getn(Containers)
+	do
+		-- use first empty location
+		if Containers[i] ~= nil and Containers[i].id == id
+		then
+			Containers[i]:updateMemSign(mem)
+			Containers[i]:updateCPUSign(cpu)
+			break
+		end
+	end
+
+end
 
 function destroyContainer(id)
 
@@ -31,7 +64,6 @@ function destroyContainer(id)
 		-- use first empty location
 		if Containers[i] ~= nil and Containers[i].id == id
 		then
-			LOG("destroyContainer: found!")
 			Containers[i]:destroy()
 			Containers[i] = nil
 			break
@@ -103,6 +135,8 @@ function newDContainer()
 	dc.setInfos = DContainer.setInfos
 	dc.display = DContainer.display
 	dc.destroy = DContainer.destroy
+	dc.updateMemSign = DContainer.updateMemSign
+	dc.updateCPUSign = DContainer.updateCPUSign
 	return dc
 end
 
@@ -192,28 +226,27 @@ function DContainer:display(running)
 			end	
 		end
 
-
 		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+		updateSign(self.x+3,Ground + 2,self.z - 1,self.id,self.name,self.imageRepo,self.imageTag)
 
-		sign = {}
-		sign.x = self.x+3
-		sign.y = Ground + 2
-		sign.z = self.z - 1
-		sign.line1 = self.id
-		sign.line2 = self.name
-		sign.line3 = self.imageRepo
-		sign.line4 = self.imageTag
+		-- Mem sign
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+		self.updateMemSign("")
 
-		-- LOG("schedule update sign: x:" .. tostring(sign.x) .. ", " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
-
-		table.insert(SignsToUpdate,sign)
-
-		cRoot:Get():GetDefaultWorld():ScheduleTask(10,updateSigns)
-
+		-- CPU sign
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+		self.updateCPUSign("")
 	end
 end
 
 
+function DContainer:updateMemSign(s)
+	updateSign(self.x,Ground + 2,self.z - 1,"Mem usage","",s,"")
+end
+
+function DContainer:updateCPUSign(s)
+	updateSign(self.x+1,Ground + 2,self.z - 1,"CPU usage","",s,"")
+end
 
 
 
@@ -356,6 +389,15 @@ function HandleRequest_Docker(Request)
 			id = Request.PostParams["id"]
 
 			destroyContainer(id)
+		end
+
+		if action == "stats"
+		then
+			id = Request.PostParams["id"]
+			cpu = Request.PostParams["cpu"]
+			ram = Request.PostParams["ram"]
+
+			updateStats(id,ram,cpu)
 		end
 
 
