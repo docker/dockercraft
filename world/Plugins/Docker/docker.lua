@@ -16,7 +16,7 @@ function updateSigns(World)
 	do					
 		sign = SignsToUpdate[i]
 
-		LOG("update sign: " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
+		-- LOG("update sign: " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
 
 		cRoot:Get():GetDefaultWorld():SetSignLines(sign.x,sign.y,sign.z,sign.line1,sign.line2,sign.line3,sign.line4)
 	end
@@ -24,7 +24,7 @@ function updateSigns(World)
 end
 
 
-function destroyContainer(id,name,imageRepo,imageTag,running)
+function destroyContainer(id)
 
 	for i=1, table.getn(Containers)
 	do
@@ -50,9 +50,6 @@ function addContainer(id,name,imageRepo,imageTag,running)
 	-- already displayed (maybe with another state)
 	for i=1, table.getn(Containers)
 	do
-		LOG("Containers[" .. tostring(i) .."].id" .. " = " .. Containers[i].id)
-		LOG("id = " .. id)
-
 		-- use first empty location
 		if Containers[i] ~= nil and Containers[i].id == id
 		then
@@ -92,10 +89,8 @@ function addContainer(id,name,imageRepo,imageTag,running)
 	if index == -1
 		then
 			table.insert(Containers, container)
-			LOG("*** Containers insert. new size: " .. tostring(table.getn(Containers)))
 		else
 			Containers[index] = container
-			LOG("*** Containers index: " .. tostring(index))
 	end
 end
 
@@ -209,7 +204,7 @@ function DContainer:display(running)
 		sign.line3 = self.imageRepo
 		sign.line4 = self.imageTag
 
-		LOG("schedule update sign: x:" .. tostring(sign.x) .. ", " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
+		-- LOG("schedule update sign: x:" .. tostring(sign.x) .. ", " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
 
 		table.insert(SignsToUpdate,sign)
 
@@ -237,6 +232,9 @@ function Initialize(Plugin)
 
 	Plugin:AddWebTab("Docker",HandleRequest_Docker)
 
+	-- make all players admin
+	cRankManager:SetDefaultRank("Admin")
+
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
 	return true
@@ -244,7 +242,6 @@ end
 
 
 function WorldStarted()
-
 	y = Ground
 	for x=-40,40
 	do
@@ -256,16 +253,6 @@ function WorldStarted()
 end
 
 function PlayerJoined(Player)
-
-	-- make all players admin
-
-	playerUUID = Player:GetUUID()
-	LOG("player UUID: " .. playerUUID)
-	playerName = cRankManager:GetPlayerName(playerUUID)
-	LOG("player name: " .. playerName)
-	cRankManager:SetPlayerRank(playerUUID,playerName,"Admin")
-
-
 	-- refresh containers
 	LOG("player joined")
 	r = os.execute("/go/src/goproxy/goproxy containers")
@@ -329,7 +316,7 @@ function HandleRequest_Docker(Request)
 			id = Request.PostParams["id"]
 			running = Request.PostParams["running"]
 
-			LOG("containerInfos running: " .. running)
+			-- LOG("containerInfos running: " .. running)
 
 			addContainer(id,name,imageRepo,imageTag,running == "true")
 		end
@@ -366,12 +353,9 @@ function HandleRequest_Docker(Request)
 
 		if action == "destroyContainer"
 		then
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			destroyContainer(id,name,imageRepo,imageTag,false)
+			destroyContainer(id)
 		end
 
 

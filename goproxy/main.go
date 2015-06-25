@@ -171,24 +171,10 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 	case "destroy":
 		fmt.Println("destroy event")
 
-		repo, tag := splitRepoAndTag(event.From)
-
-		containerName := "<name>"
-
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
-		if err != nil {
-			fmt.Print("InspectContainer error:", err.Error())
-		} else {
-			containerName = containerInfo.Name
-		}
-
 		data := url.Values{
-			"action":    {"destroyContainer"},
-			"id":        {id},
-			"name":      {containerName},
-			"imageRepo": {repo},
-			"imageTag":  {tag}}
+			"action": {"destroyContainer"},
+			"id":     {id},
+		}
 
 		MCServerRequest(data, client)
 	}
