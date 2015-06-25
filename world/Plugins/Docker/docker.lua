@@ -231,11 +231,11 @@ function DContainer:display(running)
 
 		-- Mem sign
 		cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-		self.updateMemSign("")
+		self:updateMemSign("")
 
 		-- CPU sign
 		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-		self.updateCPUSign("")
+		self:updateCPUSign("")
 	end
 end
 
@@ -396,6 +396,8 @@ function HandleRequest_Docker(Request)
 			id = Request.PostParams["id"]
 			cpu = Request.PostParams["cpu"]
 			ram = Request.PostParams["ram"]
+
+			LOG("received stats for " .. id .. ": " .. cpu .. " - " .. ram)
 
 			updateStats(id,ram,cpu)
 		end
