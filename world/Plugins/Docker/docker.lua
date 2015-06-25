@@ -30,25 +30,37 @@ function addContainer(id,name,imageRepo,imageTag,running)
 
 	index = -1
 
+	-- first pass, to see if container
+	-- already displayed (maybe with another state)
 	for i=0, table.getn(Containers)
 	do
 		-- use first empty location
-		if index == -1 and Containers[i] == nil
+		if Containers[i] ~= nil and Containers[i].id == id
 		then
+			LOG("container already displayed")
 			index = i
-		else 
-			if Containers[i].id == id
-			then
-				LOG("container already started")
-				return 
-			end
+			break
 		end
 
-		-- increment position only location
-		-- has not already been reserved
-		if index == -1
-		then
-			x = x + CONTAINER_OFFSET_X
+		x = x + CONTAINER_OFFSET_X		
+	end
+
+	-- if container not already displayed
+	-- see if there's an empty location
+	if index == -1
+	then
+		x = 0
+
+		for i=0, table.getn(Containers)
+		do
+			-- use first empty location
+			if Containers[i] == nil
+			then
+				index = i
+				break
+			end
+
+			x = x + CONTAINER_OFFSET_X			
 		end
 	end
 
@@ -63,7 +75,6 @@ function addContainer(id,name,imageRepo,imageTag,running)
 		else
 			Containers[index] = container
 	end
-
 end
 
 
@@ -171,6 +182,7 @@ function Initialize(Plugin)
 
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
+	cPluginManager:AddHook(cPluginManager.HOOK_EXECUTE_COMMAND, ExecuteCommand);
 
 	
 	-- PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
@@ -203,6 +215,34 @@ function PlayerJoined(Player)
 	r = os.execute("/go/src/goproxy/goproxy containers")
 	LOG("executed: /go/src/goproxy/goproxy containers -> " .. tostring(r))
 end
+
+
+function ExecuteCommand(Player, CommandSplit, EntireCommand)
+	-- refresh containers
+
+	LOG("EntireCommand: " .. EntireCommand)
+
+	if table.getn(CommandSplit) > 0
+	then
+
+		LOG("CommandSplit[0]: " .. CommandSplit[1])
+
+		if CommandSplit[1] == "/docker"
+		then
+			if table.getn(CommandSplit) > 1
+			then
+				if CommandSplit[2] == "pull" or CommandSplit[2] == "create" or CommandSplit[2] == "run" or CommandSplit[2] == "stop" or CommandSplit[2] == "rm" or CommandSplit[2] == "rmi" or CommandSplit[2] == "start"
+				then
+					command = string.sub(EntireCommand, 2, -1)
+
+					r = os.execute(command)
+					LOG("executed: " .. command .. " -> " .. tostring(r))
+				end
+			end
+		end
+	end
+end
+
 
 
 function HandleRequest_Docker(Request)
@@ -241,6 +281,16 @@ function HandleRequest_Docker(Request)
 			id = Request.PostParams["id"]
 
 			addContainer(id,name,imageRepo,imageTag,true)
+		end
+
+		if action == "stopContainer"
+		then
+			name = Request.PostParams["name"]
+			imageRepo = Request.PostParams["imageRepo"]
+			imageTag = Request.PostParams["imageTag"]
+			id = Request.PostParams["id"]
+
+			addContainer(id,name,imageRepo,imageTag,false)
 		end
 
 		content = content .. "{action:\"" .. action .. "\"}"

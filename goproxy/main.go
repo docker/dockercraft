@@ -27,6 +27,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 	case "create":
 		fmt.Println("create event")
 	case "start":
+		fmt.Println("start event")
 
 		repo, tag := splitRepoAndTag(event.From)
 
@@ -51,6 +52,28 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 	case "stop":
 		fmt.Println("stop event")
+
+		repo, tag := splitRepoAndTag(event.From)
+
+		containerName := "<name>"
+
+		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+
+		if err != nil {
+			fmt.Print("InspectContainer error:", err.Error())
+		} else {
+			containerName = containerInfo.Name
+		}
+
+		data := url.Values{
+			"action":    {"stopContainer"},
+			"id":        {id},
+			"name":      {containerName},
+			"imageRepo": {repo},
+			"imageTag":  {tag}}
+
+		MCServerRequest(data, client)
+
 	case "restart":
 		fmt.Println("restart event")
 	case "kill":
