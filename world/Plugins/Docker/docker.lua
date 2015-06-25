@@ -24,7 +24,7 @@ function updateSigns(World)
 	SignsToUpdate = {}
 end
 
-function startContainer(id,name,imageRepo,imageTag)
+function addContainer(id,name,imageRepo,imageTag,running)
 
 	x = 0
 
@@ -55,7 +55,7 @@ function startContainer(id,name,imageRepo,imageTag)
 	container = DContainer
 	container:init(x,CONTAINER_START_Z)
 	container:setInfos(id,name,imageRepo,imageTag)
-	container:display()
+	container:display(running)
 
 	if index == -1
 		then
@@ -81,7 +81,18 @@ function DContainer:setInfos(id,name,imageRepo,imageTag)
 	self.imageTag = imageTag
 end
 
-function DContainer:display()
+function DContainer:display(running)
+
+	metaPrimaryColor = E_META_WOOL_LIGHTBLUE
+	metaSecondaryColor = E_META_WOOL_BLUE
+
+	if running == false 
+	then
+		metaPrimaryColor = E_META_WOOL_ORANGE
+		metaSecondaryColor = E_META_WOOL_RED
+	end
+
+
 	if self.displayed == false 
 	then
 		self.displayed = true
@@ -104,54 +115,44 @@ function DContainer:display()
 
 		cRoot:Get():GetDefaultWorld():ScheduleTask(20,updateSigns)
 
-		-- 	function(World)
-		-- 		for i=1,table.getn(SignsToUpdate) do
-					
-		-- 			local sign = SignsToUpdate[i]
-
-		-- 			LOG("update sign: " .. sign.line1)
-
-		-- 			cRoot:Get():GetDefaultWorld():SetSignLines(self.x,Ground + 1,self.z - 1,sign.line1,sign.line2,sign.line3,sign.line4)
-		-- 		end
-		-- 		SignsToUpdate = {}
-		-- 	end
-		-- )
 		
 		for px=self.x, self.x+3
 		do
 			for pz=self.z, self.z+4
 			do
-				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 1,pz,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
 			end	
 		end
 
 		for py = Ground+2, Ground+3
 		do
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 			
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+1,E_BLOCK_WOOL,E_META_WOOL_BLUE)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+1,E_BLOCK_WOOL,E_META_WOOL_BLUE)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
 
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+2,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+2,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
 
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+3,E_BLOCK_WOOL,E_META_WOOL_BLUE)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+3,E_BLOCK_WOOL,E_META_WOOL_BLUE)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
 
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+4,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+4,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 		end
 
 		for px=self.x, self.x+3
 		do
 			for pz=self.z, self.z+4
 			do
-				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 4,pz,E_BLOCK_WOOL,E_META_WOOL_LIGHTBLUE)
+				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
 			end	
 		end
 	end
@@ -226,7 +227,9 @@ function HandleRequest_Docker(Request)
 			id = Request.PostParams["id"]
 			running = Request.PostParams["running"]
 
-			startContainer(id,name,imageRepo,imageTag)
+			LOG("containerInfos running: " .. running)
+
+			addContainer(id,name,imageRepo,imageTag,running == "true")
 		end
 
 		if action == "startContainer"
@@ -236,7 +239,7 @@ function HandleRequest_Docker(Request)
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			startContainer(id,name,imageRepo,imageTag)
+			addContainer(id,name,imageRepo,imageTag,true)
 		end
 
 		content = content .. "{action:\"" .. action .. "\"}"

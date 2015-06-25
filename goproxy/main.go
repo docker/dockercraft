@@ -66,7 +66,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "OK")
 
 	go func() {
-		containers, err := DOCKER_CLIENT.ListContainers(false, false, "")
+		containers, err := DOCKER_CLIENT.ListContainers(true, false, "")
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -87,7 +87,6 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 			id := containers[i].Id
 			info, _ := DOCKER_CLIENT.InspectContainer(id)
 			name := info.Name[1:]
-			//image := strings.Split(info.Image, ":")
 			imageRepo := ""
 			imageTag := ""
 
