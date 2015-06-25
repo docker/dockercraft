@@ -70,6 +70,10 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageRepo": {repo},
 			"imageTag":  {tag}}
 
+		// Monitor stats
+		fmt.Println("monitoring container", id)
+		DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
+
 		MCServerRequest(data, client)
 
 	case "stop":
@@ -178,6 +182,25 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 		MCServerRequest(data, client)
 	}
+}
+
+func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...interface{}) {
+
+	//fmt.Println("STATS", id, stat)
+
+	// fmt.Println("---")
+	// fmt.Println("cpu :", float64(stat.CpuStats.CpuUsage.TotalUsage)/float64(stat.CpuStats.SystemUsage))
+	// fmt.Println("ram :", stat.MemoryStats.Usage)
+
+	client := &http.Client{}
+
+	data := url.Values{
+		"action": {"stats"},
+		"id":     {id},
+		"cpu":    {"** %"},
+		"ram":    {string(stat.MemoryStats.Usage)}}
+
+	MCServerRequest(data, client)
 }
 
 func listContainers(w http.ResponseWriter, r *http.Request) {
