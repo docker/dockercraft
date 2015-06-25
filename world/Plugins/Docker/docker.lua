@@ -230,12 +230,10 @@ function Initialize(Plugin)
 
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
-	cPluginManager:AddHook(cPluginManager.HOOK_EXECUTE_COMMAND, ExecuteCommand);
-
-	
-	-- PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
 	
 	-- Command Bindings
+
+	cPluginManager.BindCommand("/docker", "*", DockerCommand, " - docker CLI commands")
 
 	Plugin:AddWebTab("Docker",HandleRequest_Docker)
 
@@ -275,30 +273,35 @@ function PlayerJoined(Player)
 end
 
 
-function ExecuteCommand(Player, CommandSplit, EntireCommand)
-	-- refresh containers
+function DockerCommand(Split, Player)
 
-	LOG("EntireCommand: " .. EntireCommand)
-
-	if table.getn(CommandSplit) > 0
+	if table.getn(Split) > 0
 	then
 
-		LOG("CommandSplit[0]: " .. CommandSplit[1])
+		LOG("Split[1]: " .. Split[1])
 
-		if CommandSplit[1] == "/docker"
+		if Split[1] == "/docker"
 		then
-			if table.getn(CommandSplit) > 1
+			if table.getn(Split) > 1
 			then
-				if CommandSplit[2] == "pull" or CommandSplit[2] == "create" or CommandSplit[2] == "run" or CommandSplit[2] == "stop" or CommandSplit[2] == "rm" or CommandSplit[2] == "rmi" or CommandSplit[2] == "start"
+				if Split[2] == "pull" or Split[2] == "create" or Split[2] == "run" or Split[2] == "stop" or Split[2] == "rm" or Split[2] == "rmi" or Split[2] == "start"
 				then
-					command = string.sub(EntireCommand, 2, -1)
+					-- force detach when running a container
+					if Split[2] == "run"
+					then
+						table.insert(Split,3,"-d")
+					end
 
+					EntireCommand = table.concat(Split, " ")
+					command = string.sub(EntireCommand, 2, -1)
 					r = os.execute(command)
 					LOG("executed: " .. command .. " -> " .. tostring(r))
 				end
 			end
 		end
 	end
+
+	return true
 end
 
 
