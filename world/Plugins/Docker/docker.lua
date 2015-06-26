@@ -34,9 +34,6 @@ function updateSigns(World)
 	for i=1,table.getn(SignsToUpdate)
 	do					
 		sign = SignsToUpdate[i]
-
-		-- LOG("update sign: " .. sign.line1 .. ", " .. sign.line2 .. ", " .. sign.line3 .. ", " .. sign.line4)
-
 		cRoot:Get():GetDefaultWorld():SetSignLines(sign.x,sign.y,sign.z,sign.line1,sign.line2,sign.line3,sign.line4)
 	end
 	SignsToUpdate = {}
@@ -54,7 +51,20 @@ function updateStats(id,mem,cpu)
 			break
 		end
 	end
+end
 
+function getStartStopLeverContainer(x,z)
+
+	for i=1, table.getn(Containers)
+	do
+		-- use first empty location
+		if Containers[i] ~= nil and x == Containers[i].x + 1 and z == Containers[i].z + 1
+		then
+			return Containers[i].id
+		end
+	end
+
+	return ""
 end
 
 function destroyContainer(id)
@@ -197,7 +207,8 @@ function DContainer:display(running)
 		for py = Ground+2, Ground+3
 		do
 			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+			-- leave empty space for the door
+			-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 			
 			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
@@ -217,6 +228,28 @@ function DContainer:display(running)
 			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 			cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 		end
+
+		-- torch
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
+
+		-- start / stop lever
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
+		updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","")
+
+
+		if running
+		then
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,1)
+		else
+			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,9)
+		end
+
+
+		-- door
+		-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
+		-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
+
 
 		for px=self.x, self.x+3
 		do
@@ -258,6 +291,7 @@ function Initialize(Plugin)
 
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
 	
 	-- Command Bindings
 
@@ -290,6 +324,31 @@ function PlayerJoined(Player)
 	LOG("player joined")
 	r = os.execute("/go/src/goproxy/goproxy containers")
 	LOG("executed: /go/src/goproxy/goproxy containers -> " .. tostring(r))
+end
+
+function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
+
+	LOG("Using block: " .. tostring(BlockX) .. "," .. tostring(BlockY) .. "," .. tostring(BlockZ) .. " - " .. tostring(BlockType) .. " - " .. tostring(BlockMeta))
+
+	-- lever: 1->OFF 9->ON
+
+	-- lever
+	if BlockType == 69
+	then
+		containerID = getStartStopLeverContainer(BlockX,BlockZ)
+
+		if containerID ~= ""
+		then
+			-- stop
+			if BlockMeta == 1
+			then
+				r = os.execute("docker kill " .. containerID)
+			-- start
+			else 
+				r = os.execute("docker start " .. containerID)
+			end
+		end
+	end
 end
 
 
