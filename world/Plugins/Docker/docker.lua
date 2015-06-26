@@ -3,9 +3,17 @@
 
 Ground = 63
 
-CONTAINER_START_X = 0
+CONTAINER_START_X = -3
 CONTAINER_OFFSET_X = -6
-CONTAINER_START_Z = 4
+CONTAINER_START_Z = 2
+
+-- enough to fit one container
+GROUND_MIN_X = CONTAINER_START_X - 2
+GROUND_MAX_X = CONTAINER_START_X + 5
+GROUND_MIN_Z = -4
+GROUND_MAX_Z = CONTAINER_START_Z + 6
+
+
 
 Containers = {}
 SignsToUpdate = {}
@@ -100,7 +108,7 @@ end
 
 function addContainer(id,name,imageRepo,imageTag,running)
 
-	x = 0
+	x = CONTAINER_START_X
 
 	index = -1
 
@@ -123,7 +131,7 @@ function addContainer(id,name,imageRepo,imageTag,running)
 	-- see if there's an empty location
 	if index == -1
 	then
-		x = 0
+		x = CONTAINER_START_X
 
 		for i=1, table.getn(Containers)
 		do
@@ -142,6 +150,7 @@ function addContainer(id,name,imageRepo,imageTag,running)
 	container = newDContainer()
 	container:init(x,CONTAINER_START_Z)
 	container:setInfos(id,name,imageRepo,imageTag,running)
+	addGroundForContainer(container)
 	container:display(running)
 
 	if index == -1
@@ -208,93 +217,94 @@ function DContainer:display(running)
 	end
 
 
-	if self.displayed == false 
-	then
-		self.displayed = true
+	
+	self.displayed = true
 
-		
-		for px=self.x, self.x+3
+	
+	for px=self.x, self.x+3
+	do
+		for pz=self.z, self.z+4
 		do
-			for pz=self.z, self.z+4
-			do
-				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
-			end	
-		end
-
-		for py = Ground+2, Ground+3
-		do
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-			-- leave empty space for the door
-			-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-			
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
-
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
-
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
-
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-		end
-
-		-- torch
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
-
-		-- start / stop lever
-
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
-		updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","")
-
-
-		if running
-		then
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,1)
-		else
-			cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,9)
-		end
-
-
-		-- remove button
-
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
-		updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","")
-
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
-
-
-		-- door
-		-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
-		-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
-
-
-		for px=self.x, self.x+3
-		do
-			for pz=self.z, self.z+4
-			do
-				cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
-			end	
-		end
-
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-		updateSign(self.x+3,Ground + 2,self.z - 1,self.id,self.name,self.imageRepo,self.imageTag)
-
-		-- Mem sign
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-		self:updateMemSign("")
-
-		-- CPU sign
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-		self:updateCPUSign("")
+			cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
+		end	
 	end
+
+	for py = Ground+2, Ground+3
+	do
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		-- leave empty space for the door
+		-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+	end
+
+	-- torch
+	cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
+
+	-- start / stop lever
+
+	cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
+	updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","")
+
+
+	if running
+	then
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,1)
+	else
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,9)
+	end
+
+
+	-- remove button
+
+	cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
+	updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","")
+
+	cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
+
+
+	-- door
+	-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
+	-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
+
+
+	for px=self.x, self.x+3
+	do
+		for pz=self.z, self.z+4
+		do
+			cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
+		end	
+	end
+
+	cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	updateSign(self.x+3,Ground + 2,self.z - 1,self.id,self.name,self.imageRepo,self.imageTag)
+
+	-- Mem sign
+	cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	self:updateMemSign("")
+
+	-- CPU sign
+	cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	self:updateCPUSign("")
+
+
+
 end
 
 
@@ -335,14 +345,35 @@ end
 
 function WorldStarted()
 	y = Ground
-	for x=-40,40
+
+	-- just enough to fit one container
+	-- then it should be dynamic
+	for x= GROUND_MIN_X, GROUND_MAX_X
 	do
-		for z=-40,40
+		for z=GROUND_MIN_Z,GROUND_MAX_Z
 		do
 			cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
 		end
 	end	
 end
+
+function addGroundForContainer(container)
+
+	if GROUND_MIN_X > container.x - 2
+	then 
+		OLD_GROUND_MIN_X = GROUND_MIN_X
+		GROUND_MIN_X = container.x - 2
+
+		for x= GROUND_MIN_X, OLD_GROUND_MIN_X
+		do
+			for z=GROUND_MIN_Z,GROUND_MAX_Z
+			do
+				cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
+			end
+		end	
+	end
+end
+
 
 function PlayerJoined(Player)
 	-- refresh containers
