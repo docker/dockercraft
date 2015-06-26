@@ -304,6 +304,12 @@ function DContainer:display(running)
 	self:updateCPUSign("")
 
 
+	cRoot:Get():GetDefaultWorld():ScheduleTask(5,
+		function(World)
+			World:WakeUpSimulatorsInArea(self.x-1, self.x+4,Ground, Ground+4,self.z-1, self.z+5)
+		end
+	)
+
 
 end
 
