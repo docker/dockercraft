@@ -304,7 +304,7 @@ function DockerCommand(Split, Player)
 		then
 			if table.getn(Split) > 1
 			then
-				if Split[2] == "pull" or Split[2] == "create" or Split[2] == "run" or Split[2] == "stop" or Split[2] == "rm" or Split[2] == "rmi" or Split[2] == "start"
+				if Split[2] == "pull" or Split[2] == "create" or Split[2] == "run" or Split[2] == "stop" or Split[2] == "rm" or Split[2] == "rmi" or Split[2] == "start" or Split[2] == "kill"
 				then
 					-- force detach when running a container
 					if Split[2] == "run"
