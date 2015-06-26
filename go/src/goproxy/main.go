@@ -215,6 +215,49 @@ func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...in
 	MCServerRequest(data, client)
 }
 
+func execCmd(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("*** execCmd (1)")
+
+	io.WriteString(w, "OK")
+
+	go func() {
+
+		fmt.Println("*** execCmd")
+
+		cmd := r.URL.Query().Get("cmd")
+
+		fmt.Println("*** cmd:", cmd)
+
+		cmd, _ = url.QueryUnescape(cmd)
+
+		fmt.Println("*** cmd (unescape):", cmd)
+
+		arr := strings.Split(cmd, " ")
+
+		fmt.Println("*** arr:", arr)
+
+		if len(arr) > 0 {
+			cmd := exec.Command(arr[0], arr[1:]...)
+
+			// Stdout buffer
+			// cmdOutput := &bytes.Buffer{}
+			// Attach buffer to command
+			// cmd.Stdout = cmdOutput
+
+			// Execute command
+			// printCommand(cmd)
+			err := cmd.Run() // will wait for command to return
+
+			if err != nil {
+				fmt.Println("Error:", err.Error())
+			}
+
+		}
+	}()
+
+}
+
 func listContainers(w http.ResponseWriter, r *http.Request) {
 
 	// answer right away to avoid dead locks in LUA
@@ -318,13 +361,17 @@ func main() {
 
 		// os.exec in lua will block the script execution
 		// it's better to do it in goproxy
-		// in lua: `os.exec("goproxy exec PLAYERID docker run...)`
+		// in lua: `os.exec("goproxy exec PLAYER_NAME docker run...)`
 		if len(os.Args) >= 4 && os.Args[1] == "exec" {
-			go func() {
-				//playerID := os.Args[2]
-				cmdName := os.Args[3]
-				exec.Command(cmdName, os.Args[4:]...)
-			}()
+
+			reqPath := "http://127.0.0.1:8000/exec?cmd=" + strings.Join(os.Args[3:], "+")
+
+			resp, err := http.Get(reqPath)
+			if err != nil {
+				fmt.Println("Error on request:", reqPath, "ERROR:", err.Error())
+			} else {
+				fmt.Println("Request sent", reqPath, "StatusCode:", resp.StatusCode)
+			}
 		}
 
 		return
@@ -338,6 +385,7 @@ func main() {
 
 	go func() {
 		http.HandleFunc("/containers", listContainers)
+		http.HandleFunc("/exec", execCmd)
 		http.ListenAndServe(":8000", nil)
 	}()
 

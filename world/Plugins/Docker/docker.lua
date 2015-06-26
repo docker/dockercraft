@@ -293,7 +293,7 @@ function DContainer:display(running)
 	end
 
 	cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	updateSign(self.x+3,Ground + 2,self.z - 1,self.id,self.name,self.imageRepo,self.imageTag)
+	updateSign(self.x+3,Ground + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag)
 
 	-- Mem sign
 	cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
@@ -384,8 +384,8 @@ end
 function PlayerJoined(Player)
 	-- refresh containers
 	LOG("player joined")
-	r = os.execute("/go/src/goproxy/goproxy containers")
-	LOG("executed: /go/src/goproxy/goproxy containers -> " .. tostring(r))
+	r = os.execute("goproxy containers")
+	LOG("executed: goproxy containers -> " .. tostring(r))
 end
 
 function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
@@ -404,10 +404,14 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 			-- stop
 			if BlockMeta == 1
 			then
-				r = os.execute("docker kill " .. containerID)
+				-- r = os.execute("docker kill " .. containerID)
+				Player:SendMessage("docker stop " .. string.sub(containerID,1,8))
+				r = os.execute("goproxy exec " .. Player:GetName() .. " docker stop " .. containerID)
 			-- start
 			else 
-				r = os.execute("docker start " .. containerID)
+				-- r = os.execute("docker start " .. containerID)
+				Player:SendMessage("docker start " .. string.sub(containerID,1,8))
+				r = os.execute("goproxy exec " .. Player:GetName() .. " docker start " .. containerID)
 			end
 		end
 	end
@@ -421,7 +425,9 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 		then
 			Player:SendMessage("A running container can't be removed.")
 		else 
-			r = os.execute("docker rm " .. containerID)
+			-- r = os.execute("docker rm " .. containerID)
+			Player:SendMessage("docker rm " .. string.sub(containerID,1,8))
+			r = os.execute("goproxy exec " .. Player:GetName() .. " docker rm " .. containerID)
 		end
 	end
 end
@@ -448,7 +454,10 @@ function DockerCommand(Split, Player)
 
 					EntireCommand = table.concat(Split, " ")
 					command = string.sub(EntireCommand, 2, -1)
-					r = os.execute(command)
+					
+					-- r = os.execute(command)
+					r = os.execute("goproxy exec " .. Player:GetName() .. " " .. command)
+
 					LOG("executed: " .. command .. " -> " .. tostring(r))
 				end
 			end

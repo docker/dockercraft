@@ -8,6 +8,6 @@ ADD ./world /srv/world
 ADD start.sh /srv/start.sh
 
 ADD ./go /go
-RUN cd /go/src/goproxy; go build
+RUN cd /go/src/goproxy; go install
 
 CMD ["/bin/bash","/srv/start.sh"]
