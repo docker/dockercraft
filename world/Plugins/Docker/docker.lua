@@ -67,6 +67,22 @@ function getStartStopLeverContainer(x,z)
 	return ""
 end
 
+-- returns container ID and running state (true / false)
+function getRemoveButtonContainer(x,z)
+
+	for i=1, table.getn(Containers)
+	do
+		-- use first empty location
+		if Containers[i] ~= nil and x == Containers[i].x + 2 and z == Containers[i].z + 3
+		then
+			return Containers[i].id, Containers[i].running
+		end
+	end
+
+	return "", true
+end
+
+
 function destroyContainer(id)
 
 	for i=1, table.getn(Containers)
@@ -125,7 +141,7 @@ function addContainer(id,name,imageRepo,imageTag,running)
 
 	container = newDContainer()
 	container:init(x,CONTAINER_START_Z)
-	container:setInfos(id,name,imageRepo,imageTag)
+	container:setInfos(id,name,imageRepo,imageTag,running)
 	container:display(running)
 
 	if index == -1
@@ -140,7 +156,7 @@ end
 DContainer = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag=""}
 
 function newDContainer()
-	dc = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag=""}
+	dc = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag="",running=false}
 	dc.init = DContainer.init
 	dc.setInfos = DContainer.setInfos
 	dc.display = DContainer.display
@@ -156,11 +172,12 @@ function DContainer:init(x,z)
 	self.displayed = false
 end
 
-function DContainer:setInfos(id,name,imageRepo,imageTag)
+function DContainer:setInfos(id,name,imageRepo,imageTag,running)
 	self.id = id
 	self.name = name
 	self.imageRepo = imageRepo
 	self.imageTag = imageTag
+	self.running = running
 end
 
 
@@ -246,6 +263,14 @@ function DContainer:display(running)
 		end
 
 
+		-- remove button
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
+		updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","")
+
+		cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
+
+
 		-- door
 		-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
 		-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
@@ -328,9 +353,9 @@ end
 
 function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
 
-	LOG("Using block: " .. tostring(BlockX) .. "," .. tostring(BlockY) .. "," .. tostring(BlockZ) .. " - " .. tostring(BlockType) .. " - " .. tostring(BlockMeta))
+	-- LOG("Using block: " .. tostring(BlockX) .. "," .. tostring(BlockY) .. "," .. tostring(BlockZ) .. " - " .. tostring(BlockType) .. " - " .. tostring(BlockMeta))
 
-	-- lever: 1->OFF 9->ON
+	-- lever: 1->OFF 9->ON (in that orientation)
 
 	-- lever
 	if BlockType == 69
@@ -347,6 +372,19 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 			else 
 				r = os.execute("docker start " .. containerID)
 			end
+		end
+	end
+
+	-- stone button
+	if BlockType == 77
+	then
+		containerID, running = getRemoveButtonContainer(BlockX,BlockZ)
+
+		if running
+		then
+			Player:SendMessage("A running container can't be removed.")
+		else 
+			r = os.execute("docker rm " .. containerID)
 		end
 	end
 end
