@@ -77,76 +77,16 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 		MCServerRequest(data, client)
 
 	case "stop":
-		fmt.Println("stop event")
-
-		repo, tag := splitRepoAndTag(event.From)
-
-		containerName := "<name>"
-
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
-		if err != nil {
-			fmt.Print("InspectContainer error:", err.Error())
-		} else {
-			containerName = containerInfo.Name
-		}
-
-		data := url.Values{
-			"action":    {"stopContainer"},
-			"id":        {id},
-			"name":      {containerName},
-			"imageRepo": {repo},
-			"imageTag":  {tag}}
-
-		MCServerRequest(data, client)
+		// die event is enough
+		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
 
 	case "restart":
-		fmt.Println("restart event")
-		//  same as start event
-		repo, tag := splitRepoAndTag(event.From)
-
-		containerName := "<name>"
-
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
-		if err != nil {
-			fmt.Print("InspectContainer error:", err.Error())
-		} else {
-			containerName = containerInfo.Name
-		}
-
-		data := url.Values{
-			"action":    {"startContainer"},
-			"id":        {id},
-			"name":      {containerName},
-			"imageRepo": {repo},
-			"imageTag":  {tag}}
-
-		MCServerRequest(data, client)
+		// start event is enough
+		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
 
 	case "kill":
-		fmt.Println("kill event")
-		// same as stop event
-		repo, tag := splitRepoAndTag(event.From)
-
-		containerName := "<name>"
-
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
-		if err != nil {
-			fmt.Print("InspectContainer error:", err.Error())
-		} else {
-			containerName = containerInfo.Name
-		}
-
-		data := url.Values{
-			"action":    {"stopContainer"},
-			"id":        {id},
-			"name":      {containerName},
-			"imageRepo": {repo},
-			"imageTag":  {tag}}
-
-		MCServerRequest(data, client)
+		// die event is enough
+		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
 
 	case "die":
 		fmt.Println("die event")
