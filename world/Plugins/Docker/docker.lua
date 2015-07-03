@@ -106,7 +106,14 @@ function destroyContainer(id)
 
 end
 
-function addContainer(id,name,imageRepo,imageTag,running)
+
+UPDATE_CREATED = 0
+UPDATE_RUNNING = 1
+UPDATE_STOPPED = 2
+-- updateContainer accepts 3 different states: running, stopped, created
+-- sometimes "start" events arrive before "create" ones
+-- in this case, we just ignore the update
+function updateContainer(id,name,imageRepo,imageTag,state)
 
 	x = CONTAINER_START_X
 
@@ -116,10 +123,15 @@ function addContainer(id,name,imageRepo,imageTag,running)
 	-- already displayed (maybe with another state)
 	for i=1, table.getn(Containers)
 	do
-		-- use first empty location
+		-- if container found with same ID
 		if Containers[i] ~= nil and Containers[i].id == id
 		then
-			LOG("container already displayed")
+			-- container already found
+			-- "create" event arrives too late
+			if state == UPDATE_CREATED then
+				return
+			end
+
 			index = i
 			break
 		end
@@ -149,9 +161,9 @@ function addContainer(id,name,imageRepo,imageTag,running)
 
 	container = newDContainer()
 	container:init(x,CONTAINER_START_Z)
-	container:setInfos(id,name,imageRepo,imageTag,running)
+	container:setInfos(id,name,imageRepo,imageTag,state == UPDATE_RUNNING)
 	addGroundForContainer(container)
-	container:display(running)
+	container:display(state == UPDATE_RUNNING)
 
 	if index == -1
 		then
@@ -477,15 +489,12 @@ function HandleRequest_Docker(Request)
 
 		action = Request.PostParams["action"]
 
-		if action == "generateGround"
-		then
-			WorldStarted()
-		end
-
 		-- receiving informations about one container
 		
 		if action == "containerInfos"
 		then
+			LOG("EVENT - containerInfos")
+
 			name = Request.PostParams["name"]
 			imageRepo = Request.PostParams["imageRepo"]
 			imageTag = Request.PostParams["imageTag"]
@@ -494,41 +503,54 @@ function HandleRequest_Docker(Request)
 
 			-- LOG("containerInfos running: " .. running)
 
-			addContainer(id,name,imageRepo,imageTag,running == "true")
+			state = UPDATE_STOPPED
+			if running == "true" then
+				state = UPDATE_RUNNING
+			end
+
+			updateContainer(id,name,imageRepo,imageTag,state)
 		end
 
 		if action == "startContainer"
 		then
+			LOG("EVENT - startContainer")
+
 			name = Request.PostParams["name"]
 			imageRepo = Request.PostParams["imageRepo"]
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			addContainer(id,name,imageRepo,imageTag,true)
+			updateContainer(id,name,imageRepo,imageTag,UPDATE_RUNNING)
 		end
 
 		if action == "createContainer"
 		then
+			LOG("EVENT - createContainer")
+
 			name = Request.PostParams["name"]
 			imageRepo = Request.PostParams["imageRepo"]
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			addContainer(id,name,imageRepo,imageTag,false)
+			updateContainer(id,name,imageRepo,imageTag,UPDATE_CREATED)
 		end
 
 		if action == "stopContainer"
 		then
+			LOG("EVENT - stopContainer")
+
 			name = Request.PostParams["name"]
 			imageRepo = Request.PostParams["imageRepo"]
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			addContainer(id,name,imageRepo,imageTag,false)
+			updateContainer(id,name,imageRepo,imageTag,UPDATE_STOPPED)
 		end
 
 		if action == "destroyContainer"
 		then
+			LOG("EVENT - destroyContainer")
+
 			id = Request.PostParams["id"]
 
 			destroyContainer(id)
