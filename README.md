@@ -12,15 +12,15 @@ docker build -t mcclient .
 ### Run the container:
 
 ```
-docker run -t -i --rm -p 25565:25565 \
+docker run -t -i -d -p 25565:25565 \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v /usr/local/bin/docker:/usr/local/bin/docker \
+-v `machine ssh $(machine active) which docker`:/usr/local/bin/docker \
 --name mcclient mcclient
 ```
 
 Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
 
-Mounting `/usr/local/bin/docker` inside the container is necessary to bind Minecraft commands to Docker CLI commands.
+Mounting `/usr/local/bin/docker` inside the container is necessary to bind Minecraft commands to Docker CLI commands. The binary may not always be stored at the same place depending on the environment, if you're using **docker-machine**, this command should return the right path: `machine ssh $(machine active) which docker`
 
 
 ### How it works
