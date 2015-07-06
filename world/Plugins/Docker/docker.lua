@@ -345,7 +345,8 @@ function Initialize(Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
-	
+	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
+
 	-- Command Bindings
 
 	cPluginManager.BindCommand("/docker", "*", DockerCommand, " - docker CLI commands")
@@ -442,6 +443,17 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 			r = os.execute("goproxy exec " .. Player:GetName() .. " docker rm " .. containerID)
 		end
 	end
+end
+
+
+function OnChunkGenerating(World, ChunkX, ChunkZ, ChunkDesc)
+	-- override the built-in chunk generator
+	-- to have it generate empty chunks only
+	ChunkDesc:SetUseDefaultBiomes(false)
+	ChunkDesc:SetUseDefaultComposition(false)
+	ChunkDesc:SetUseDefaultFinish(false)
+	ChunkDesc:SetUseDefaultHeight(false)
+	return true
 end
 
 
