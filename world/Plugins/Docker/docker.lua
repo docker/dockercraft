@@ -13,10 +13,113 @@ GROUND_MAX_X = CONTAINER_START_X + 5
 GROUND_MIN_Z = -4
 GROUND_MAX_Z = CONTAINER_START_Z + 6
 
+MAX_BLOCK_UPDATE_PER_TICK = 50
+-- a list of blocks to be updated (first in first out)
+FIRST_BLOCK_UPDATE = nil
+LAST_BLOCK_UPDATE = nil
+UPDATE_SET = 0
+UPDATE_DIG = 1
+-- update operations in the list should have these fields:
+-- {op (UPDATE_SET || UPDATE_DIG), next, x, y, z, [blockID, meta]}
+
+function setBlock(x,y,z,blockID,meta)
+	update = {op=UPDATE_SET,next=nil,x=x,y=y,z=z,blockID=blockID,meta=meta }
+
+	if FIRST_BLOCK_UPDATE == nil
+	then 
+		FIRST_BLOCK_UPDATE = update
+		LAST_BLOCK_UPDATE = update
+	else 
+		LAST_BLOCK_UPDATE.next = update
+		LAST_BLOCK_UPDATE = update
+	end
+end
+
+function digBlock(x,y,z)
+	update = {op=UPDATE_DIG,next=nil,x=x,y=y,z=z }
+
+	if FIRST_BLOCK_UPDATE == nil
+	then 
+		FIRST_BLOCK_UPDATE = update
+		LAST_BLOCK_UPDATE = update
+	else 
+		LAST_BLOCK_UPDATE.next = update
+		LAST_BLOCK_UPDATE = update
+	end
+end
+
+-- updates one block
+-- returns false if there's no update remaining in the list
+-- otherwise, returns true
+function updateOneBlock()
+
+	if FIRST_BLOCK_UPDATE == nil
+	then 
+		return false
+	else 
+		update = FIRST_BLOCK_UPDATE
+		FIRST_BLOCK_UPDATE = FIRST_BLOCK_UPDATE.next
+
+		if update.op == UPDATE_SET
+			then
+			cRoot:Get():GetDefaultWorld():SetBlock(update.x,update.y,update.z,update.blockID,update.meta)
+			else
+			cRoot:Get():GetDefaultWorld():DigBlock(update.x,update.y,update.z)
+		end
+	end
+end
+
+
+function Tick(TimeDelta)
+
+	-- update blocks, considering limit per tick
+	n = MAX_BLOCK_UPDATE_PER_TICK
+
+ 	while n > 0
+ 	do
+ 		if updateOneBlock() == false
+ 		then
+ 			break
+ 		end
+ 		n = n - 1
+ 	end
+
+end
+
+
 
 
 Containers = {}
 SignsToUpdate = {}
+
+-- Plugin initialization
+function Initialize(Plugin)
+	Plugin:SetName("Docker")
+	Plugin:SetVersion(1)
+
+	-- Hooks
+
+	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
+	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
+	cPluginManager:AddHook(cPluginManager.HOOK_TICK, Tick);
+
+	-- Command Bindings
+
+	cPluginManager.BindCommand("/docker", "*", DockerCommand, " - docker CLI commands")
+
+	Plugin:AddWebTab("Docker",HandleRequest_Docker)
+
+	-- make all players admin
+	cRankManager:SetDefaultRank("Admin")
+
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+
+	return true
+end
+
+
 
 
 function updateSign(x,y,z,line1,line2,line3,line4)
@@ -237,92 +340,92 @@ function DContainer:display(running)
 	do
 		for pz=self.z, self.z+4
 		do
-			cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
-		end	
+			setBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
+			-- cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
+		end
 	end
 
 	for py = Ground+2, Ground+3
 	do
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+
 		-- leave empty space for the door
-		-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		-- setBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 		
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
 
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
 
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
 
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 	end
 
 	-- torch
-	cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
+	setBlock(self.x+1,Ground+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
 
 	-- start / stop lever
 
-	cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
-	updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","")
+	setBlock(self.x+1,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
+	-- updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","")
 
 
 	if running
 	then
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,1)
+		setBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,1)
 	else
-		cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,9)
+		setBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,9)
 	end
 
 
 	-- remove button
 
-	cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
-	updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","")
+	setBlock(self.x+2,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
+	-- updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","")
 
-	cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
+	setBlock(self.x+2,Ground+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
 
 
 	-- door
 	-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
-	-- cRoot:Get():GetDefaultWorld():SetBlock(self.x+2,Ground+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
+	-- setBlock(self.x+2,Ground+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
 
 
 	for px=self.x, self.x+3
 	do
 		for pz=self.z, self.z+4
 		do
-			cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
+			setBlock(px,Ground + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
 		end	
 	end
 
-	cRoot:Get():GetDefaultWorld():SetBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	updateSign(self.x+3,Ground + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag)
+	setBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	-- updateSign(self.x+3,Ground + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag)
 
 	-- Mem sign
-	cRoot:Get():GetDefaultWorld():SetBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	self:updateMemSign("")
+	setBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	-- self:updateMemSign("")
 
 	-- CPU sign
-	cRoot:Get():GetDefaultWorld():SetBlock(self.x+1,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	self:updateCPUSign("")
+	setBlock(self.x+1,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	-- self:updateCPUSign("")
 
 
-	cRoot:Get():GetDefaultWorld():ScheduleTask(5,
-		function(World)
-			World:WakeUpSimulatorsInArea(self.x-1, self.x+4,Ground, Ground+4,self.z-1, self.z+5)
-		end
-	)
-
-
+	-- cRoot:Get():GetDefaultWorld():ScheduleTask(5,
+	-- 	function(World)
+	-- 		World:WakeUpSimulatorsInArea(self.x-1, self.x+4,Ground, Ground+4,self.z-1, self.z+5)
+	-- 	end
+	-- )
 end
 
 
@@ -332,33 +435,6 @@ end
 
 function DContainer:updateCPUSign(s)
 	updateSign(self.x+1,Ground + 2,self.z - 1,"CPU usage","",s,"")
-end
-
-
-
-function Initialize(Plugin)
-	Plugin:SetName("Docker")
-	Plugin:SetVersion(1)
-
-	-- Hooks
-
-	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
-
-	-- Command Bindings
-
-	cPluginManager.BindCommand("/docker", "*", DockerCommand, " - docker CLI commands")
-
-	Plugin:AddWebTab("Docker",HandleRequest_Docker)
-
-	-- make all players admin
-	cRankManager:SetDefaultRank("Admin")
-
-	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
-
-	return true
 end
 
 
@@ -387,7 +463,7 @@ function addGroundForContainer(container)
 		do
 			for z=GROUND_MIN_Z,GROUND_MAX_Z
 			do
-				cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
+				setBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
 			end
 		end	
 	end
