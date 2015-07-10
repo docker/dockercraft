@@ -19,8 +19,9 @@ FIRST_BLOCK_UPDATE = nil
 LAST_BLOCK_UPDATE = nil
 UPDATE_SET = 0
 UPDATE_DIG = 1
+UPDATE_SIGN = 2
 -- update operations in the list should have these fields:
--- {op (UPDATE_SET || UPDATE_DIG), next, x, y, z, [blockID, meta]}
+-- {op (UPDATE_SET || UPDATE_DIG || UPDATE_SIGN), next, x, y, z, [blockID, meta]}
 
 function setBlock(x,y,z,blockID,meta)
 	update = {op=UPDATE_SET,next=nil,x=x,y=y,z=z,blockID=blockID,meta=meta }
@@ -48,6 +49,21 @@ function digBlock(x,y,z)
 	end
 end
 
+function updateSign(x,y,z,line1,line2,line3,line4,delay)
+
+	update = {op=UPDATE_SIGN,next=nil,x=x,y=y,z=z,line1=line1,line2=line2,line3=line3,line4=line4,delay=delay }
+
+	if FIRST_BLOCK_UPDATE == nil
+	then 
+		FIRST_BLOCK_UPDATE = update
+		LAST_BLOCK_UPDATE = update
+	else 
+		LAST_BLOCK_UPDATE.next = update
+		LAST_BLOCK_UPDATE = update
+	end
+end
+
+
 -- updates one block
 -- returns false if there's no update remaining in the list
 -- otherwise, returns true
@@ -63,10 +79,47 @@ function updateOneBlock()
 		if update.op == UPDATE_SET
 			then
 			cRoot:Get():GetDefaultWorld():SetBlock(update.x,update.y,update.z,update.blockID,update.meta)
-			else
+			return true
+		end
+
+		if update.op == UPDATE_DIG
+			then
 			cRoot:Get():GetDefaultWorld():DigBlock(update.x,update.y,update.z)
+			return true
+		end
+
+		if update.op == UPDATE_SIGN
+			then
+
+			if update.delay ~= nil and update.delay > 0
+			then
+				local sign = {}
+				sign.x = update.x
+				sign.y = update.y
+				sign.z = update.z
+				sign.line1 = update.line1
+				sign.line2 = update.line2
+				sign.line3 = update.line3
+				sign.line4 = update.line4
+
+				--table.insert(SignsToUpdate,sign)
+				--cRoot:Get():GetDefaultWorld():ScheduleTask(update.delay,updateSigns)
+
+				cRoot:Get():GetDefaultWorld():ScheduleTask(update.delay,
+					function(World)
+						-- LOG("UPDATE SIGN: " .. " | " .. (sign.line1 or "") .. " | " .. (sign.line2 or "") .. " | " .. (sign.line3 or "") .. " | " ..(sign.line4 or ""))
+						cRoot:Get():GetDefaultWorld():SetSignLines(sign.x,sign.y,sign.z,sign.line1,sign.line2,sign.line3,sign.line4)
+					end
+				)
+
+			else
+				cRoot:Get():GetDefaultWorld():SetSignLines(update.x,update.y,update.z,update.line1,update.line2,update.line3,update.line4)
+			end
+
+			return true
 		end
 	end
+	
 end
 
 
@@ -119,25 +172,6 @@ function Initialize(Plugin)
 	return true
 end
 
-
-
-
-function updateSign(x,y,z,line1,line2,line3,line4)
-	
-	sign = {}
-	sign.x = x
-	sign.y = y
-	sign.z = z
-	sign.line1 = line1
-	sign.line2 = line2
-	sign.line3 = line3
-	sign.line4 = line4
-
-	table.insert(SignsToUpdate,sign)
-
-	cRoot:Get():GetDefaultWorld():ScheduleTask(10,updateSigns)
-
-end
 
 
 function updateSigns(World)
@@ -377,7 +411,7 @@ function DContainer:display(running)
 	-- start / stop lever
 
 	setBlock(self.x+1,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
-	-- updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","")
+	updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","",2)
 
 
 	if running
@@ -391,7 +425,7 @@ function DContainer:display(running)
 	-- remove button
 
 	setBlock(self.x+2,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
-	-- updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","")
+	updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","",2)
 
 	setBlock(self.x+2,Ground+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
 
@@ -410,7 +444,7 @@ function DContainer:display(running)
 	end
 
 	setBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	-- updateSign(self.x+3,Ground + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag)
+	updateSign(self.x+3,Ground + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag,2)
 
 	-- Mem sign
 	setBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
