@@ -1,7 +1,5 @@
 FROM golang:1.5.1
 
-RUN apt-get -yqq update
-
 ADD ./cuberite_server /srv/cuberite_server
 ADD ./world /srv/world
 ADD start.sh /srv/start.sh
