@@ -15,6 +15,7 @@ import (
 	"github.com/samalba/dockerclient"
 	"log"
 	"time"
+	"os"
 )
 
 // Callback used to listen to Docker's events
@@ -40,6 +41,20 @@ func main() {
 		id := containers[0].Id
 		info, _ := docker.InspectContainer(id)
 		log.Println(info)
+	}
+
+	// Build a docker image
+	// some.tar contains the build context (Dockerfile any any files it needs to add/copy)
+	dockerBuildContext, err := os.Open("some.tar")
+	defer dockerBuildContext.Close()
+	buildImageConfig := &dockerclient.BuildImage{
+			Context:        dockerBuildContext,
+			RepoName:       "your_image_name",
+			SuppressOutput: false,
+	}
+	reader, err := docker.BuildImage(buildImageConfig)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// Create a container

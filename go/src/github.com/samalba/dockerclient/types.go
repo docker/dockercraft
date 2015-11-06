@@ -2,6 +2,7 @@ package dockerclient
 
 import (
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/docker/docker/pkg/units"
@@ -22,13 +23,16 @@ type ContainerConfig struct {
 	Cmd             []string
 	Image           string
 	Volumes         map[string]struct{}
-	VolumeDriver    string
 	WorkingDir      string
 	Entrypoint      []string
 	NetworkDisabled bool
 	MacAddress      string
 	OnBuild         []string
 	Labels          map[string]string
+	StopSignal      string
+
+	// FIXME: VolumeDriver have been removed since docker 1.9
+	VolumeDriver string
 
 	// FIXME: The following fields have been removed since API v1.18
 	Memory     int64
@@ -42,39 +46,46 @@ type ContainerConfig struct {
 }
 
 type HostConfig struct {
-	Binds           []string
-	ContainerIDFile string
-	LxcConf         []map[string]string
-	Memory          int64
-	MemorySwap      int64
-	CpuShares       int64
-	CpuPeriod       int64
-	CpusetCpus      string
-	CpusetMems      string
-	CpuQuota        int64
-	BlkioWeight     int64
-	OomKillDisable  bool
-	Privileged      bool
-	PortBindings    map[string][]PortBinding
-	Links           []string
-	PublishAllPorts bool
-	Dns             []string
-	DnsSearch       []string
-	ExtraHosts      []string
-	VolumesFrom     []string
-	Devices         []DeviceMapping
-	NetworkMode     string
-	IpcMode         string
-	PidMode         string
-	UTSMode         string
-	CapAdd          []string
-	CapDrop         []string
-	RestartPolicy   RestartPolicy
-	SecurityOpt     []string
-	ReadonlyRootfs  bool
-	Ulimits         []Ulimit
-	LogConfig       LogConfig
-	CgroupParent    string
+	Binds             []string
+	ContainerIDFile   string
+	LxcConf           []map[string]string
+	Memory            int64
+	MemoryReservation int64
+	MemorySwap        int64
+	KernelMemory      int64
+	CpuShares         int64
+	CpuPeriod         int64
+	CpusetCpus        string
+	CpusetMems        string
+	CpuQuota          int64
+	BlkioWeight       int64
+	OomKillDisable    bool
+	MemorySwappiness  int64
+	Privileged        bool
+	PortBindings      map[string][]PortBinding
+	Links             []string
+	PublishAllPorts   bool
+	Dns               []string
+	DNSOptions        []string
+	DnsSearch         []string
+	ExtraHosts        []string
+	VolumesFrom       []string
+	Devices           []DeviceMapping
+	NetworkMode       string
+	IpcMode           string
+	PidMode           string
+	UTSMode           string
+	CapAdd            []string
+	CapDrop           []string
+	GroupAdd          []string
+	RestartPolicy     RestartPolicy
+	SecurityOpt       []string
+	ReadonlyRootfs    bool
+	Ulimits           []Ulimit
+	LogConfig         LogConfig
+	CgroupParent      string
+	ConsoleSize       [2]int
+	VolumeDriver      string
 }
 
 type DeviceMapping struct {
@@ -271,7 +282,9 @@ type RespContainersCreate struct {
 type Image struct {
 	Created     int64
 	Id          string
+	Labels      map[string]string
 	ParentId    string
+	RepoDigests []string
 	RepoTags    []string
 	Size        int64
 	VirtualSize int64
@@ -297,7 +310,7 @@ type Info struct {
 	Debug              interface{}
 	NFd                int64
 	NGoroutines        int64
-	SystemTime         time.Time
+	SystemTime         string
 	NEventsListener    int64
 	InitPath           string
 	InitSha1           string
@@ -305,6 +318,8 @@ type Info struct {
 	MemoryLimit        interface{}
 	SwapLimit          interface{}
 	IPv4Forwarding     interface{}
+	BridgeNfIptables   bool
+	BridgeNfIp6tables  bool
 	DockerRootDir      string
 	HttpProxy          string
 	HttpsProxy         string
@@ -319,6 +334,11 @@ type ImageDelete struct {
 type EventOrError struct {
 	Event
 	Error error
+}
+
+type WaitResult struct {
+	ExitCode int
+	Error    error
 }
 
 type decodingResult struct {
@@ -412,4 +432,98 @@ type Ulimit struct {
 type LogConfig struct {
 	Type   string            `json:"type"`
 	Config map[string]string `json:"config"`
+}
+
+type BuildImage struct {
+	Config         *ConfigFile
+	DockerfileName string
+	Context        io.Reader
+	RemoteURL      string
+	RepoName       string
+	SuppressOutput bool
+	NoCache        bool
+	Remove         bool
+	ForceRemove    bool
+	Pull           bool
+	Memory         int64
+	MemorySwap     int64
+	CpuShares      int64
+	CpuPeriod      int64
+	CpuQuota       int64
+	CpuSetCpus     string
+	CpuSetMems     string
+	CgroupParent   string
+	BuildArgs      map[string]string
+}
+
+type Volume struct {
+	Name       string // Name is the name of the volume
+	Driver     string // Driver is the Driver name used to create the volume
+	Mountpoint string // Mountpoint is the location on disk of the volume
+}
+
+type VolumesListResponse struct {
+	Volumes []*Volume // Volumes is the list of volumes being returned
+}
+
+type VolumeCreateRequest struct {
+	Name       string            // Name is the requested name of the volume
+	Driver     string            // Driver is the name of the driver that should be used to create the volume
+	DriverOpts map[string]string // DriverOpts holds the driver specific options to use for when creating the volume.
+}
+
+// IPAM represents IP Address Management
+type IPAM struct {
+	Driver string
+	Config []IPAMConfig
+}
+
+// IPAMConfig represents IPAM configurations
+type IPAMConfig struct {
+	Subnet     string            `json:",omitempty"`
+	IPRange    string            `json:",omitempty"`
+	Gateway    string            `json:",omitempty"`
+	AuxAddress map[string]string `json:"AuxiliaryAddresses,omitempty"`
+}
+
+// NetworkResource is the body of the "get network" http response message
+type NetworkResource struct {
+	Name       string
+	ID         string `json:"Id"`
+	Scope      string
+	Driver     string
+	IPAM       IPAM
+	Containers map[string]EndpointResource
+}
+
+//EndpointResource contains network resources allocated and usd for a container in a network
+type EndpointResource struct {
+	EndpointID  string
+	MacAddress  string
+	IPv4Address string
+	IPv6Address string
+}
+
+// NetworkCreate is the expected body of the "create network" http request message
+type NetworkCreate struct {
+	Name           string
+	CheckDuplicate bool
+	Driver         string
+	IPAM           IPAM
+}
+
+// NetworkCreateResponse is the response message sent by the server for network create call
+type NetworkCreateResponse struct {
+	ID      string `json:"Id"`
+	Warning string
+}
+
+// NetworkConnect represents the data to be used to connect a container to the network
+type NetworkConnect struct {
+	Container string
+}
+
+// NetworkDisconnect represents the data to be used to disconnect a container from the network
+type NetworkDisconnect struct {
+	Container string
 }

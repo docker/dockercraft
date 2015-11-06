@@ -211,7 +211,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		images, err := DOCKER_CLIENT.ListImages()
+		images, err := DOCKER_CLIENT.ListImages(true)
 
 		if err != nil {
 			fmt.Println(err.Error())
