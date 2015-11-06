@@ -1,25 +1,3 @@
--- local PLUGIN = nil
-
-
-Ground = 63
-
-CONTAINER_START_X = -3
-CONTAINER_OFFSET_X = -6
-CONTAINER_START_Z = 2
-
--- enough to fit one container
-GROUND_MIN_X = CONTAINER_START_X - 2
-GROUND_MAX_X = CONTAINER_START_X + 5
-GROUND_MIN_Z = -4
-GROUND_MAX_Z = CONTAINER_START_Z + 6
-
-MAX_BLOCK_UPDATE_PER_TICK = 50
--- a list of blocks to be updated (first in first out)
-FIRST_BLOCK_UPDATE = nil
-LAST_BLOCK_UPDATE = nil
-UPDATE_SET = 0
-UPDATE_DIG = 1
-UPDATE_SIGN = 2
 -- update operations in the list should have these fields:
 -- {op (UPDATE_SET || UPDATE_DIG || UPDATE_SIGN), next, x, y, z, [blockID, meta]}
 
@@ -341,7 +319,7 @@ end
 
 function DContainer:destroy(running)
 
-	for py = Ground+1, Ground+4
+	for py = GROUND_LEVEL+1, GROUND_LEVEL+4
 	do
 		for px=self.x-1, self.x+4
 		do
@@ -374,12 +352,12 @@ function DContainer:display(running)
 	do
 		for pz=self.z, self.z+4
 		do
-			setBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
-			-- cRoot:Get():GetDefaultWorld():SetBlock(px,Ground + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
+			setBlock(px,GROUND_LEVEL + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
+			-- cRoot:Get():GetDefaultWorld():SetBlock(px,GROUND_LEVEL + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
 		end
 	end
 
-	for py = Ground+2, Ground+3
+	for py = GROUND_LEVEL+2, GROUND_LEVEL+3
 	do
 		setBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 
@@ -406,74 +384,74 @@ function DContainer:display(running)
 	end
 
 	-- torch
-	setBlock(self.x+1,Ground+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
+	setBlock(self.x+1,GROUND_LEVEL+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
 
 	-- start / stop lever
 
-	setBlock(self.x+1,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
-	updateSign(self.x+1,Ground + 3,self.z + 2,"","START/STOP","---->","",2)
+	setBlock(self.x+1,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
+	updateSign(self.x+1,GROUND_LEVEL + 3,self.z + 2,"","START/STOP","---->","",2)
 
 
 	if running
 	then
-		setBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,1)
+		setBlock(self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,1)
 	else
-		setBlock(self.x+1,Ground+3,self.z+1,E_BLOCK_LEVER,9)
+		setBlock(self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,9)
 	end
 
 
 	-- remove button
 
-	setBlock(self.x+2,Ground + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
-	updateSign(self.x+2,Ground + 3,self.z + 2,"","REMOVE","---->","",2)
+	setBlock(self.x+2,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
+	updateSign(self.x+2,GROUND_LEVEL + 3,self.z + 2,"","REMOVE","---->","",2)
 
-	setBlock(self.x+2,Ground+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
+	setBlock(self.x+2,GROUND_LEVEL+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
 
 
 	-- door
 	-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
-	-- setBlock(self.x+2,Ground+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
+	-- setBlock(self.x+2,GROUND_LEVEL+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
 
 
 	for px=self.x, self.x+3
 	do
 		for pz=self.z, self.z+4
 		do
-			setBlock(px,Ground + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
+			setBlock(px,GROUND_LEVEL + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
 		end	
 	end
 
-	setBlock(self.x+3,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	updateSign(self.x+3,Ground + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag,2)
+	setBlock(self.x+3,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	updateSign(self.x+3,GROUND_LEVEL + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag,2)
 
 	-- Mem sign
-	setBlock(self.x,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	setBlock(self.x,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
 	-- self:updateMemSign("")
 
 	-- CPU sign
-	setBlock(self.x+1,Ground + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	setBlock(self.x+1,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
 	-- self:updateCPUSign("")
 
 
 	-- cRoot:Get():GetDefaultWorld():ScheduleTask(5,
 	-- 	function(World)
-	-- 		World:WakeUpSimulatorsInArea(self.x-1, self.x+4,Ground, Ground+4,self.z-1, self.z+5)
+	-- 		World:WakeUpSimulatorsInArea(self.x-1, self.x+4,GROUND_LEVEL, GROUND_LEVEL+4,self.z-1, self.z+5)
 	-- 	end
 	-- )
 end
 
 
 function DContainer:updateMemSign(s)
-	updateSign(self.x,Ground + 2,self.z - 1,"Mem usage","",s,"")
+	updateSign(self.x,GROUND_LEVEL + 2,self.z - 1,"Mem usage","",s,"")
 end
 
 function DContainer:updateCPUSign(s)
-	updateSign(self.x+1,Ground + 2,self.z - 1,"CPU usage","",s,"")
+	updateSign(self.x+1,GROUND_LEVEL + 2,self.z - 1,"CPU usage","",s,"")
 end
 
 
 function WorldStarted()
-	y = Ground
+	y = GROUND_LEVEL
 
 	-- just enough to fit one container
 	-- then it should be dynamic
