@@ -136,7 +136,7 @@ local function BuildCategories(a_PluginInfo)
 	
 	-- For each command add a reference to it into all of its categories:
 	local function AddCommands(a_CmdPrefix, a_Commands)
-		for cmd, info in pairs(a_Commands) do
+		for cmd, info in pairs(a_Commands or {}) do
 			local NewCmd =
 			{
 				CommandString = a_CmdPrefix .. cmd,
@@ -451,7 +451,7 @@ local function BuildPermissions(a_PluginInfo)
 	-- Collect all used permissions from Commands, reference the commands that use the permission:
 	local Permissions = a_PluginInfo.Permissions or {}
 	local function CollectPermissions(a_CmdPrefix, a_Commands)
-		for cmd, info in pairs(a_Commands) do
+		for cmd, info in pairs(a_Commands or {}) do
 			CommandString = a_CmdPrefix .. cmd
 			if ((info.Permission ~= nil) and (info.Permission ~= "")) then
 				-- Add the permission to the list of permissions:

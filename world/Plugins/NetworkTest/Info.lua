@@ -90,6 +90,23 @@ g_PluginInfo =
 					},
 				},  -- lookup
 				
+				sclient =
+				{
+					HelpString = "Connects, as an SSL client, to a specified webpage (github.com by default) and downloads its front page using HTTPS",
+					Handler = HandleConsoleNetSClient,
+					ParameterCombinations =
+					{
+						{
+							Params = "",
+							Help = "Connects, as an SSL client, to github.com and downloads its front page using HTTPS",
+						},
+						{
+							Params = "host [port]",
+							Help = "Connects, as an SSL client, to the specified host and downloads its front page using HTTPS",
+						},
+					},  -- ParameterCombinations
+				},  -- sclient
+
 				udp =
 				{
 					Subcommands =

@@ -129,23 +129,18 @@ function RegisterPluginInfoCommands()
 				else
 					HelpString = ""
 				end
-
-				if CmdName == "/help"
-				then
-					cPluginManager.BindCommand(CmdName, info.Permission or "", Handler, HelpString)
-
-					-- Register all aliases for the command:
-					if (info.Alias ~= nil) then
-						if (type(info.Alias) == "string") then
-							info.Alias = {info.Alias}
-						end
-						for idx, alias in ipairs(info.Alias) do
-							cPluginManager.BindCommand(a_Prefix .. alias, info.Permission or "", Handler, HelpString)						
-							-- Also copy the alias's info table as a separate subcommand,
-							-- so that MultiCommandHandler() handles it properly. Need to off-load into a separate table
-							-- than the one we're currently iterating and join after the iterating.
-							AliasTable[alias] = info
-						end
+				cPluginManager.BindCommand(CmdName, info.Permission or "", Handler, HelpString)
+				-- Register all aliases for the command:
+				if (info.Alias ~= nil) then
+					if (type(info.Alias) == "string") then
+						info.Alias = {info.Alias}
+					end
+					for idx, alias in ipairs(info.Alias) do
+						cPluginManager.BindCommand(a_Prefix .. alias, info.Permission or "", Handler, HelpString)
+						-- Also copy the alias's info table as a separate subcommand,
+						-- so that MultiCommandHandler() handles it properly. Need to off-load into a separate table
+						-- than the one we're currently iterating and join after the iterating.
+						AliasTable[alias] = info
 					end
 				end
 			end  -- else (if Handler == nil)

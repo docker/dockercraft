@@ -700,9 +700,6 @@ function HandleRequest_Docker(Request)
 	return content
 end
 
-
-
-
 -- function OnDisable()
 -- 	LOG(PLUGIN:GetName() .. " is shutting down...")
 -- end

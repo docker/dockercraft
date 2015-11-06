@@ -9,7 +9,7 @@
 
 function HandleConsoleClear(Split)
 	if (#Split == 1) then
-		return true, "Usage: clear <PlayerName>"
+		return true, "Usage: " .. Split[1] .. " <player>"
     end
     
     local InventoryCleared = false;
@@ -34,7 +34,7 @@ end
 
 function HandleConsoleKick(Split)
 	if (#Split < 2) then
-		return true, "Usage: kick <PlayerName> [<Reason>]"
+		return true, "Usage: " .. Split[1] .. " <player> [reason ...]"
 	end
 
 	local Reason = cChatColor.Red .. "You have been kicked."
@@ -56,7 +56,7 @@ end
 function HandleConsoleKill(Split)
 	-- Check the params:
 	if (#Split == 1) then
-		return true, "Usage: kill <PlayerName>"
+		return true, "Usage: " .. Split[1] .. " <player>"
 	end
 
 	-- Kill the player:
@@ -104,7 +104,7 @@ end
 function HandleConsoleListGroups(a_Split)
 	if (a_Split[3] ~= nil) then
 		-- Too many params:
-		return true, "Too many parameters. Usage: listgroups [<RankName>]"
+		return true, "Too many parameters. Usage: listgroups [rank]"
 	end
 	
 	-- If no params are given, list all groups that the manager knows:
@@ -255,7 +255,7 @@ function HandleConsoleRank(a_Split)
 	-- Check parameters:
 	if ((a_Split[2] == nil) or (a_Split[4] ~= nil)) then
 		-- Not enough or too many parameters
-		return true, "Usage: rank <Player> [<Rank>]"
+		return true, "Usage: " .. Split[1] .. " <player> [rank]"
 	end
 	
 	-- Translate the PlayerName to a UUID:
@@ -369,7 +369,7 @@ function HandleConsoleTeleport(Split)
 			return true, "Player not found"
 		end
 	else
-		return true, "Usage: tp <PlayerName> <ToPlayerName> or tp <PlayerName> <X> <Y> <Z>"
+		return true, "Usage: '" .. Split[1] .. " <target player> <destination player>' or 'tp <target player> <x> <y> <z>'"
 	end
 end
 
@@ -396,7 +396,7 @@ function HandleConsoleUnrank(a_Split)
 	-- Check params:
 	if ((a_Split[2] == nil) or (a_Split[3] ~= nil)) then
 		-- Too few or too many parameters:
-		return true, "Usage: unrank <PlayerName>"
+		return true, "Usage: " .. Split[1] .. " <player>"
 	end
 
 	-- Translate the PlayerName to a UUID:

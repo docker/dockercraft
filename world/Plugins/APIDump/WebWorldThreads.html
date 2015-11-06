@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>MCServer - Webserver vs World threads</title>
+		<title>Cuberite - Webserver vs World threads</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -14,7 +14,7 @@
 			<p>
 			This article will explain the threading issues that arise between the webserver and world threads are of concern to plugin authors.</p>
 			<p>
-			Generally, plugins that provide webadmin pages should be quite careful about their interactions. Most operations on MCServer objects requires synchronization, that MCServer provides automatically and transparently to plugins - when a block is written, the chunkmap is locked, or when an entity is being manipulated, the entity list is locked. Each plugin also has a mutex lock, so that only one thread at a time may be executing plugin code.</p>
+			Generally, plugins that provide webadmin pages should be quite careful about their interactions. Most operations on Cuberite objects requires synchronization, that Cuberite provides automatically and transparently to plugins - when a block is written, the chunkmap is locked, or when an entity is being manipulated, the entity list is locked. Each plugin also has a mutex lock, so that only one thread at a time may be executing plugin code.</p>
 			<p>
 			This locking can be a source of deadlocks for plugins that are not written carefully.</p>
 

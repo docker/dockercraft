@@ -29,7 +29,7 @@ return
 		},
 		Returns = [[
 			If the function returns false or no value, the next plugin's callback is called, and finally
-			MCServer will process the spread. If the function
+			Cuberite will process the spread. If the function
 			returns true, no other callback is called for this event and the spread will not occur.
 		]],
 	},  -- HOOK_BLOCK_SPREAD

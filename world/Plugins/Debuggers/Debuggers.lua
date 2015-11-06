@@ -1648,6 +1648,17 @@ end
 
 
 
+
+function HandlePlugMsg(a_Split, a_Player)
+	local ch = a_Player:GetClientHandle()
+	ch:SendPluginMessage("TestCh", "some\0string\1with\2funny\3chars")
+	return true
+end
+
+
+
+
+
 function HandlePoof(a_Split, a_Player)
 	local PlayerPos = Vector3d(a_Player:GetPosition())  -- Create a copy of the position
 	PlayerPos.y = PlayerPos.y - 1

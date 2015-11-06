@@ -5,12 +5,12 @@ return
 		CalledWhen = "A right-click packet is received from the client. Plugin may override / refuse.",
 		DefaultFnName = "OnPlayerRightClick",  -- also used as pagename
 		Desc = [[
-			This hook is called when MCServer receives a right-click packet from the {{cClientHandle|client}}. It
+			This hook is called when Cuberite receives a right-click packet from the {{cClientHandle|client}}. It
 			is called before any processing whatsoever is performed on the packet, meaning that hacked /
 			malicious clients may be trigerring this event very often and with unchecked parameters. Therefore
 			plugin authors are advised to use extreme caution with this callback.</p>
 			<p>
-			Plugins may refuse the default processing for the packet, causing MCServer to behave as if the
+			Plugins may refuse the default processing for the packet, causing Cuberite to behave as if the
 			packet has never arrived. This may, however, create inconsistencies in the client - the client may
 			think that they placed a block, while the server didn't process the placing, etc.
 		]],
@@ -26,7 +26,7 @@ return
 			{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the mouse crosshair on the block" },
 		},
 		Returns = [[
-			If the function returns false or no value, MCServer calls other plugins' callbacks and finally sends
+			If the function returns false or no value, Cuberite calls other plugins' callbacks and finally sends
 			the packet for further processing.</p>
 			<p>
 			If the function returns true, no other plugins are called, processing is halted.

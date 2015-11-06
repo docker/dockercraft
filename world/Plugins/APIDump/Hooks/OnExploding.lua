@@ -39,7 +39,7 @@ return
 		},
 		Returns = [[
 			If the function returns false or no value, the next plugin's callback is called, and finally
-			MCServer will process the explosion - destroy blocks and push + hurt entities. If the function
+			Cuberite will process the explosion - destroy blocks and push + hurt entities. If the function
 			returns true, no other callback is called for this event and the explosion will not occur.
 		]],
 	},  -- HOOK_EXPLODING

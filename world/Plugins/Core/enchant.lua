@@ -530,8 +530,8 @@ local EnchantmentInformation = {
 }
 
 
-local EnchantCommandUsage = "Usage: %s <PlayerName> <Enchantment ID> [Level]"
-local IEnchantCommandUsage = "Usage: %s <Enchantment ID> [Level]"
+local EnchantCommandUsage = "Usage: %s <player> <enchantment ID> [level]"
+local IEnchantCommandUsage = "Usage: %s <enchantment ID> [level]"
 local UnknownEnchantment = "There is no known enchantment %s"
 local LevelNAN = "%s is not a number, level must be a number"
 local LevelIsZero = "Level must be greater than 0"
@@ -686,7 +686,7 @@ end
 
 
 --- Handles the enchant in-game command
---  Usage: /enchant <PlayerName> <EnchantmentID> [level]
+--  Usage: /enchant <player> <enchantment ID> [level]
 function HandleEnchantCommand( Split, Player )
 
 	if not Split[3] then
@@ -709,7 +709,7 @@ end
 
 
 --- Handles the ienchant in-game command
---  Usage: /ienchant <EnchantmentID> [level]
+--  Usage: /ienchant <enchantment ID> [level]
 function HandleIEnchantCommand( Split, Player )
 
 	if not Split[2] then
@@ -734,7 +734,7 @@ end
 
 
 --- Handles the enchant console command
---  Usage: enchant <PlayerName> <EnchantmentID> [level]
+--  Usage: enchant <player> <enchantment ID> [level]
 function HandleConsoleEnchant( Split )
 
 	if not Split[3] then

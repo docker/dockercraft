@@ -17,10 +17,10 @@ return
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player tossing an item" },
 		},
 		Returns = [[
-			If the function returns false or no value, other plugins' callbacks are called and finally MCServer
+			If the function returns false or no value, other plugins' callbacks are called and finally Cuberite
 			creates the pickup for the item and tosses it, using {{cPlayer}}:TossHeldItem, {{cPlayer}}:TossEquippedItem,
 			or {{cPlayer}}:TossPickup. If the function returns true, no other callbacks are called for this event
-			and MCServer doesn't toss the item.
+			and Cuberite doesn't toss the item.
 		]],
 	},  -- HOOK_PLAYER_TOSSING_ITEM
 }

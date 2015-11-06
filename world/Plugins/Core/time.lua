@@ -1,10 +1,10 @@
 -- Implements time related commands and console commands
 
 
-local PlayerTimeAddCommandUsage = "Usage: /time add <amount> [WorldName]"
-local PlayerTimeSetCommandUsage = "Usage: /time set <amount|day|night> [WorldName]"
-local ConsoleSetTimeCommandUsage = "Usage: time set <amount|day|night> [WorldName]"
-local ConsoleAddTimeCommandUsage = "Usage: time add <amount> [WorldName]"
+local PlayerTimeAddCommandUsage = "Usage: /time add <value> [world]"
+local PlayerTimeSetCommandUsage = "Usage: /time set <day|night|value> [world]"
+local ConsoleSetTimeCommandUsage = "Usage: time set <day|night|value> [world]"
+local ConsoleAddTimeCommandUsage = "Usage: time add <value> [world]"
 
 -- Times of day and night as defined in vanilla minecraft
 local SpecialTimesTable = {
@@ -77,7 +77,7 @@ local function CommonAddTime( World, Time )
 end
 
 
--- Handler for "/time add <amount> [WorldName]" subcommand 
+-- Handler for "/time add <amount> [world]" subcommand 
 function HandleAddTimeCommand( Split, Player )
 
 	if not CommonAddTime( GetWorld( Split[4], Player ), Split[3] ) then
@@ -120,7 +120,7 @@ local function CommonSetTime( World, Time )
 end
 
 
--- Handler for "/time set <value> [WorldName]" subcommand 
+-- Handler for "/time set <value> [world]" subcommand 
 function HandleSetTimeCommand( Split, Player )
 
 	if not CommonSetTime( GetWorld( Split[4], Player ), Split[3] ) then
@@ -132,7 +132,7 @@ function HandleSetTimeCommand( Split, Player )
 end
 
 
--- Handler for console command: time set <day|night|value> [WorldName]
+-- Handler for console command: time set <day|night|value> [world]
 function HandleConsoleSetTime(a_Split)
 
 	if not CommonSetTime( GetWorld( a_Split[4] ), a_Split[3] ) then
@@ -157,7 +157,7 @@ local function CommonSpecialTime( World, TimeName )
 end
 
 
--- Handler for /time <day|night> [WorldName]
+-- Handler for /time <day|night> [world]
 function HandleSpecialTimeCommand( Split, Player )
 
 	return CommonSpecialTime( GetWorld( Split[3], Player ), Split[2] )
@@ -165,7 +165,7 @@ function HandleSpecialTimeCommand( Split, Player )
 end
 
 
--- Handler for console command: time <day|night> [WorldName]
+-- Handler for console command: time <day|night> [world]
 function HandleConsoleSpecialTime(a_Split)
 
 	return CommonSpecialTime( GetWorld( a_Split[3] ), a_Split[2] )
@@ -173,7 +173,7 @@ function HandleConsoleSpecialTime(a_Split)
 end
 
 
--- Handler for /time query daytime [WorldName]
+-- Handler for /time query daytime [world]
 function HandleQueryDaytimeCommand( Split, Player )
 
 	local World = GetWorld( Split[4], Player )
@@ -189,7 +189,7 @@ function HandleQueryDaytimeCommand( Split, Player )
 end
 
 
--- Handler for console command: time query daytime [WorldName]
+-- Handler for console command: time query daytime [world]
 function HandleConsoleQueryDaytime(a_Split)
 
 	local World = GetWorld( a_Split[4] )
@@ -205,7 +205,7 @@ function HandleConsoleQueryDaytime(a_Split)
 end
 
 
--- Handler for /time query gametime [WorldName]
+-- Handler for /time query gametime [world]
 function HandleQueryGametimeCommand( Split, Player )
 
 	local World = GetWorld( Split[4], Player )
@@ -221,7 +221,7 @@ function HandleQueryGametimeCommand( Split, Player )
 end
 
 
--- Handler for console command: time query gametime [WorldName]
+-- Handler for console command: time query gametime [world]
 function HandleConsoleQueryGametime(a_Split)
 
 	local World = GetWorld( a_Split[4] )

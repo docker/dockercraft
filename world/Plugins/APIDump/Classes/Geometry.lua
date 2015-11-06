@@ -123,10 +123,10 @@ various events. See below for further information.
 			{
 				Header = "Callbacks",
 				Contents = [[
-The Callbacks in the Trace() function is a table that contains named functions. MCServer will call
+The Callbacks in the Trace() function is a table that contains named functions. Cuberite will call
 individual functions from that table for the events that occur on the line - hitting a block, going out of
 valid world data etc. The following table lists all the available callbacks. If the callback function is
-not defined, MCServer skips it. Each function can return a bool value, if it returns true, the tracing is
+not defined, Cuberite skips it. Each function can return a bool value, if it returns true, the tracing is
 aborted and Trace() returns false.</p>
 <p>
 <table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>

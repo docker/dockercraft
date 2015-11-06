@@ -20,7 +20,7 @@ return
 			{ Name = "Pickup", Type = "{{cPickup}}", Notes = "The pickup being collected" },
 		},
 		Returns = [[
-			If the function returns false or no value, MCServer calls other plugins' callbacks and finally the
+			If the function returns false or no value, Cuberite calls other plugins' callbacks and finally the
 			pickup is collected. If the function returns true, no other plugins are called for this event and
 			the pickup is not collected.
 		]],

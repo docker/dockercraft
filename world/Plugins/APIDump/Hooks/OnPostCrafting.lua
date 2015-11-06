@@ -6,7 +6,7 @@ return
 		DefaultFnName = "OnPostCrafting",  -- also used as pagename
 		Desc = [[
 			This hook is called when a {{cPlayer|player}} changes contents of their
-			{{cCraftingGrid|crafting grid}}, after the recipe has been established by MCServer. Plugins may use
+			{{cCraftingGrid|crafting grid}}, after the recipe has been established by Cuberite. Plugins may use
 			this to modify the resulting recipe or provide an alternate recipe.</p>
 			<p>
 			If a plugin implements custom recipes, it should do so using the {{OnPreCrafting|HOOK_PRE_CRAFTING}}
@@ -20,11 +20,11 @@ return
 		{
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has changed their crafting grid contents" },
 			{ Name = "Grid", Type = "{{cCraftingGrid}}", Notes = "The new crafting grid contents" },
-			{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that MCServer has decided to use (can be tweaked by plugins)" },
+			{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that Cuberite has decided to use (can be tweaked by plugins)" },
 		},
 		Returns = [[
 			If the function returns false or no value, other plugins' callbacks are called. If the function
-			returns true, no other callbacks are called for this event. In either case, MCServer uses the value
+			returns true, no other callbacks are called for this event. In either case, Cuberite uses the value
 			of Recipe as the recipe to be presented to the player.
 		]],
 	},  -- HOOK_POST_CRAFTING

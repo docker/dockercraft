@@ -2,7 +2,7 @@
 
 <html>
 	<head>
-		<title>MCS Plugin Tutorial</title>
+		<title>Cuberite Plugin Tutorial</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -11,7 +11,7 @@
 	</head>
 	<body>
 		<div id="content">
-			<h1>Writing a MCServer plugin</h1>
+			<h1>Writing a Cuberite plugin</h1>
 			<p>
 			This article will explain how to write a basic plugin. It details basic requirements
 			for a plugin, explains how to register a hook and bind a command, and gives plugin
@@ -19,13 +19,13 @@
 			</p>
 			<p>
 			Let us begin. In order to begin development, we must firstly obtain a compiled copy
-			of MCServer, and make sure that the Core plugin is within the Plugins folder, and activated.
-			Core handles much of the MCServer end-user experience and gameplay will be very bland without it.
+			of Cuberite, and make sure that the Core plugin is within the Plugins folder, and activated.
+			Core handles much of the Cuberite end-user experience and gameplay will be very bland without it.
 			</p>
 			<h2>Creating the basic template</h2>
 			<p>
 			Plugins are written in Lua. Therefore, create a new Lua file. You can create as many files as you wish, with
-			any filename - MCServer bungs them all together at runtime, however, let us create a file called main.lua for now.
+			any filename - Cuberite bungs them all together at runtime, however, let us create a file called main.lua for now.
 			Format it like so:
 			</p>
 			<pre class="prettyprint lang-lua">
@@ -34,11 +34,11 @@ PLUGIN = nil
 function Initialize(Plugin)
 	Plugin:SetName("NewPlugin")
 	Plugin:SetVersion(1)
-	
+
 	-- Hooks
-	
+
 	PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
-	
+
 	-- Command Bindings
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
@@ -60,12 +60,12 @@ end
 					This global variable is only needed if you want to know the plugin details (name, etc.) when shutting down.</li>
 				<li><b>function OnDisable</b> is called when the plugin is disabled, commonly when the server is shutting down. Perform cleanup and logging here.</li>
 			</ul>
-			Be sure to return true for this function, else MCS thinks you plugin had failed to initialise and prints a stacktrace with an error message.
+			Be sure to return true for this function, else Cuberite thinks you plugin had failed to initialise and prints a stacktrace with an error message.
 			</p>
-			
+
 			<h2>Registering hooks</h2>
 			<p>
-			Hooks are things that MCServer calls when an internal event occurs. For example, a hook is fired when a player places a block, moves,
+			Hooks are things that Cuberite calls when an internal event occurs. For example, a hook is fired when a player places a block, moves,
 			logs on, eats, and many other things. For a full list, see <a href="index.html">the API documentation</a>.
 			</p>
 			<p>
@@ -85,7 +85,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
 			<ul>
 				<li><b>cPluginManager.AddHook</b> registers the hook. The hook name is the second parameter. See the previous API documentation link for a list of all hooks.</li>
 			</ul>
-			What about the third parameter, you ask? Well, it is the name of the function that MCServer calls when the hook fires. It is in this
+			What about the third parameter, you ask? Well, it is the name of the function that Cuberite calls when the hook fires. It is in this
 			function that you should handle or cancel the hook.
 			</p>
 			<p>
@@ -113,7 +113,7 @@ end
 			<h2>Binding a command</h2>
 			<h3>Format</h3>
 			<p>
-			So now we know how to hook into MCServer, how do we bind a command, such as /explode, for a player to type? That is more complicated.
+			So now we know how to hook into Cuberite, how do we bind a command, such as /explode, for a player to type? That is more complicated.
 			We firstly add this template to the "-- Command bindings" section of the initial example:
 			</p>
 			<pre class="prettyprint lang-lua">
@@ -140,11 +140,11 @@ cPluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " ~
 			</p>
 			<h3>Parameters</h3>
 			<p>
-			What parameters are in the function MCServer calls when the command is executed? A 'Split' array and a 'Player' object.
+			What parameters are in the function Cuberite calls when the command is executed? A 'Split' array and a 'Player' object.
 			</p>
 			<h4>The Split Array</h4>
 			<p>
-			The Split array is an array of all text submitted to the server, including the actual command. MCServer automatically splits the text into the array,
+			The Split array is an array of all text submitted to the server, including the actual command. Cuberite automatically splits the text into the array,
 			so plugin authors do not need to worry about that. An example of a Split array passed for the command, "/derp zubby explode" would be:<br /><br />
 				&nbsp&nbsp /derp (Split[1])<br />
 				&nbsp&nbsp zubby (Split[2])<br />
@@ -206,7 +206,7 @@ function Explode(Split, Player)
 		return true
 	end
 
-	-- Create a callback ExplodePlayer with parameter Explodee, which MCS calls for every player on the server
+	-- Create a callback ExplodePlayer with parameter Explodee, which Cuberite calls for every player on the server
 	local HasExploded = false
 	local ExplodePlayer = function(Explodee)
 		-- If the player we are currently at is the one we specified as the parameter
@@ -215,18 +215,18 @@ function Explode(Split, Player)
 			Player:GetWorld():DoExplosionAt(Explodee:GetPosX(), Explodee:GetPosY(), Explodee:GetPosZ(), false, esPlugin)
 			Player:SendMessageSuccess(Split[2] .. " was successfully exploded")
 			HasExploded = true;
-			return true -- Signalize to MCS that we do not need to call this callback for any more players
+			return true -- Signalize to Cuberite that we do not need to call this callback for any more players
 		end
 	end
-	
-	-- Tell MCS to loop through all players and call the callback above with the Player object it has found
+
+	-- Tell Cuberite to loop through all players and call the callback above with the Player object it has found
 	cRoot:Get():FindAndDoWithPlayer(Split[2], ExplodePlayer)
-	
+
 	if not(HasExploded) then
 		-- We have not broken out so far, therefore, the player must not exist, send failure
 		Player:SendMessageFailure(Split[2] .. " was not found")
 	end
-	
+
 	return true
 end
 
@@ -239,14 +239,14 @@ function OnCollectingPickup(Player, Pickup) -- Again, see the API docs for param
 end
 			</pre>
 			<p>
-			Make sure to read the comments for a description of what everything does. Also be sure to return true for all <b>command</b> handlers, unless you want MCS to print out an "Unknown command" message
+			Make sure to read the comments for a description of what everything does. Also be sure to return true for all <b>command</b> handlers, unless you want Cuberite to print out an "Unknown command" message
 			when the command gets executed :P. Make sure to follow standards - use CoreMessaging.lua functions for messaging, dashes for no parameter commands and tildes for vice versa,
 			and finally, <a href="index.html">the API documentation</a> is your friend!
 			</p>
 			<p>
 			Happy coding ;)
 			</p>
-			
+
 			<script>
 				prettyPrint();
 			</script>

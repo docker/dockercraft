@@ -76,6 +76,47 @@ return
 		},
 	},
 
+	cBrewingstandEntity =
+	{
+		Desc = [[
+			This class represents a brewingstand entity in the world.</p>
+			<p>
+			See also the {{cRoot}}:GetBrewingRecipe() function.
+		]],
+		Functions =
+		{
+			GetBrewingTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current items finishes brewing, in ticks" },
+			GetTimeBrewed = { Params = "", Return = "number", Notes = "Returns the time that the current items has been brewing, in ticks" },
+			GetLeftBottleSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the left bottle slot" },
+			GetMiddleBottleSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the middle bottle slot" },
+			GetRightBottleSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the right bottle slot" },
+			GetIndgredientSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the ingredient slot" },
+			GetResultItem = { Params = "number", Return = "{{cItem|cItem}}", Notes = "Returns the expected result item for the given slot number." },
+			SetLeftBottleSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the left bottle slot" },
+			SetMiddleBottleSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the middle bottle slot" },
+			SetRightBottleSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the right bottle slot" },
+			SetIngredientSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the ingredient bottle slot" },
+		},
+		Constants =
+		{
+			bsLeftBottle = { Notes = "Index of the left bottle slot" },
+			bsMiddleBottle = { Notes = "Index of the middle bottle slot" },
+			bsRightBottle = { Notes = "Index of the right bottle slot" },
+			bsIngredient = { Notes = "Index of the ingredient slot" },
+			ContentsWidth = { Notes = "Width (X) of the {{cItemGrid|cItemGrid}} representing the contents" },
+			ContentsHeight = { Notes = "Height (Y) of the {{cItemGrid|cItemGrid}} representing the contents" },
+		},
+		ConstantGroups =
+		{
+			SlotIndices =
+			{
+				Include = "bs.*",
+				TextBefore = "When using the GetSlot() or SetSlot() function, use these constants for slot index:",
+			},
+		},
+		Inherits = "cBlockEntityWithItems"
+	},  -- cBrewingstandEntity
+
 	cChestEntity =
 	{
 		Desc = [[

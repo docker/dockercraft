@@ -371,6 +371,49 @@ end
 
 
 
+function HandleConsoleNetSClient(a_Split)
+	-- Get the address to connect to:
+	local Host = a_Split[3] or "github.com"
+	local Port = a_Split[4] or 443
+
+	-- Create the callbacks "personalised" for the address:
+	local Callbacks =
+	{
+		OnConnected = function (a_Link)
+			LOG("Connected to " .. Host .. ":" .. Port .. ".")
+			LOG("Connection stats: Remote address: " .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. ", Local address: " .. a_Link:GetLocalIP() .. ":" .. a_Link:GetLocalPort())
+			LOG("Sending HTTP request for front page.")
+			a_Link:StartTLSClient()
+			a_Link:Send("GET / HTTP/1.0\r\nHost: " .. Host .. "\r\n\r\n")
+		end,
+
+		OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
+			LOG("Connection to " .. Host .. ":" .. Port .. " failed: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+		end,
+
+		OnReceivedData = function (a_Link, a_Data)
+			LOG("Received data from " .. Host .. ":" .. Port .. ":\r\n" .. a_Data)
+		end,
+
+		OnRemoteClosed = function (a_Link)
+			LOG("Connection to " .. Host .. ":" .. Port .. " was closed by the remote peer.")
+		end
+	}
+
+	-- Queue a connect request:
+	local res = cNetwork:Connect(Host, Port, Callbacks)
+	if not(res) then
+		LOGWARNING("cNetwork:Connect call failed immediately")
+		return true
+	end
+
+	return true, "SSL Client connection request queued."
+end
+
+
+
+
+
 function HandleConsoleNetUdpClose(a_Split)
 	-- Get the port to close:
 	local Port = tonumber(a_Split[4] or 1024)

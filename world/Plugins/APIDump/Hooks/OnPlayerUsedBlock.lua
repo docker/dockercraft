@@ -6,7 +6,7 @@ return
 		DefaultFnName = "OnPlayerUsedBlock",  -- also used as pagename
 		Desc = [[
 			This hook is called after a {{cPlayer|player}} has right-clicked a block that can be used, such as a
-			{{cChestEntity|chest}} or a lever. It is called after MCServer processes the usage (sends the UI
+			{{cChestEntity|chest}} or a lever. It is called after Cuberite processes the usage (sends the UI
 			handling packets / toggles redstone). Note that for UI-related blocks, the player is most likely
 			still using the UI. This is a notification-only event.</p>
 			<p>

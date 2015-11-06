@@ -23,7 +23,7 @@ function Initialize( Plugin )
 	Plugin:SetVersion( 1 )
 
 	-- This is the place for commands!
-	-- cPluginManager.BindCommand("/language", "transapi.setlang", HandleLanguageCommand, " - Set your preferred language (use ISO 639-1)")
+	cPluginManager.BindCommand("/language", "transapi.setlang", HandleLanguageCommand, " - Set your preferred language (use ISO 639-1)")
 
 	-- Load the userdata file.
 	g_UserData = cIniFile()

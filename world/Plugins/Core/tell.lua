@@ -1,6 +1,6 @@
 function HandleTellCommand(Split, Player)
 	if (Split[2] == nil) or (Split[3] == nil) then
-		SendMessage( Player, "Usage: "..Split[1].." <player> <message>")
+		SendMessage( Player, "Usage: "..Split[1].." <player> <message ...>")
 		return true
 	end
 	
@@ -32,7 +32,7 @@ end
 
 function HandleRCommand(Split,Player)
     if Split[2] == nil then
-        Player:SendMessageInfo("Usage: "..Split[1].." <message>")
+        Player:SendMessageInfo("Usage: "..Split[1].." <message ...>")
     else
         local SendMessage = function(OtherPlayer)
             if (OtherPlayer:GetName() == lastsender[Player:GetName()]) then

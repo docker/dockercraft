@@ -1,7 +1,7 @@
 function HandleKickCommand( Split, Player )
 
 	if( #Split < 2 ) then
-		SendMessage( Player, "Usage: /kick [Player] <Reason>" )
+		SendMessage( Player, "Usage: " .. Split[1] .. " <player> [reason ...]" )
 		return true
 	end
 

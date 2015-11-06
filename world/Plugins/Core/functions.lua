@@ -1,7 +1,3 @@
-function SetBackCoordinates( Player )
-	BackCoords[Player:GetName()] = Vector3d( Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() )
-end
-
 function SendMessage(a_Player, a_Message)
 	a_Player:SendMessageInfo(a_Message)
 end
@@ -106,7 +102,6 @@ function TeleportToPlayer( a_SrcPlayer, a_DstPlayerName, a_TellDst )
 			-- Asked to teleport to self?
 			SendMessageFailure( a_SrcPlayer, "Y' can't teleport to yerself!" )
 		else
-			SetBackCoordinates( a_SrcPlayer )
 			a_SrcPlayer:TeleportToEntity( a_DstPlayerName )
 			SendMessageSuccess( a_SrcPlayer, "You teleported to " .. a_DstPlayerName:GetName() .. "!" )
 			if (a_TellDst) then

@@ -19,7 +19,7 @@ return
 		},
 		Returns = [[
 			If the function returns true, no other plugins are called for this event and the client is kicked.
-			If the function returns false or no value, MCServer calls other plugins' callbacks and finally
+			If the function returns false or no value, Cuberite calls other plugins' callbacks and finally
 			sends an authentication request for the client's username to the auth server. If the auth server
 			is disabled in the server settings, the player object is immediately created.
 		]],

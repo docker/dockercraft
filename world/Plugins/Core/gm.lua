@@ -64,7 +64,7 @@ local function ChangeGameMode( GameMode, PlayerName )
 
 end
 
---- Handles the `/gamemode <survival|creative|adventure|spectator> [PlayerName]` in-game command
+--- Handles the `/gamemode <survival|creative|adventure|spectator> [player]` in-game command
 --  
 function HandleChangeGMCommand(Split, Player)
 
@@ -72,7 +72,7 @@ function HandleChangeGMCommand(Split, Player)
 	local GameMode = GameModeTable[Split[2]]
 
 	if not GameMode then
-		SendMessage(Player, "Usage: " .. Split[1] .. " <survival|creative|adventure|spectator> [PlayerName]" )
+		SendMessage(Player, "Usage: " .. Split[1] .. " <survival|creative|adventure|spectator> [player]" )
 		return true
 	end
 
@@ -98,7 +98,7 @@ function HandleChangeGMCommand(Split, Player)
 end
 
 
---- Handles the `gamemode <survival|creative|adventure|spectator> [PlayerName]` console command
+--- Handles the `gamemode <survival|creative|adventure|spectator> [player]` console command
 --  
 function HandleConsoleGamemode( a_Split )
 
@@ -107,7 +107,7 @@ function HandleConsoleGamemode( a_Split )
 	local PlayerToChange = a_Split[3]
 	
 	if not PlayerToChange or not GameMode then
-		return true, "Usage: " .. a_Split[1] .. " <survival|creative|adventure|spectator> <PlayerName> "
+		return true, "Usage: " .. a_Split[1] .. " <survival|creative|adventure|spectator> <player> "
 	end
 
 	-- Report success or failure:

@@ -287,7 +287,7 @@ end
 function HandleWhitelistAddCommand(a_Split, a_Player)
 	-- Check params:
 	if (a_Split[3] == nil) then
-		SendMessage(a_Player, "Usage: /whitelist add <PlayerName>")
+		SendMessage(a_Player, "Usage: " .. a_Split[1] .. " add <player>")
 		return true
 	end
 	local playerName = a_Split[3]
@@ -352,7 +352,7 @@ end
 function HandleWhitelistRemoveCommand(a_Split, a_Player)
 	-- Check params:
 	if ((a_Split[3] == nil) or (a_Split[4] ~= nil)) then
-		SendMessage(a_Player, "Usage: /whitelist remove [PlayerName]")
+		SendMessage(a_Player, "Usage: " .. a_Split[1] .. " remove <player>")
 		return true
 	end
 	local playerName = a_Split[3]
@@ -378,7 +378,7 @@ end
 function HandleConsoleWhitelistAdd(a_Split)
 	-- Check params:
 	if (a_Split[3] == nil) then
-		return true, "Usage: whitelist add <PlayerName>"
+		return true, "Usage: " .. a_Split[1] .. " add <player>"
 	end
 	local playerName = a_Split[3]
 
@@ -438,7 +438,7 @@ end
 function HandleConsoleWhitelistRemove(a_Split)
 	-- Check params:
 	if ((a_Split[3] == nil) or (a_Split[4] ~= nil)) then
-		return true, "Usage: whitelist remove <PlayerName>"
+		return true, "Usage: " .. a_Split[1] .. " remove <player>"
 	end
 	local playerName = a_Split[3]
 

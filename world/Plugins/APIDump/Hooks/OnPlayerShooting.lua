@@ -20,7 +20,7 @@ return
 		},
 		Returns = [[
 			If the function returns false or no value, the next plugin's callback is called, and finally
-			MCServer creates the projectile. If the functino returns true, no other callback is called and no
+			Cuberite creates the projectile. If the functino returns true, no other callback is called and no
 			projectile is created.
 		]],
 	},  -- HOOK_PLAYER_SHOOTING

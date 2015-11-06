@@ -4,7 +4,7 @@ function HandlePortalCommand(Split, Player)
 		SendMessage(Player, "You are in world " .. Player:GetWorld():GetName())
 		return true
 	elseif (NumParams ~= 2) then
-		SendMessage(Player, "Usage: /portal [WorldName]")
+		SendMessage(Player, "Usage: " .. Split[1] .. " [world]")
 		return true
 	end
 	if (Player:GetWorld():GetName() == Split[2]) then
