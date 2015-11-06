@@ -6,7 +6,7 @@ A simple Minecraft docker client, to visualize and run containers.
 ### Build the image:
 
 ```
-docker build -t mcclient .
+docker build -t dockercraft .
 ```
 
 ### Run the container:
@@ -15,7 +15,8 @@ docker build -t mcclient .
 docker run -t -i -d -p 25565:25565 \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v `docker-machine ssh $(docker-machine active) which docker`:/usr/local/bin/docker \
---name mcclient mcclient
+--name dockercraft \
+dockercraft
 ```
 
 Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
@@ -59,6 +60,3 @@ function PlayerJoined(Player)
 	r = os.execute("goproxy containers")
 end
 ```
-
-
-
