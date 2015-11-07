@@ -22,12 +22,3 @@ GROUND_MAX_Z = CONTAINER_START_Z + 6
 -- maximum of block updates that can be handled
 -- in one single tick, for performance issues.
 MAX_BLOCK_UPDATE_PER_TICK = 50
-
--- list of blocks to be updated (first in first out)
-FIRST_BLOCK_UPDATE = nil
-LAST_BLOCK_UPDATE = nil
-
--- block update operation types
-UPDATE_SET = 0
-UPDATE_DIG = 1
-UPDATE_SIGN = 2

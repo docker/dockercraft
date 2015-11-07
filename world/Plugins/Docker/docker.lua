@@ -1,132 +1,19 @@
--- update operations in the list should have these fields:
--- {op (UPDATE_SET || UPDATE_DIG || UPDATE_SIGN), next, x, y, z, [blockID, meta]}
 
-function setBlock(x,y,z,blockID,meta)
-	update = {op=UPDATE_SET,next=nil,x=x,y=y,z=z,blockID=blockID,meta=meta }
-
-	if FIRST_BLOCK_UPDATE == nil
-	then 
-		FIRST_BLOCK_UPDATE = update
-		LAST_BLOCK_UPDATE = update
-	else 
-		LAST_BLOCK_UPDATE.next = update
-		LAST_BLOCK_UPDATE = update
-	end
-end
-
-function digBlock(x,y,z)
-	update = {op=UPDATE_DIG,next=nil,x=x,y=y,z=z }
-
-	if FIRST_BLOCK_UPDATE == nil
-	then 
-		FIRST_BLOCK_UPDATE = update
-		LAST_BLOCK_UPDATE = update
-	else 
-		LAST_BLOCK_UPDATE.next = update
-		LAST_BLOCK_UPDATE = update
-	end
-end
-
-function updateSign(x,y,z,line1,line2,line3,line4,delay)
-
-	update = {op=UPDATE_SIGN,next=nil,x=x,y=y,z=z,line1=line1,line2=line2,line3=line3,line4=line4,delay=delay }
-
-	if FIRST_BLOCK_UPDATE == nil
-	then 
-		FIRST_BLOCK_UPDATE = update
-		LAST_BLOCK_UPDATE = update
-	else 
-		LAST_BLOCK_UPDATE.next = update
-		LAST_BLOCK_UPDATE = update
-	end
-end
-
-
--- updates one block
--- returns false if there's no update remaining in the list
--- otherwise, returns true
-function updateOneBlock()
-
-	if FIRST_BLOCK_UPDATE == nil
-	then 
-		return false
-	else 
-		update = FIRST_BLOCK_UPDATE
-		FIRST_BLOCK_UPDATE = FIRST_BLOCK_UPDATE.next
-
-		if update.op == UPDATE_SET
-			then
-			cRoot:Get():GetDefaultWorld():SetBlock(update.x,update.y,update.z,update.blockID,update.meta)
-			return true
-		end
-
-		if update.op == UPDATE_DIG
-			then
-			cRoot:Get():GetDefaultWorld():DigBlock(update.x,update.y,update.z)
-			return true
-		end
-
-		if update.op == UPDATE_SIGN
-			then
-
-			if update.delay ~= nil and update.delay > 0
-			then
-				local sign = {}
-				sign.x = update.x
-				sign.y = update.y
-				sign.z = update.z
-				sign.line1 = update.line1
-				sign.line2 = update.line2
-				sign.line3 = update.line3
-				sign.line4 = update.line4
-
-				--table.insert(SignsToUpdate,sign)
-				--cRoot:Get():GetDefaultWorld():ScheduleTask(update.delay,updateSigns)
-
-				cRoot:Get():GetDefaultWorld():ScheduleTask(update.delay,
-					function(World)
-						-- LOG("UPDATE SIGN: " .. " | " .. (sign.line1 or "") .. " | " .. (sign.line2 or "") .. " | " .. (sign.line3 or "") .. " | " ..(sign.line4 or ""))
-						cRoot:Get():GetDefaultWorld():SetSignLines(sign.x,sign.y,sign.z,sign.line1,sign.line2,sign.line3,sign.line4)
-					end
-				)
-
-			else
-				cRoot:Get():GetDefaultWorld():SetSignLines(update.x,update.y,update.z,update.line1,update.line2,update.line3,update.line4)
-			end
-
-			return true
-		end
-	end
-	
-end
-
-
-function Tick(TimeDelta)
-
-	-- update blocks, considering limit per tick
-	n = MAX_BLOCK_UPDATE_PER_TICK
-
- 	while n > 0
- 	do
- 		if updateOneBlock() == false
- 		then
- 			break
- 		end
- 		n = n - 1
- 	end
-
-end
-
-
-
-
+UpdateQueue = nil
 Containers = {}
 SignsToUpdate = {}
+
+-- Tick is triggered by cPluginManager.HOOK_TICK
+function Tick(TimeDelta)
+	UpdateQueue:update(MAX_BLOCK_UPDATE_PER_TICK)
+end
 
 -- Plugin initialization
 function Initialize(Plugin)
 	Plugin:SetName("Docker")
 	Plugin:SetVersion(1)
+
+	UpdateQueue = NewUpdateQueue()
 
 	-- Hooks
 
@@ -150,20 +37,7 @@ function Initialize(Plugin)
 	return true
 end
 
-
-
-function updateSigns(World)
-
-	for i=1,table.getn(SignsToUpdate)
-	do					
-		sign = SignsToUpdate[i]
-		cRoot:Get():GetDefaultWorld():SetSignLines(sign.x,sign.y,sign.z,sign.line1,sign.line2,sign.line3,sign.line4)
-	end
-	SignsToUpdate = {}
-end
-
 function updateStats(id,mem,cpu)
-
 	for i=1, table.getn(Containers)
 	do
 		-- use first empty location
@@ -318,14 +192,13 @@ end
 
 
 function DContainer:destroy(running)
-
 	for py = GROUND_LEVEL+1, GROUND_LEVEL+4
 	do
 		for px=self.x-1, self.x+4
 		do
 			for pz=self.z-1, self.z+5
 			do
-				cRoot:Get():GetDefaultWorld():DigBlock(px,py,pz)
+				digBlock(UpdateQueue,px,py,pz)
 			end	
 		end
 	end
@@ -343,123 +216,109 @@ function DContainer:display(running)
 		metaSecondaryColor = E_META_WOOL_RED
 	end
 
-
-	
 	self.displayed = true
-
 	
 	for px=self.x, self.x+3
 	do
 		for pz=self.z, self.z+4
 		do
-			setBlock(px,GROUND_LEVEL + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
-			-- cRoot:Get():GetDefaultWorld():SetBlock(px,GROUND_LEVEL + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
+			setBlock(UpdateQueue,px,GROUND_LEVEL + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
 		end
 	end
 
 	for py = GROUND_LEVEL+2, GROUND_LEVEL+3
 	do
-		setBlock(self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 
 		-- leave empty space for the door
-		-- setBlock(self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		-- setBlock(UpdateQueue,self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 		
-		setBlock(self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
 
-		setBlock(self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
-		setBlock(self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(UpdateQueue,self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(UpdateQueue,self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
 
-		setBlock(self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
 
-		setBlock(self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
-		setBlock(self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(UpdateQueue,self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
+		setBlock(UpdateQueue,self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
 
-		setBlock(self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 
-		setBlock(self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
+		setBlock(UpdateQueue,self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
 	end
 
 	-- torch
-	setBlock(self.x+1,GROUND_LEVEL+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
+	setBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
 
 	-- start / stop lever
-
-	setBlock(self.x+1,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
-	updateSign(self.x+1,GROUND_LEVEL + 3,self.z + 2,"","START/STOP","---->","",2)
+	setBlock(UpdateQueue,self.x+1,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
+	updateSign(UpdateQueue,self.x+1,GROUND_LEVEL + 3,self.z + 2,"","START/STOP","---->","",2)
 
 
 	if running
 	then
-		setBlock(self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,1)
+		setBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,1)
 	else
-		setBlock(self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,9)
+		setBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,9)
 	end
 
 
 	-- remove button
 
-	setBlock(self.x+2,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
-	updateSign(self.x+2,GROUND_LEVEL + 3,self.z + 2,"","REMOVE","---->","",2)
+	setBlock(UpdateQueue,self.x+2,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
+	updateSign(UpdateQueue,self.x+2,GROUND_LEVEL + 3,self.z + 2,"","REMOVE","---->","",2)
 
-	setBlock(self.x+2,GROUND_LEVEL+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
+	setBlock(UpdateQueue,self.x+2,GROUND_LEVEL+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
 
 
 	-- door
 	-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
-	-- setBlock(self.x+2,GROUND_LEVEL+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
+	-- setBlock(UpdateQueue,self.x+2,GROUND_LEVEL+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
 
 
 	for px=self.x, self.x+3
 	do
 		for pz=self.z, self.z+4
 		do
-			setBlock(px,GROUND_LEVEL + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
+			setBlock(UpdateQueue,px,GROUND_LEVEL + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
 		end	
 	end
 
-	setBlock(self.x+3,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	updateSign(self.x+3,GROUND_LEVEL + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag,2)
+	setBlock(UpdateQueue,self.x+3,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
+	updateSign(UpdateQueue,self.x+3,GROUND_LEVEL + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag,2)
 
 	-- Mem sign
-	setBlock(self.x,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	-- self:updateMemSign("")
+	setBlock(UpdateQueue,self.x,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
 
 	-- CPU sign
-	setBlock(self.x+1,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	-- self:updateCPUSign("")
+	setBlock(UpdateQueue,self.x+1,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
 
-
-	-- cRoot:Get():GetDefaultWorld():ScheduleTask(5,
-	-- 	function(World)
-	-- 		World:WakeUpSimulatorsInArea(self.x-1, self.x+4,GROUND_LEVEL, GROUND_LEVEL+4,self.z-1, self.z+5)
-	-- 	end
-	-- )
 end
 
 
 function DContainer:updateMemSign(s)
-	updateSign(self.x,GROUND_LEVEL + 2,self.z - 1,"Mem usage","",s,"")
+	updateSign(UpdateQueue,self.x,GROUND_LEVEL + 2,self.z - 1,"Mem usage","",s,"")
 end
 
 function DContainer:updateCPUSign(s)
-	updateSign(self.x+1,GROUND_LEVEL + 2,self.z - 1,"CPU usage","",s,"")
+	updateSign(UpdateQueue,self.x+1,GROUND_LEVEL + 2,self.z - 1,"CPU usage","",s,"")
 end
 
 
 function WorldStarted()
 	y = GROUND_LEVEL
-
 	-- just enough to fit one container
 	-- then it should be dynamic
 	for x= GROUND_MIN_X, GROUND_MAX_X
 	do
 		for z=GROUND_MIN_Z,GROUND_MAX_Z
 		do
-			cRoot:Get():GetDefaultWorld():SetBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
+			setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
 		end
 	end	
 end
@@ -475,7 +334,7 @@ function addGroundForContainer(container)
 		do
 			for z=GROUND_MIN_Z,GROUND_MAX_Z
 			do
-				setBlock(x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
+				setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
 			end
 		end	
 	end
