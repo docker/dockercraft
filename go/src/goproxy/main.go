@@ -299,21 +299,6 @@ func main() {
 			}
 		}
 
-		// os.exec in lua will block the script execution
-		// it's better to do it in goproxy
-		// in lua: `os.exec("goproxy exec PLAYER_NAME docker run...)`
-		if len(os.Args) >= 4 && os.Args[1] == "exec" {
-
-			reqPath := "http://127.0.0.1:8000/exec?cmd=" + strings.Join(os.Args[3:], "+")
-
-			resp, err := http.Get(reqPath)
-			if err != nil {
-				fmt.Println("Error on request:", reqPath, "ERROR:", err.Error())
-			} else {
-				fmt.Println("Request sent", reqPath, "StatusCode:", resp.StatusCode)
-			}
-		}
-
 		return
 	}
 

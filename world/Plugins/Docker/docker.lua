@@ -364,14 +364,12 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 			-- stop
 			if BlockMeta == 1
 			then
-				-- r = os.execute("docker kill " .. containerID)
 				Player:SendMessage("docker stop " .. string.sub(containerID,1,8))
-				r = os.execute("goproxy exec " .. Player:GetName() .. " docker stop " .. containerID)
+				r = os.execute("goproxy exec?cmd=docker+stop+" .. containerID)
 			-- start
 			else 
-				-- r = os.execute("docker start " .. containerID)
 				Player:SendMessage("docker start " .. string.sub(containerID,1,8))
-				r = os.execute("goproxy exec " .. Player:GetName() .. " docker start " .. containerID)
+				os.execute("goproxy exec?cmd=docker+start+" .. containerID)
 			end
 		end
 	end
@@ -385,9 +383,8 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 		then
 			Player:SendMessage("A running container can't be removed.")
 		else 
-			-- r = os.execute("docker rm " .. containerID)
 			Player:SendMessage("docker rm " .. string.sub(containerID,1,8))
-			r = os.execute("goproxy exec " .. Player:GetName() .. " docker rm " .. containerID)
+			os.execute("goproxy exec?cmd=docker+rm+" .. containerID)
 		end
 	end
 end
@@ -423,11 +420,11 @@ function DockerCommand(Split, Player)
 						table.insert(Split,3,"-d")
 					end
 
-					EntireCommand = table.concat(Split, " ")
+					EntireCommand = table.concat(Split, "+")
+					-- remove '/' at the beginning
 					command = string.sub(EntireCommand, 2, -1)
 					
-					-- r = os.execute(command)
-					r = os.execute("goproxy exec " .. Player:GetName() .. " " .. command)
+					r = os.execute("goproxy exec?cmd=" .. command)
 
 					LOG("executed: " .. command .. " -> " .. tostring(r))
 				end
