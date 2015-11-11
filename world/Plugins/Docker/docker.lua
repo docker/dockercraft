@@ -37,6 +37,8 @@ function Initialize(Plugin)
 	return true
 end
 
+-- updateStats update CPU and memory usage displayed
+-- on container sign (container identified by id)
 function updateStats(id,mem,cpu)
 	for i=1, table.getn(Containers)
 	do
@@ -50,8 +52,9 @@ function updateStats(id,mem,cpu)
 	end
 end
 
+-- getStartStopLeverContainer returns the container
+-- id that corresponds to lever at x,y coordinates
 function getStartStopLeverContainer(x,z)
-
 	for i=1, table.getn(Containers)
 	do
 		-- use first empty location
@@ -60,13 +63,12 @@ function getStartStopLeverContainer(x,z)
 			return Containers[i].id
 		end
 	end
-
 	return ""
 end
 
--- returns container ID and running state (true / false)
+-- getRemoveButtonContainer returns the container
+-- id and state for the button at x,y coordinates
 function getRemoveButtonContainer(x,z)
-
 	for i=1, table.getn(Containers)
 	do
 		-- use first empty location
@@ -75,13 +77,12 @@ function getRemoveButtonContainer(x,z)
 			return Containers[i].id, Containers[i].running
 		end
 	end
-
 	return "", true
 end
 
-
+-- destroyContainer looks for the container with given
+-- id on the map and removes it.
 function destroyContainer(id)
-
 	for i=1, table.getn(Containers)
 	do
 		-- use first empty location
@@ -92,67 +93,54 @@ function destroyContainer(id)
 			break
 		end
 	end
-
 end
 
-
-UPDATE_CREATED = 0
-UPDATE_RUNNING = 1
-UPDATE_STOPPED = 2
 -- updateContainer accepts 3 different states: running, stopped, created
 -- sometimes "start" events arrive before "create" ones
 -- in this case, we just ignore the update
 function updateContainer(id,name,imageRepo,imageTag,state)
-
-	x = CONTAINER_START_X
-
-	index = -1
+	LOG("Update container with ID: " .. id .. " state: " .. state)
 
 	-- first pass, to see if container
 	-- already displayed (maybe with another state)
 	for i=1, table.getn(Containers)
 	do
+		LOG("looking for id: " .. Containers[i].id .. " i:" .. i)
 		-- if container found with same ID
 		if Containers[i] ~= nil and Containers[i].id == id
 		then
-			-- container already found
-			-- "create" event arrives too late
-			if state == UPDATE_CREATED then
-				return
-			end
 
-			index = i
-			break
+			Containers[i]:setInfos(id,name,imageRepo,imageTag,state == CONTAINER_RUNNING)
+			Containers[i]:display(state == CONTAINER_RUNNING)
+			LOG("found. updated. now return")
+			return
+
 		end
-
 		x = x + CONTAINER_OFFSET_X		
 	end
 
 	-- if container not already displayed
 	-- see if there's an empty location
-	if index == -1
-	then
-		x = CONTAINER_START_X
+	x = CONTAINER_START_X
+	index = -1
 
-		for i=1, table.getn(Containers)
-		do
-			-- use first empty location
-			if Containers[i] == nil
-			then
-				LOG("Found empty location: Containers[" .. tostring(i) .. "]")
-				index = i
-				break
-			end
-
-			x = x + CONTAINER_OFFSET_X			
+	for i=1, table.getn(Containers)
+	do
+		-- use first empty location
+		if Containers[i] == nil
+		then
+			LOG("Found empty location: Containers[" .. tostring(i) .. "]")
+			index = i
+			break
 		end
+		x = x + CONTAINER_OFFSET_X			
 	end
 
-	container = newDContainer()
+	container = NewContainer()
 	container:init(x,CONTAINER_START_Z)
-	container:setInfos(id,name,imageRepo,imageTag,state == UPDATE_RUNNING)
-	addGroundForContainer(container)
-	container:display(state == UPDATE_RUNNING)
+	container:setInfos(id,name,imageRepo,imageTag,state == CONTAINER_RUNNING)
+	container:addGround()
+	container:display(state == CONTAINER_RUNNING)
 
 	if index == -1
 		then
@@ -160,153 +148,6 @@ function updateContainer(id,name,imageRepo,imageTag,state)
 		else
 			Containers[index] = container
 	end
-end
-
-
-DContainer = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag=""}
-
-function newDContainer()
-	dc = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag="",running=false}
-	dc.init = DContainer.init
-	dc.setInfos = DContainer.setInfos
-	dc.display = DContainer.display
-	dc.destroy = DContainer.destroy
-	dc.updateMemSign = DContainer.updateMemSign
-	dc.updateCPUSign = DContainer.updateCPUSign
-	return dc
-end
-
-function DContainer:init(x,z)
-	self.x = x
-	self.z = z
-	self.displayed = false
-end
-
-function DContainer:setInfos(id,name,imageRepo,imageTag,running)
-	self.id = id
-	self.name = name
-	self.imageRepo = imageRepo
-	self.imageTag = imageTag
-	self.running = running
-end
-
-
-function DContainer:destroy(running)
-	for py = GROUND_LEVEL+1, GROUND_LEVEL+4
-	do
-		for px=self.x-1, self.x+4
-		do
-			for pz=self.z-1, self.z+5
-			do
-				digBlock(UpdateQueue,px,py,pz)
-			end	
-		end
-	end
-end
-
-
-function DContainer:display(running)
-
-	metaPrimaryColor = E_META_WOOL_LIGHTBLUE
-	metaSecondaryColor = E_META_WOOL_BLUE
-
-	if running == false 
-	then
-		metaPrimaryColor = E_META_WOOL_ORANGE
-		metaSecondaryColor = E_META_WOOL_RED
-	end
-
-	self.displayed = true
-	
-	for px=self.x, self.x+3
-	do
-		for pz=self.z, self.z+4
-		do
-			setBlock(UpdateQueue,px,GROUND_LEVEL + 1,pz,E_BLOCK_WOOL,metaPrimaryColor)
-		end
-	end
-
-	for py = GROUND_LEVEL+2, GROUND_LEVEL+3
-	do
-		setBlock(UpdateQueue,self.x+1,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-
-		-- leave empty space for the door
-		-- setBlock(UpdateQueue,self.x+2,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-		
-		setBlock(UpdateQueue,self.x,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(UpdateQueue,self.x+3,py,self.z,E_BLOCK_WOOL,metaPrimaryColor)
-
-		setBlock(UpdateQueue,self.x,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
-		setBlock(UpdateQueue,self.x+3,py,self.z+1,E_BLOCK_WOOL,metaSecondaryColor)
-
-		setBlock(UpdateQueue,self.x,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(UpdateQueue,self.x+3,py,self.z+2,E_BLOCK_WOOL,metaPrimaryColor)
-
-		setBlock(UpdateQueue,self.x,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
-		setBlock(UpdateQueue,self.x+3,py,self.z+3,E_BLOCK_WOOL,metaSecondaryColor)
-
-		setBlock(UpdateQueue,self.x,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(UpdateQueue,self.x+3,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-
-		setBlock(UpdateQueue,self.x+1,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-		setBlock(UpdateQueue,self.x+2,py,self.z+4,E_BLOCK_WOOL,metaPrimaryColor)
-	end
-
-	-- torch
-	setBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+3,E_BLOCK_TORCH,E_META_TORCH_ZP)
-
-	-- start / stop lever
-	setBlock(UpdateQueue,self.x+1,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XP)
-	updateSign(UpdateQueue,self.x+1,GROUND_LEVEL + 3,self.z + 2,"","START/STOP","---->","",2)
-
-
-	if running
-	then
-		setBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,1)
-	else
-		setBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,9)
-	end
-
-
-	-- remove button
-
-	setBlock(UpdateQueue,self.x+2,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
-	updateSign(UpdateQueue,self.x+2,GROUND_LEVEL + 3,self.z + 2,"","REMOVE","---->","",2)
-
-	setBlock(UpdateQueue,self.x+2,GROUND_LEVEL+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
-
-
-	-- door
-	-- mcserver bug with Minecraft 1.8 apparently, doors are not displayed correctly
-	-- setBlock(UpdateQueue,self.x+2,GROUND_LEVEL+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
-
-
-	for px=self.x, self.x+3
-	do
-		for pz=self.z, self.z+4
-		do
-			setBlock(UpdateQueue,px,GROUND_LEVEL + 4,pz,E_BLOCK_WOOL,metaPrimaryColor)
-		end	
-	end
-
-	setBlock(UpdateQueue,self.x+3,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-	updateSign(UpdateQueue,self.x+3,GROUND_LEVEL + 2,self.z - 1,string.sub(self.id,1,8),self.name,self.imageRepo,self.imageTag,2)
-
-	-- Mem sign
-	setBlock(UpdateQueue,self.x,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-
-	-- CPU sign
-	setBlock(UpdateQueue,self.x+1,GROUND_LEVEL + 2,self.z - 1,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_ZM)
-
-end
-
-
-function DContainer:updateMemSign(s)
-	updateSign(UpdateQueue,self.x,GROUND_LEVEL + 2,self.z - 1,"Mem usage","",s,"")
-end
-
-function DContainer:updateCPUSign(s)
-	updateSign(UpdateQueue,self.x+1,GROUND_LEVEL + 2,self.z - 1,"CPU usage","",s,"")
 end
 
 
@@ -323,24 +164,6 @@ function WorldStarted()
 	end	
 end
 
-function addGroundForContainer(container)
-
-	if GROUND_MIN_X > container.x - 2
-	then 
-		OLD_GROUND_MIN_X = GROUND_MIN_X
-		GROUND_MIN_X = container.x - 2
-
-		for x= GROUND_MIN_X, OLD_GROUND_MIN_X
-		do
-			for z=GROUND_MIN_Z,GROUND_MAX_Z
-			do
-				setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
-			end
-		end	
-	end
-end
-
-
 function PlayerJoined(Player)
 	-- refresh containers
 	LOG("player joined")
@@ -349,15 +172,14 @@ function PlayerJoined(Player)
 end
 
 function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
-
-	-- LOG("Using block: " .. tostring(BlockX) .. "," .. tostring(BlockY) .. "," .. tostring(BlockZ) .. " - " .. tostring(BlockType) .. " - " .. tostring(BlockMeta))
+	LOG("Using block: " .. tostring(BlockX) .. "," .. tostring(BlockY) .. "," .. tostring(BlockZ) .. " - " .. tostring(BlockType) .. " - " .. tostring(BlockMeta))
 
 	-- lever: 1->OFF 9->ON (in that orientation)
-
 	-- lever
 	if BlockType == 69
 	then
 		containerID = getStartStopLeverContainer(BlockX,BlockZ)
+		LOG("Using lever associated with container ID: " .. containerID)
 
 		if containerID ~= ""
 		then
@@ -459,9 +281,9 @@ function HandleRequest_Docker(Request)
 
 			-- LOG("containerInfos running: " .. running)
 
-			state = UPDATE_STOPPED
+			state = CONTAINER_STOPPED
 			if running == "true" then
-				state = UPDATE_RUNNING
+				state = CONTAINER_RUNNING
 			end
 
 			updateContainer(id,name,imageRepo,imageTag,state)
@@ -476,7 +298,7 @@ function HandleRequest_Docker(Request)
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			updateContainer(id,name,imageRepo,imageTag,UPDATE_RUNNING)
+			updateContainer(id,name,imageRepo,imageTag,CONTAINER_RUNNING)
 		end
 
 		if action == "createContainer"
@@ -488,7 +310,7 @@ function HandleRequest_Docker(Request)
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			updateContainer(id,name,imageRepo,imageTag,UPDATE_CREATED)
+			updateContainer(id,name,imageRepo,imageTag,CONTAINER_CREATED)
 		end
 
 		if action == "stopContainer"
@@ -500,7 +322,7 @@ function HandleRequest_Docker(Request)
 			imageTag = Request.PostParams["imageTag"]
 			id = Request.PostParams["id"]
 
-			updateContainer(id,name,imageRepo,imageTag,UPDATE_STOPPED)
+			updateContainer(id,name,imageRepo,imageTag,CONTAINER_STOPPED)
 		end
 
 		if action == "destroyContainer"
@@ -534,6 +356,3 @@ function HandleRequest_Docker(Request)
 	return content
 end
 
--- function OnDisable()
--- 	LOG(PLUGIN:GetName() .. " is shutting down...")
--- end
