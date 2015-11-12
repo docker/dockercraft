@@ -14,14 +14,11 @@ docker build -t dockercraft .
 ```
 docker run -t -i -d -p 25565:25565 \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v `docker-machine ssh $(docker-machine active) which docker`:/usr/local/bin/docker \
 --name dockercraft \
 dockercraft
 ```
 
 Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
-
-Mounting `/usr/local/bin/docker` inside the container is necessary to bind Minecraft commands to Docker CLI commands. The binary may not always be stored at the same place depending on the environment, if you're using **docker-machine**, this command should return the right path: `docker-machine ssh $(docker-machine active) which docker`
 
 
 ### How it works
@@ -43,7 +40,7 @@ Basically it means the plungin can catch POST requests sent to `http://127.0.0.1
 
 Events from the Docker remote API are transmitted to the LUA plugin by a small daemon (written in Go). (go/src/goproxy)
 
-```golang
+```go
 func MCServerRequest(data url.Values, client *http.Client) {
 	req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
