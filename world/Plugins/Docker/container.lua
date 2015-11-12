@@ -10,7 +10,23 @@ CONTAINER_STOPPED = 2
 -- representation of a Docker container in
 -- the Minecraft world
 function NewContainer()
-	c = Container
+	c = {
+			displayed = false, 
+			x = 0, 
+			z = 0, 
+			name="",
+			id="",
+			imageRepo="",
+			imageTag="",
+			running=false,
+			init=Container.init,
+			setInfos=Container.setInfos,
+			destroy=Container.destroy,
+			display=Container.display,
+			updateMemSign=Container.updateMemSign,
+			updateCPUSign=Container.updateCPUSign,
+			addGround=Container.addGround
+		}
 	return c
 end
 
