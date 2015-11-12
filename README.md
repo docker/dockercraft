@@ -3,23 +3,47 @@ A simple Minecraft docker client, to visualize and run containers.
 
 [![Dockercraft video](http://img.youtube.com/vi/eZDlJgJf55o/0.jpg)](http://www.youtube.com/watch?v=eZDlJgJf55o)
 
-### Build the image:
+### How to run Dockercraft
 
-```
-docker build -t dockercraft .
-```
+1. **Install Minecraft: [minecraft.net](https://minecraft.net)**
 
-### Run the container:
+	The Minecraft client hasn't been modified, just get the official release.
 
-```
-docker run -t -i -d -p 25565:25565 \
--v /var/run/docker.sock:/var/run/docker.sock \
---name dockercraft \
-dockercraft
-```
+2. **Pull or build Dockercraft image:**
 
-Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
+	```
+	docker pull dockercraft
+	```
+	or
+	
+	```
+	git clone git@github.com:docker/dockercraft.git
+	docker build -t dockercraft dockercraft
+	```
+3. **Run Dockercraft container:**
 
+	```
+	docker run -t -i -d -p 25565:25565 \
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	--name dockercraft \
+	dockercraft
+	```
+	
+	Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
+	
+	The default port for a Minecraft server is *25565*, if you prefer a different one: `-p <port>:25565`
+	
+4. **Open Minecraft > Multiplayer > Add Server**
+
+	The server address is the IP of Docker host. No need to specify a port if you used the default one.
+	
+	If you're using [Docker Machine](https://docs.docker.com/machine/install-machine/): `docker-machine ip <machine_name>`
+	
+5. **Join Server!**
+
+	You should see at least one container in your world, which is the one hosting your Dockercrasft server.
+	
+	You can start, stop and remove containers interacting with levers and buttons. Some Docker commands are also supported directly via Minecraft's chat window, which is displayed by pressing the `T` key (default) or `/` key. 
 
 ### How it works
 
