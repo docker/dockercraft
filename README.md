@@ -3,7 +3,7 @@ A simple Minecraft docker client, to visualize and run containers.
 
 [![Dockercraft video](http://img.youtube.com/vi/eZDlJgJf55o/0.jpg)](http://www.youtube.com/watch?v=eZDlJgJf55o)
 
-### How to run Dockercraft
+## How to run Dockercraft
 
 1. **Install Minecraft: [minecraft.net](https://minecraft.net)**
 
@@ -41,11 +41,11 @@ A simple Minecraft docker client, to visualize and run containers.
 	
 5. **Join Server!**
 
-	You should see at least one container in your world, which is the one hosting your Dockercrasft server.
+	You should see at least one container in your world, which is the one hosting your Dockercraft server.
 	
 	You can start, stop and remove containers interacting with levers and buttons. Some Docker commands are also supported directly via Minecraft's chat window, which is displayed by pressing the `T` key (default) or `/` key. 
 
-### How it works
+## How it works
 
 The game itself remains unmodified. All operations are done server side. 
 
@@ -60,7 +60,7 @@ Plugin:AddWebTab("Docker",HandleRequest_Docker)
 ```
 Basically it means the plungin can catch POST requests sent to `http://127.0.0.1:8080/webadmin/Docker/Docker`. 
 
-#### Goproxy
+### Goproxy
 
 Events from the Docker remote API are transmitted to the LUA plugin by a small daemon (written in Go). (go/src/goproxy)
 
@@ -81,3 +81,6 @@ function PlayerJoined(Player)
 	r = os.execute("goproxy containers")
 end
 ```
+## Contributing
+
+Want to hack on Dockercraft? [Docker's contributions guidelines](https://github.com/docker/docker/blob/master/CONTRIBUTING.md) apply.
