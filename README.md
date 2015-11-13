@@ -1,7 +1,12 @@
 # Dockercraft
-A simple Minecraft docker client, to visualize and run containers.
 
-[![Dockercraft video](http://img.youtube.com/vi/eZDlJgJf55o/0.jpg)](http://www.youtube.com/watch?v=eZDlJgJf55o)
+<!-- Drawing: Dockercraft logo -->
+
+A simple Minecraft Docker client, to visualize and manage Docker containers.
+
+![Dockercraft](https://raw.githubusercontent.com/docker/dockercraft/master/docs/img/dockercraft.gif)
+
+[YouTube video](http://www.youtube.com/watch?v=eZDlJgJf55o)
 
 ## How to run Dockercraft
 
@@ -44,10 +49,12 @@ A simple Minecraft docker client, to visualize and run containers.
 	You should see at least one container in your world, which is the one hosting your Dockercraft server.
 	
 	You can start, stop and remove containers interacting with levers and buttons. Some Docker commands are also supported directly via Minecraft's chat window, which is displayed by pressing the `T` key (default) or `/` key. 
+	
+<!-- Drawing: character and containers -->
 
 ## How it works
 
-The game itself remains unmodified. All operations are done server side. 
+The Minecraft client itself remains unmodified. All operations are done server side.
 
 The Minecraft server we use is [http://cuberite.org](http://cuberite.org). A custom Minecraft compatible game server written in C++. [github repo](https://github.com/cuberite/cuberite)
 
@@ -84,3 +91,5 @@ end
 ## Contributing
 
 Want to hack on Dockercraft? [Docker's contributions guidelines](https://github.com/docker/docker/blob/master/CONTRIBUTING.md) apply.
+
+<!-- Drawing: Contributing -->
