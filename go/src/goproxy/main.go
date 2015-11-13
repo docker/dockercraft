@@ -33,7 +33,8 @@ type CPUStats struct {
 	SystemUsage uint64
 }
 
-// previousCPUStats is a map containing TODO: gaetan:
+// previousCPUStats is a map containing the previous CPU stats we got from the 
+// docker daemon through the docker remote API
 var previousCPUStats map[string]*CPUStats = make(map[string]*CPUStats)
 
 func main() {
@@ -56,7 +57,7 @@ func main() {
 		return
 	}
 
-	// init the dockerclient object
+	// init docker client object
 	var err error
 	DOCKER_CLIENT, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
 	if err != nil {
@@ -79,22 +80,17 @@ func main() {
 
 // eventCallback receives and handles the docker events
 func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}) {
+	logrus.Debugln("--\n%+v", *event)
 
-	// logrus.Println("--\n%+v", *event)
-
-	client := &http.Client{}
 	id := event.Id
 
 	switch event.Status {
 	case "create":
-		logrus.Println("create event")
+		logrus.Debugln("create event")
 
 		repo, tag := splitRepoAndTag(event.From)
-
 		containerName := "<name>"
-
 		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -108,17 +104,14 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageRepo": {repo},
 			"imageTag":  {tag}}
 
-		CuberiteServerRequest(data, client)
+		CuberiteServerRequest(data)
 
 	case "start":
-		logrus.Println("start event")
+		logrus.Debugln("start event")
 
 		repo, tag := splitRepoAndTag(event.From)
-
 		containerName := "<name>"
-
 		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -134,8 +127,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 		// Monitor stats
 		DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
-
-		CuberiteServerRequest(data, client)
+		CuberiteServerRequest(data)
 
 	case "stop":
 		// die event is enough
@@ -150,14 +142,12 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
 
 	case "die":
-		logrus.Println("die event")
+		logrus.Debugln("die event")
+
 		// same as stop event
 		repo, tag := splitRepoAndTag(event.From)
-
 		containerName := "<name>"
-
 		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -171,17 +161,17 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageRepo": {repo},
 			"imageTag":  {tag}}
 
-		CuberiteServerRequest(data, client)
+		CuberiteServerRequest(data)
 
 	case "destroy":
-		logrus.Println("destroy event")
+		logrus.Debugln("destroy event")
 
 		data := url.Values{
 			"action": {"destroyContainer"},
 			"id":     {id},
 		}
 
-		CuberiteServerRequest(data, client)
+		CuberiteServerRequest(data)
 	}
 }
 
@@ -189,21 +179,15 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 // the cuberite server
 func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...interface{}) {
 
-	//logrus.Println("STATS", id, stat)
-	// logrus.Println("---")
-	// logrus.Println("cpu :", float64(stat.CpuStats.CpuUsage.TotalUsage)/float64(stat.CpuStats.SystemUsage))
-	// logrus.Println("ram :", stat.MemoryStats.Usage)
-
-	client := &http.Client{}
+	// logrus.Debugln("STATS", id, stat)
+	// logrus.Debugln("---")
+	// logrus.Debugln("cpu :", float64(stat.CpuStats.CpuUsage.TotalUsage)/float64(stat.CpuStats.SystemUsage))
+	// logrus.Debugln("ram :", stat.MemoryStats.Usage)
 
 	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
-
 	var cpuPercent float64 = 0.0
-
 	if preCPUStats, exists := previousCPUStats[id]; exists {
-
 		cpuPercent = calculateCPUPercent(preCPUStats, &stat.CpuStats)
-
 	}
 
 	previousCPUStats[id] = &CPUStats{TotalUsage: stat.CpuStats.CpuUsage.TotalUsage, SystemUsage: stat.CpuStats.SystemUsage}
@@ -214,40 +198,24 @@ func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...in
 		"cpu":    {strconv.FormatFloat(cpuPercent, 'f', 2, 64) + "%"},
 		"ram":    {strconv.FormatFloat(memPercent, 'f', 2, 64) + "%"}}
 
-	CuberiteServerRequest(data, client)
+	CuberiteServerRequest(data)
 }
 
 // execCmd handles http requests received for the path "/exec"
 func execCmd(w http.ResponseWriter, r *http.Request) {
 
-	logrus.Println("*** execCmd (1)")
-
 	io.WriteString(w, "OK")
 
 	go func() {
-
-		logrus.Println("*** execCmd")
-
 		cmd := r.URL.Query().Get("cmd")
-
-		logrus.Println("*** cmd:", cmd)
-
 		cmd, _ = url.QueryUnescape(cmd)
-
-		logrus.Println("*** cmd (unescape):", cmd)
-
 		arr := strings.Split(cmd, " ")
-
-		logrus.Println("*** arr:", arr)
-
 		if len(arr) > 0 {
 			cmd := exec.Command(arr[0], arr[1:]...)
-
 			// Stdout buffer
 			// cmdOutput := &bytes.Buffer{}
 			// Attach buffer to command
 			// cmd.Stdout = cmdOutput
-
 			// Execute command
 			// printCommand(cmd)
 			err := cmd.Run() // will wait for command to return
@@ -279,8 +247,6 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		client := &http.Client{}
-
 		for i := 0; i < len(containers); i++ {
 
 			id := containers[i].Id
@@ -307,7 +273,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 				"running":   {strconv.FormatBool(info.State.Running)},
 			}
 
-			CuberiteServerRequest(data, client)
+			CuberiteServerRequest(data)
 
 			if info.State.Running {
 				// Monitor stats
@@ -354,12 +320,8 @@ func splitRepoAndTag(repoTag string) (string, string) {
 
 // CuberiteServerRequest send a POST request that will be handled
 // by our Cuberite Docker plugin.
-func CuberiteServerRequest(data url.Values, client *http.Client) {
-
-	if client == nil {
-		client = &http.Client{}
-	}
-
+func CuberiteServerRequest(data url.Values) {
+	client := &http.Client{}
 	req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth("admin", "admin")

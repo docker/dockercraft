@@ -7,7 +7,7 @@ function logTable (tbl, indent)
 		formatting = string.rep("  ", indent) .. k .. ": "
 		if type(v) == "table" then
 			print(formatting)
-			tprint(v, indent+1)
+			logTable(v, indent+1)
 		elseif type(v) == 'boolean' then
 			print(formatting .. tostring(v))
 		elseif type(v) == 'function' then
