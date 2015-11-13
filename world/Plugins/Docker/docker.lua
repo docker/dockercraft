@@ -3,6 +3,10 @@ UpdateQueue = nil
 Containers = {}
 SignsToUpdate = {}
 
+-- as a lua array cannot contain nil values, we store references to this object
+-- in the "Containers" array to indicate that there is no container at an index
+EmptyContainerSpace = {}
+
 -- Tick is triggered by cPluginManager.HOOK_TICK
 function Tick(TimeDelta)
 	UpdateQueue:update(MAX_BLOCK_UPDATE_PER_TICK)
@@ -39,11 +43,10 @@ end
 
 -- updateStats update CPU and memory usage displayed
 -- on container sign (container identified by id)
-function updateStats(id,mem,cpu)
+function updateStats(id, mem, cpu)
 	for i=1, table.getn(Containers)
 	do
-		-- use first empty location
-		if Containers[i] ~= nil and Containers[i].id == id
+		if Containers[i] ~= EmptyContainerSpace and Containers[i].id == id
 		then
 			Containers[i]:updateMemSign(mem)
 			Containers[i]:updateCPUSign(cpu)
@@ -54,11 +57,10 @@ end
 
 -- getStartStopLeverContainer returns the container
 -- id that corresponds to lever at x,y coordinates
-function getStartStopLeverContainer(x,z)
+function getStartStopLeverContainer(x, z)
 	for i=1, table.getn(Containers)
 	do
-		-- use first empty location
-		if Containers[i] ~= nil and x == Containers[i].x + 1 and z == Containers[i].z + 1
+		if Containers[i] ~= EmptyContainerSpace and x == Containers[i].x + 1 and z == Containers[i].z + 1
 		then
 			return Containers[i].id
 		end
@@ -68,11 +70,10 @@ end
 
 -- getRemoveButtonContainer returns the container
 -- id and state for the button at x,y coordinates
-function getRemoveButtonContainer(x,z)
+function getRemoveButtonContainer(x, z)
 	for i=1, table.getn(Containers)
 	do
-		-- use first empty location
-		if Containers[i] ~= nil and x == Containers[i].x + 2 and z == Containers[i].z + 3
+		if Containers[i] ~= EmptyContainerSpace and x == Containers[i].x + 2 and z == Containers[i].z + 3
 		then
 			return Containers[i].id, Containers[i].running
 		end
@@ -86,10 +87,10 @@ function destroyContainer(id)
 	for i=1, table.getn(Containers)
 	do
 		-- use first empty location
-		if Containers[i] ~= nil and Containers[i].id == id
+		if Containers[i] ~= EmptyContainerSpace and Containers[i].id == id
 		then
 			Containers[i]:destroy()
-			Containers[i] = nil
+			Containers[i] = EmptyContainerSpace
 			break
 		end
 	end
@@ -101,33 +102,29 @@ end
 function updateContainer(id,name,imageRepo,imageTag,state)
 	LOG("Update container with ID: " .. id .. " state: " .. state)
 
-	-- first pass, to see if container
+	-- first pass, to see if the container is
 	-- already displayed (maybe with another state)
 	for i=1, table.getn(Containers)
 	do
-		LOG("looking for id: " .. Containers[i].id .. " i:" .. i)
-		-- if container found with same ID
-		if Containers[i] ~= nil and Containers[i].id == id
+		-- if container found with same ID, we update it
+		if Containers[i] ~= EmptyContainerSpace and Containers[i].id == id
 		then
-
 			Containers[i]:setInfos(id,name,imageRepo,imageTag,state == CONTAINER_RUNNING)
 			Containers[i]:display(state == CONTAINER_RUNNING)
 			LOG("found. updated. now return")
 			return
-
 		end
-		x = x + CONTAINER_OFFSET_X		
 	end
 
-	-- if container not already displayed
-	-- see if there's an empty location
+	-- if container isn't already displayed, we see if there's an empty space
+	-- in the world to display the container
 	x = CONTAINER_START_X
 	index = -1
 
 	for i=1, table.getn(Containers)
 	do
 		-- use first empty location
-		if Containers[i] == nil
+		if Containers[i] == EmptyContainerSpace
 		then
 			LOG("Found empty location: Containers[" .. tostring(i) .. "]")
 			index = i
@@ -150,7 +147,7 @@ function updateContainer(id,name,imageRepo,imageTag,state)
 	end
 end
 
-
+--
 function WorldStarted()
 	y = GROUND_LEVEL
 	-- just enough to fit one container
@@ -164,6 +161,7 @@ function WorldStarted()
 	end	
 end
 
+--
 function PlayerJoined(Player)
 	-- refresh containers
 	LOG("player joined")
@@ -171,6 +169,7 @@ function PlayerJoined(Player)
 	LOG("executed: goproxy containers -> " .. tostring(r))
 end
 
+-- 
 function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
 	LOG("Using block: " .. tostring(BlockX) .. "," .. tostring(BlockY) .. "," .. tostring(BlockZ) .. " - " .. tostring(BlockType) .. " - " .. tostring(BlockMeta))
 
@@ -193,6 +192,8 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 				Player:SendMessage("docker start " .. string.sub(containerID,1,8))
 				os.execute("goproxy exec?cmd=docker+start+" .. containerID)
 			end
+		else
+			LOG("WARNING: no docker container ID attached to this lever")
 		end
 	end
 
@@ -328,9 +329,7 @@ function HandleRequest_Docker(Request)
 		if action == "destroyContainer"
 		then
 			LOG("EVENT - destroyContainer")
-
 			id = Request.PostParams["id"]
-
 			destroyContainer(id)
 		end
 
