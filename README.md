@@ -4,7 +4,7 @@
 
 A simple Minecraft Docker client, to visualize and manage Docker containers.
 
-![Dockercraft](https://raw.githubusercontent.com/docker/dockercraft/master/docs/img/dockercraft.gif)
+![Dockercraft](../blob/master/docs/img/dockercraft.gif?raw=true)
 
 [YouTube video](http://www.youtube.com/watch?v=eZDlJgJf55o)
 
