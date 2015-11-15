@@ -1,6 +1,9 @@
 
+-- queue containing the updates that need to be applied to the minecraft world
 UpdateQueue = nil
+-- array of container objects
 Containers = {}
+-- 
 SignsToUpdate = {}
 
 -- as a lua array cannot contain nil values, we store references to this object
@@ -81,16 +84,35 @@ function getRemoveButtonContainer(x, z)
 	return "", true
 end
 
--- destroyContainer looks for the container with given
--- id on the map and removes it.
+-- destroyContainer looks for the first container having the given id,
+-- removes it from the Minecraft world and from the 'Containers' array
 function destroyContainer(id)
+	-- loop over the containers and remove the first having the given id
 	for i=1, table.getn(Containers)
 	do
-		-- use first empty location
 		if Containers[i] ~= EmptyContainerSpace and Containers[i].id == id
 		then
+			-- remove the container from the world
 			Containers[i]:destroy()
-			Containers[i] = EmptyContainerSpace
+			-- if the container being removed is the last element of the array
+			-- we reduce the size of the "Container" array, but if it is not, 
+			-- we store a reference to the "EmptyContainerSpace" object at the
+			-- same index to indicate this is a free space now.
+			-- We use a reference to this object because it is not possible to
+			-- have 'nil' values in the middle of a lua array.
+			if i == table.getn(Containers)
+			then
+				table.remove(Containers, i)
+				-- we have removed the last element of the array. If the array
+				-- has tailing empty container spaces, we remove them as well.
+				while Containers[table.getn(Containers)] == EmptyContainerSpace
+				do
+					table.remove(Containers, table.getn(Containers))
+				end
+			else
+				Containers[i] = EmptyContainerSpace
+			end
+			-- we removed the container, we can exit the loop
 			break
 		end
 	end
