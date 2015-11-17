@@ -1,6 +1,6 @@
 # Dockercraft
 
-<!-- Drawing: Dockercraft logo -->
+![Dockercraft](../master/docs/img/logo.png?raw=true)
 
 A simple Minecraft Docker client, to visualize and manage Docker containers.
 
@@ -50,7 +50,7 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 	
 	You can start, stop and remove containers interacting with levers and buttons. Some Docker commands are also supported directly via Minecraft's chat window, which is displayed by pressing the `T` key (default) or `/` key. 
 	
-<!-- Drawing: character and containers -->
+![Dockercraft](../master/docs/img/landscape.png?raw=true)
 
 ## How it works
 
@@ -92,4 +92,4 @@ end
 
 Want to hack on Dockercraft? [Docker's contributions guidelines](https://github.com/docker/docker/blob/master/CONTRIBUTING.md) apply.
 
-<!-- Drawing: Contributing -->
+![Dockercraft](../master/docs/img/contribute.png?raw=true)
