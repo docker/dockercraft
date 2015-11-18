@@ -20,7 +20,7 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 	docker pull dockercraft
 	```
 	or
-	
+
 	```
 	git clone git@github.com:docker/dockercraft.git
 	docker build -t dockercraft dockercraft
@@ -33,23 +33,23 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 	--name dockercraft \
 	dockercraft
 	```
-	
+
 	Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
-	
+
 	The default port for a Minecraft server is *25565*, if you prefer a different one: `-p <port>:25565`
-	
+
 4. **Open Minecraft > Multiplayer > Add Server**
 
 	The server address is the IP of Docker host. No need to specify a port if you used the default one.
-	
+
 	If you're using [Docker Machine](https://docs.docker.com/machine/install-machine/): `docker-machine ip <machine_name>`
-	
+
 5. **Join Server!**
 
 	You should see at least one container in your world, which is the one hosting your Dockercraft server.
-	
-	You can start, stop and remove containers interacting with levers and buttons. Some Docker commands are also supported directly via Minecraft's chat window, which is displayed by pressing the `T` key (default) or `/` key. 
-	
+
+	You can start, stop and remove containers interacting with levers and buttons. Some Docker commands are also supported directly via Minecraft's chat window, which is displayed by pressing the `T` key (default) or `/` key.
+
 ![Dockercraft](../master/docs/img/landscape.png?raw=true)
 
 ## How it works
@@ -58,18 +58,18 @@ The Minecraft client itself remains unmodified. All operations are done server s
 
 The Minecraft server we use is [http://cuberite.org](http://cuberite.org). A custom Minecraft compatible game server written in C++. [github repo](https://github.com/cuberite/cuberite)
 
-This server accepts plugins, scripts written in LUA. So we did one for Docker. (world/Plugins/Docker)
+This server accepts plugins, scripts written in Lua. So we did one for Docker. (world/Plugins/Docker)
 
-Unfortunately, there's no nice API to communicate with these plugins. But there's a webadmin, and plugins can be responsible for "webtabs". 
+Unfortunately, there's no nice API to communicate with these plugins. But there's a webadmin, and plugins can be responsible for "webtabs".
 
 ```lua
 Plugin:AddWebTab("Docker",HandleRequest_Docker)
 ```
-Basically it means the plungin can catch POST requests sent to `http://127.0.0.1:8080/webadmin/Docker/Docker`. 
+Basically it means the plungin can catch POST requests sent to `http://127.0.0.1:8080/webadmin/Docker/Docker`.
 
 ### Goproxy
 
-Events from the Docker remote API are transmitted to the LUA plugin by a small daemon (written in Go). (go/src/goproxy)
+Events from the Docker remote API are transmitted to the Lua plugin by a small daemon (written in Go). (go/src/goproxy)
 
 ```go
 func MCServerRequest(data url.Values, client *http.Client) {
@@ -80,7 +80,7 @@ func MCServerRequest(data url.Values, client *http.Client) {
 }
 ```
 
-The goproxy binary can also be executed with parameters from the LUA plugin, to send requests to the daemon:
+The goproxy binary can also be executed with parameters from the Lua plugin, to send requests to the daemon:
 
 ```lua
 function PlayerJoined(Player)
