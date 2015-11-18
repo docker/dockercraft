@@ -30,6 +30,7 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 	```
 	docker run -t -i -d -p 25565:25565 \
 	-v /var/run/docker.sock:/var/run/docker.sock \
+	-v /usr/local/bin/docker:/usr/local/bin/docker \
 	--name dockercraft \
 	gaetan/dockercraft
 	```
