@@ -58,7 +58,7 @@ The Minecraft client itself remains unmodified. All operations are done server s
 
 The Minecraft server we use is [http://cuberite.org](http://cuberite.org). A custom Minecraft compatible game server written in C++. [github repo](https://github.com/cuberite/cuberite)
 
-This server accepts plugins, scripts written in LUA. So we did one for Docker. (world/Plugins/Docker)
+This server accepts plugins, scripts written in Lua. So we did one for Docker. (world/Plugins/Docker)
 
 Unfortunately, there's no nice API to communicate with these plugins. But there's a webadmin, and plugins can be responsible for "webtabs". 
 
@@ -69,7 +69,7 @@ Basically it means the plungin can catch POST requests sent to `http://127.0.0.1
 
 ### Goproxy
 
-Events from the Docker remote API are transmitted to the LUA plugin by a small daemon (written in Go). (go/src/goproxy)
+Events from the Docker remote API are transmitted to the Lua plugin by a small daemon (written in Go). (go/src/goproxy)
 
 ```go
 func MCServerRequest(data url.Values, client *http.Client) {
@@ -80,7 +80,7 @@ func MCServerRequest(data url.Values, client *http.Client) {
 }
 ```
 
-The goproxy binary can also be executed with parameters from the LUA plugin, to send requests to the daemon:
+The goproxy binary can also be executed with parameters from the Lua plugin, to send requests to the daemon:
 
 ```lua
 function PlayerJoined(Player)
