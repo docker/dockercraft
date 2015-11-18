@@ -65,7 +65,7 @@ Unfortunately, there's no nice API to communicate with these plugins. But there'
 ```lua
 Plugin:AddWebTab("Docker",HandleRequest_Docker)
 ```
-Basically it means the plungin can catch POST requests sent to `http://127.0.0.1:8080/webadmin/Docker/Docker`. 
+Basically it means the plugin can catch POST requests sent to `http://127.0.0.1:8080/webadmin/Docker/Docker`. 
 
 ### Goproxy
 
