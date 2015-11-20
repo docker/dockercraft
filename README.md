@@ -52,6 +52,27 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 
 ![Dockercraft](../master/docs/img/landscape.png?raw=true)
 
+## Upcoming features
+
+This is just the beginning for Dockercraft! We should be able to support a lot more Docker features like:
+
+- List [Docker Machines](https://docs.docker.com/machine/) and use portals to see what's inside
+- Support more Docker commands
+- Display [logs](https://docs.docker.com/v1.8/reference/commandline/logs/) (for each container, pushing a simple button)
+- Represent links
+- Docker networking
+- Docker volumes
+- ...
+
+If you're interested about Dockercraft's design, discussions happen in [that issue](https://github.com/docker/dockercraft/issues/19).
+Also, we're using [Magicavoxel](https://voxel.codeplex.com) to do these nice prototypes:
+
+![Dockercraft](../master/docs/img/voxelproto.jpg?raw=true)
+
+You can find our Magicavoxel patterns in [that folder](![Dockercraft](https://github.com/docker/dockercraft/tree/master/docs/magicavoxel)).
+
+To get fresh news, follow our Twitter account: [@dockercraft](https://twitter.com/dockercraft).
+
 ## How it works
 
 The Minecraft client itself remains unmodified. All operations are done server side.
