@@ -28,6 +28,7 @@ function Initialize(Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
 	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
+	cPluginManager:AddHook(cPluginManager.HOOK_SERVER_PING, OnServerPing);
 	cPluginManager:AddHook(cPluginManager.HOOK_TICK, Tick);
 
 	-- Command Bindings
@@ -376,4 +377,17 @@ function HandleRequest_Docker(Request)
 
 	return content
 end
+
+function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers, Favicon)
+	-- Change Server Description
+	ServerDescription = "A Docker client for Minecraft"
+	-- Change favicon
+	if cFile:IsFile("/srv/logo.png") then
+		local FaviconData = cFile:ReadWholeFile("/srv/logo.png")
+		if (FaviconData ~= "") and (FaviconData ~= nil) then
+			Favicon = Base64Encode(FaviconData)
+		end
+	end
+	return false, ServerDescription, OnlinePlayers, MaxPlayers, Favicon
+end				
 
