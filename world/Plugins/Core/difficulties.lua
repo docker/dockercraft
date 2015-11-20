@@ -14,9 +14,9 @@ function HandleDifficultyCommand ( Split, Player )
 	if (Split[2] == nil) then
 		if (#Split == 1) then
 			SendMessage(Player, "Current world difficulty: " .. GetWorldDifficulty(Player:GetWorld()))
-			SendMessage(Player, "To change: /difficulty [peaceful/easy/normal/hard]")
+			SendMessage(Player, "To change: " .. Split[1] .. " <peaceful|easy|normal|hard>")
 		else
-			SendMessage( Player, "Usage: /difficulty [peaceful/easy/normal/hard]" )
+			SendMessage( Player, "Usage: " .. Split[1] .. " <peaceful|easy|normal|hard>" )
 		end
 		return true
 	end
@@ -34,7 +34,7 @@ function HandleDifficultyCommand ( Split, Player )
 		SetWorldDifficulty(Player:GetWorld(), 3)
 		SendMessage( Player, "World difficulty set to hard" )
 	else
-		SendMessage( Player, "Usage: /difficulty [peaceful/easy/normal/hard]" )
+		SendMessage( Player, "Usage: " .. Split[1] .. " <peaceful|easy|normal|hard>" )
 	end
 
 	return true

@@ -222,6 +222,7 @@ function HandleListUsers(a_Split, a_Player)
 	-- Command syntax: /protection user list AreaID
 	if (#a_Split ~= 4) then
 		a_Player:SendMessage(g_Msgs.ErrExpectedAreaID);
+		return true
 	end
 	
 	-- Get the general info about the area

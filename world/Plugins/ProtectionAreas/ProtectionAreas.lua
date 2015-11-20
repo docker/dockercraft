@@ -31,7 +31,8 @@ function Initialize(a_Plugin)
 		return false;
 	end
 	InitializeHooks(a_Plugin);
-	RegisterPluginInfoCommands();
+	dofile(cPluginManager:GetPluginsPath() .. "/InfoReg.lua")
+	RegisterPluginInfoCommands()
 	
 	-- We might be reloading, so there may be players already present in the server; reload all of them
 	cRoot:Get():ForEachWorld(

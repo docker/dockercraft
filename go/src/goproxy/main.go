@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"github.com/samalba/dockerclient"
 	"io"
 	"net/http"
 	"net/url"
@@ -10,32 +8,91 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/samalba/dockerclient"
 )
 
+// goproxy main purpose is to be a daemon connecting the docker daemon
+// (remote API) and the custom Minecraft server (cubrite using lua scripts).
+// But the cuberite lua scripts also execute goproxy as a short lived process
+// to send requests to the goproxy daemon. If the program is executed without
+// additional arguments it is the daemon "mode".
+//
+// As a daemon, goproxy listens for events from the docker daemon and send
+// them to the cuberite server. It also listen for requests from the
+// cuberite server, convert them into docker daemon remote API calls and send
+// them to the docker daemon.
+
+// instance of DockerClient allowing for making calls to the docker daemon
+// remote API
 var DOCKER_CLIENT *dockerclient.DockerClient
 
-// Callback used to listen to Docker's events
+type CPUStats struct {
+	TotalUsage  uint64
+	SystemUsage uint64
+}
+
+// previousCPUStats is a map containing the previous CPU stats we got from the 
+// docker daemon through the docker remote API
+var previousCPUStats map[string]*CPUStats = make(map[string]*CPUStats)
+
+func main() {
+
+	// goproxy is executed as a short lived process to send a request to the
+	// goproxy daemon process
+	if len(os.Args) > 1 {
+		// If there's an argument
+		// It will be considered as a path for an HTTP GET request
+		// That's a way to communicate with goproxy daemon
+		if len(os.Args) == 2 {
+			reqPath := "http://127.0.0.1:8000/" + os.Args[1]
+			resp, err := http.Get(reqPath)
+			if err != nil {
+				logrus.Println("Error on request:", reqPath, "ERROR:", err.Error())
+			} else {
+				logrus.Println("Request sent", reqPath, "StatusCode:", resp.StatusCode)
+			}
+		}
+		return
+	}
+
+	// init docker client object
+	var err error
+	DOCKER_CLIENT, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	// start monitoring docker events
+	DOCKER_CLIENT.StartMonitorEvents(eventCallback, nil)
+
+	// start a http server and listen on local port 8000
+	go func() {
+		http.HandleFunc("/containers", listContainers)
+		http.HandleFunc("/exec", execCmd)
+		http.ListenAndServe(":8000", nil)
+	}()
+
+	// wait for interruption
+	<-make(chan int)
+}
+
+// eventCallback receives and handles the docker events
 func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}) {
-
-	fmt.Println("---")
-	fmt.Printf("%+v\n", *event)
-
-	client := &http.Client{}
+	logrus.Debugln("--\n%+v", *event)
 
 	id := event.Id
 
 	switch event.Status {
 	case "create":
-		fmt.Println("create event")
+		logrus.Debugln("create event")
 
 		repo, tag := splitRepoAndTag(event.From)
-
 		containerName := "<name>"
-
 		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
 		if err != nil {
-			fmt.Print("InspectContainer error:", err.Error())
+			logrus.Print("InspectContainer error:", err.Error())
 		} else {
 			containerName = containerInfo.Name
 		}
@@ -47,19 +104,16 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageRepo": {repo},
 			"imageTag":  {tag}}
 
-		MCServerRequest(data, client)
+		CuberiteServerRequest(data)
 
 	case "start":
-		fmt.Println("start event")
+		logrus.Debugln("start event")
 
 		repo, tag := splitRepoAndTag(event.From)
-
 		containerName := "<name>"
-
 		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
 		if err != nil {
-			fmt.Print("InspectContainer error:", err.Error())
+			logrus.Print("InspectContainer error:", err.Error())
 		} else {
 			containerName = containerInfo.Name
 		}
@@ -73,8 +127,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 		// Monitor stats
 		DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
-
-		MCServerRequest(data, client)
+		CuberiteServerRequest(data)
 
 	case "stop":
 		// die event is enough
@@ -89,16 +142,14 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
 
 	case "die":
-		fmt.Println("die event")
+		logrus.Debugln("die event")
+
 		// same as stop event
 		repo, tag := splitRepoAndTag(event.From)
-
 		containerName := "<name>"
-
 		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
-
 		if err != nil {
-			fmt.Print("InspectContainer error:", err.Error())
+			logrus.Print("InspectContainer error:", err.Error())
 		} else {
 			containerName = containerInfo.Name
 		}
@@ -110,38 +161,33 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageRepo": {repo},
 			"imageTag":  {tag}}
 
-		MCServerRequest(data, client)
+		CuberiteServerRequest(data)
 
 	case "destroy":
-		fmt.Println("destroy event")
+		logrus.Debugln("destroy event")
 
 		data := url.Values{
 			"action": {"destroyContainer"},
 			"id":     {id},
 		}
 
-		MCServerRequest(data, client)
+		CuberiteServerRequest(data)
 	}
 }
 
+// statCallback receives the stats (cpu & ram) from containers and send them to
+// the cuberite server
 func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...interface{}) {
 
-	//fmt.Println("STATS", id, stat)
-
-	// fmt.Println("---")
-	// fmt.Println("cpu :", float64(stat.CpuStats.CpuUsage.TotalUsage)/float64(stat.CpuStats.SystemUsage))
-	// fmt.Println("ram :", stat.MemoryStats.Usage)
-
-	client := &http.Client{}
+	// logrus.Debugln("STATS", id, stat)
+	// logrus.Debugln("---")
+	// logrus.Debugln("cpu :", float64(stat.CpuStats.CpuUsage.TotalUsage)/float64(stat.CpuStats.SystemUsage))
+	// logrus.Debugln("ram :", stat.MemoryStats.Usage)
 
 	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
-
 	var cpuPercent float64 = 0.0
-
 	if preCPUStats, exists := previousCPUStats[id]; exists {
-
 		cpuPercent = calculateCPUPercent(preCPUStats, &stat.CpuStats)
-
 	}
 
 	previousCPUStats[id] = &CPUStats{TotalUsage: stat.CpuStats.CpuUsage.TotalUsage, SystemUsage: stat.CpuStats.SystemUsage}
@@ -152,52 +198,35 @@ func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...in
 		"cpu":    {strconv.FormatFloat(cpuPercent, 'f', 2, 64) + "%"},
 		"ram":    {strconv.FormatFloat(memPercent, 'f', 2, 64) + "%"}}
 
-	MCServerRequest(data, client)
+	CuberiteServerRequest(data)
 }
 
+// execCmd handles http requests received for the path "/exec"
 func execCmd(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println("*** execCmd (1)")
 
 	io.WriteString(w, "OK")
 
 	go func() {
-
-		fmt.Println("*** execCmd")
-
 		cmd := r.URL.Query().Get("cmd")
-
-		fmt.Println("*** cmd:", cmd)
-
 		cmd, _ = url.QueryUnescape(cmd)
-
-		fmt.Println("*** cmd (unescape):", cmd)
-
 		arr := strings.Split(cmd, " ")
-
-		fmt.Println("*** arr:", arr)
-
 		if len(arr) > 0 {
 			cmd := exec.Command(arr[0], arr[1:]...)
-
 			// Stdout buffer
 			// cmdOutput := &bytes.Buffer{}
 			// Attach buffer to command
 			// cmd.Stdout = cmdOutput
-
 			// Execute command
 			// printCommand(cmd)
 			err := cmd.Run() // will wait for command to return
-
 			if err != nil {
-				fmt.Println("Error:", err.Error())
+				logrus.Println("Error:", err.Error())
 			}
-
 		}
 	}()
-
 }
 
+// listContainers handles and reply to http requests having the path "/containers"
 func listContainers(w http.ResponseWriter, r *http.Request) {
 
 	// answer right away to avoid dead locks in LUA
@@ -207,18 +236,16 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 		containers, err := DOCKER_CLIENT.ListContainers(true, false, "")
 
 		if err != nil {
-			fmt.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 
-		images, err := DOCKER_CLIENT.ListImages()
+		images, err := DOCKER_CLIENT.ListImages(true)
 
 		if err != nil {
-			fmt.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
-
-		client := &http.Client{}
 
 		for i := 0; i < len(containers); i++ {
 
@@ -246,7 +273,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 				"running":   {strconv.FormatBool(info.State.Running)},
 			}
 
-			MCServerRequest(data, client)
+			CuberiteServerRequest(data)
 
 			if info.State.Running {
 				// Monitor stats
@@ -255,6 +282,8 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 }
+
+// Utility functions
 
 func calculateCPUPercent(previousCPUStats *CPUStats, newCPUStats *dockerclient.CpuStats) float64 {
 	var (
@@ -269,68 +298,6 @@ func calculateCPUPercent(previousCPUStats *CPUStats, newCPUStats *dockerclient.C
 		cpuPercent = (cpuDelta / systemDelta) * float64(len(newCPUStats.CpuUsage.PercpuUsage)) * 100.0
 	}
 	return cpuPercent
-}
-
-type CPUStats struct {
-	TotalUsage  uint64
-	SystemUsage uint64
-}
-
-var previousCPUStats map[string]*CPUStats
-
-func main() {
-
-	previousCPUStats = make(map[string]*CPUStats)
-
-	if len(os.Args) > 1 {
-
-		// If there's an argument
-		// It will be considered as a path for an HTTP GET request
-		// That's a way to communicate with goproxy daemon
-
-		if len(os.Args) == 2 {
-			reqPath := "http://127.0.0.1:8000/" + os.Args[1]
-
-			resp, err := http.Get(reqPath)
-			if err != nil {
-				fmt.Println("Error on request:", reqPath, "ERROR:", err.Error())
-			} else {
-				fmt.Println("Request sent", reqPath, "StatusCode:", resp.StatusCode)
-			}
-		}
-
-		// os.exec in lua will block the script execution
-		// it's better to do it in goproxy
-		// in lua: `os.exec("goproxy exec PLAYER_NAME docker run...)`
-		if len(os.Args) >= 4 && os.Args[1] == "exec" {
-
-			reqPath := "http://127.0.0.1:8000/exec?cmd=" + strings.Join(os.Args[3:], "+")
-
-			resp, err := http.Get(reqPath)
-			if err != nil {
-				fmt.Println("Error on request:", reqPath, "ERROR:", err.Error())
-			} else {
-				fmt.Println("Request sent", reqPath, "StatusCode:", resp.StatusCode)
-			}
-		}
-
-		return
-	}
-
-	// Init the client
-	DOCKER_CLIENT, _ = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
-
-	// Monitor events
-	DOCKER_CLIENT.StartMonitorEvents(eventCallback, nil)
-
-	go func() {
-		http.HandleFunc("/containers", listContainers)
-		http.HandleFunc("/exec", execCmd)
-		http.ListenAndServe(":8000", nil)
-	}()
-
-	// wait for interruption
-	<-make(chan int)
 }
 
 func splitRepoAndTag(repoTag string) (string, string) {
@@ -351,14 +318,10 @@ func splitRepoAndTag(repoTag string) (string, string) {
 	return repo, tag
 }
 
-// MCServerRequest send a POST request that will be handled
-// by our MCServer Docker plugin.
-func MCServerRequest(data url.Values, client *http.Client) {
-
-	if client == nil {
-		client = &http.Client{}
-	}
-
+// CuberiteServerRequest send a POST request that will be handled
+// by our Cuberite Docker plugin.
+func CuberiteServerRequest(data url.Values) {
+	client := &http.Client{}
 	req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth("admin", "admin")

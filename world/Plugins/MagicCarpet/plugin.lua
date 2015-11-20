@@ -9,7 +9,7 @@ function Initialize( Plugin )
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
 	
 	local PluginManager = cPluginManager:Get()
-	-- PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
+	PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
 	
 	PLUGIN = Plugin
 	

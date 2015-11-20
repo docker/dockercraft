@@ -5,10 +5,10 @@ end
 
 function LoadMotd()
 
-	-- Check if the file 'motd.txt' exists, else create it.
-	if (not cFile:Exists("motd.txt")) then
+	-- Check if the file 'motd.txt' exists, if not, create it with default content:
+	if (not cFile:IsFile("motd.txt")) then
 		CreateFile = io.open( "motd.txt", "w" )
-		CreateFile:write("@6Welcome to the MCServer test server!\n@6http://www.mc-server.org/\n@6Type /help for all commands")
+		CreateFile:write("@6Welcome to the Cuberite test server!\n@6http://www.cuberite.org/\n@6Type /help for all commands")
 		CreateFile:close()
 	end
 

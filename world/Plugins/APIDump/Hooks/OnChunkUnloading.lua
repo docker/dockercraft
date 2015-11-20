@@ -5,8 +5,8 @@ return
 		CalledWhen = " 	A chunk is about to be unloaded from the memory. Plugins may refuse the unload.",
 		DefaultFnName = "OnChunkUnloading",  -- also used as pagename
 		Desc = [[
-			MCServer calls this function when a chunk is about to be unloaded from the memory. A plugin may
-			force MCServer to keep the chunk in memory by returning true.</p>
+			Cuberite calls this function when a chunk is about to be unloaded from the memory. A plugin may
+			force Cuberite to keep the chunk in memory by returning true.</p>
 			<p>
 			FIXME: The return value should be used only for event propagation stopping, not for the actual
 			decision whether to unload.
@@ -18,7 +18,7 @@ return
 			{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
 		},
 		Returns = [[
-			If the function returns false or no value, the next plugin's callback is called and finally MCServer
+			If the function returns false or no value, the next plugin's callback is called and finally Cuberite
 			unloads the chunk. If the function returns true, no other callback is called for this event and the
 			chunk is left in the memory.
 		]],

@@ -242,7 +242,7 @@ end
 function HandleBanCommand(a_Split, a_Player)
 	-- Check params:
 	if (a_Split[2] == nil) then
-		SendMessage(a_Player, "Usage: /ban <PlayerName> [<Reason>]")
+		SendMessage(a_Player, "Usage: " .. a_Split[1] .. " <player> [reason ...]")
 		return true
 	end
 
@@ -260,7 +260,7 @@ function HandleBanCommand(a_Split, a_Player)
 	if (KickPlayer(a_Split[2], Reason)) then
 		SendMessageSuccess(a_Player, "Successfully kicked and banned " .. a_Split[2])
 	else
-		SendMessageFailure(a_Player, "Successfully Banned " .. a_Split[2])
+		SendMessageFailure(a_Player, "Successfully banned " .. a_Split[2])
 	end
 	
 	return true
@@ -274,7 +274,7 @@ end
 function HandleUnbanCommand(a_Split, a_Player)
 	-- Check params:
 	if ((a_Split[2] == nil) or (a_Split[3] ~= nil)) then
-		SendMessage(a_Player, "Usage: /unban [Player]")
+		SendMessage(a_Player, "Usage: " .. a_Split[1] .. " <player>")
 		return true
 	end
 
@@ -294,7 +294,7 @@ end
 function HandleConsoleBan(a_Split)
 	-- Check params:
 	if (a_Split[2] == nil) then
-		return true, "Usage: ban <PlayerName> [<Reason>]"
+		return true, "Usage: " .. a_Split[1] .. " <player> [reason ...]"
 	end
 	local PlayerName = a_Split[2]
 
@@ -324,7 +324,7 @@ end
 function HandleConsoleBanIP(a_Split)
 	-- Check params:
 	if (a_Split[2] == nil) then
-		return true, "Usage: banip <IP> [<Reason>]"
+		return true, "Usage: " .. a_Split[1] .. " <IP> [reason ..]"
 	end
 	local BanIP = a_Split[2]
 
@@ -375,7 +375,7 @@ end
 function HandleConsoleUnban(a_Split)
 	-- Check params:
 	if ((a_Split[2] == nil) or (a_Split[3] ~= nil)) then
-		return true, "Usage: unban <PlayerName>"
+		return true, "Usage: " .. a_Split[1] .. " <player>"
 	end
 
 	-- Unban the player:
@@ -393,7 +393,7 @@ end
 function HandleConsoleUnbanIP(a_Split)
 	-- Check params:
 	if ((a_Split[2] == nil) or (a_Split[3] ~= nil)) then
-		return true, "Usage: unbanip <PlayerName>"
+		return true, "Usage: " .. a_Split[1] .. " <IP>"
 	end
 
 	-- Unban the player:

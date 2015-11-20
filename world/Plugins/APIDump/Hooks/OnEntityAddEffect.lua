@@ -22,7 +22,7 @@ return
 		},
 		Returns = [[
 			If the plugin returns true, the effect will not be added and none of the remaining hook handlers will
-			be called. If the plugin returns false, MCServer calls all the remaining hook handlers and finally
+			be called. If the plugin returns false, Cuberite calls all the remaining hook handlers and finally
 			the effect is added to the entity.
 		]],
 	},  -- HOOK_EXECUTE_COMMAND

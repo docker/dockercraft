@@ -137,7 +137,7 @@ g_APIDesc =
 				GetSizeY = { Params = "", Return = "number", Notes = "Returns the size of the held data in the y-axis" },
 				GetSizeZ = { Params = "", Return = "number", Notes = "Returns the size of the held data in the z-axis" },
 				GetVolume = { Params = "", Return = "number", Notes = "Returns the volume of the area - the total number of blocks stored within." },
-				GetWEOffset = { Params = "", Return = "{{Vector3i}}", Notes = "Returns the WE offset, a data value sometimes stored in the schematic files. MCServer doesn't use this value, but provides access to it using this method. The default is {0, 0, 0}."},
+				GetWEOffset = { Params = "", Return = "{{Vector3i}}", Notes = "Returns the WE offset, a data value sometimes stored in the schematic files. Cuberite doesn't use this value, but provides access to it using this method. The default is {0, 0, 0}."},
 				HasBlockLights = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include blocklight" },
 				HasBlockMetas = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include block metas" },
 				HasBlockSkyLights = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include skylight" },
@@ -189,8 +189,8 @@ g_APIDesc =
 				SetRelBlockTypeMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified relative coords" },
 				SetWEOffset =
 				{
-					{ Params = "{{Vector3i|Offset}}", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. MCServer doesn't use this value, but provides access to it using this method." },
-					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. MCServer doesn't use this value, but provides access to it using this method." },
+					{ Params = "{{Vector3i|Offset}}", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. Cuberite doesn't use this value, but provides access to it using this method." },
+					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. Cuberite doesn't use this value, but provides access to it using this method." },
 				},
 				Write =
 				{
@@ -519,7 +519,7 @@ g_APIDesc =
 				SetUseDefaultFinish       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default finishers or not" },
 				SetUseDefaultHeight       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default height generator or not" },
 				SetUseDefaultStructures   = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
-				UpdateHeightmap           = { Params = "",     Return = "", Notes = "Updates the heightmap to match current contents. The plugins should do that if they modify the contents and don't modify the heightmap accordingly; MCServer expects (and checks in Debug mode) that the heightmap matches the contents when the cChunkDesc is returned from a plugin." },
+				UpdateHeightmap           = { Params = "",     Return = "", Notes = "Updates the heightmap to match current contents. The plugins should do that if they modify the contents and don't modify the heightmap accordingly; Cuberite expects (and checks in Debug mode) that the heightmap matches the contents when the cChunkDesc is returned from a plugin." },
 				WriteBlockArea            = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
 			},
 			AdditionalInfo =
@@ -586,7 +586,7 @@ end
 				Kick = { Params = "Reason", Return = "", Notes = "Kicks the user with the specified reason" },
 				SendPluginMessage = { Params = "Channel, Message", Return = "", Notes = "Sends the plugin message on the specified channel." },
 				SetClientBrand = { Params = "ClientBrand", Return = "", Notes = "Sets the value of the client's brand. Normally this value is received from the client by a MC|Brand plugin message, this function lets plugins overwrite the value." },
-				SetLocale = { Params = "Locale", Return = "", Notes = "Sets the locale that MCServer keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects)." },
+				SetLocale = { Params = "Locale", Return = "", Notes = "Sets the locale that Cuberite keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects)." },
 				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
 				SetViewDistance = { Params = "ViewDistance", Return = "", Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)" },
 				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player." },
@@ -832,7 +832,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				{{cMonster}}:GetMonsterType() to mtSpider. GetClass(), on the other hand, returns "cSpider"
 				directly.</p>
 				<p>
-				Note that you should not store a cEntity object between two hooks' calls, because MCServer may
+				Note that you should not store a cEntity object between two hooks' calls, because Cuberite may
 				despawn / remove that entity in between the calls. If you need to refer to an entity later, use its
 				UniqueID and {{cWorld|cWorld}}'s entity manipulation functions DoWithEntityByID(), ForEachEntity()
 				or ForEachEntityInChunk() to access the entity again.</p>
@@ -1008,16 +1008,20 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				Provides helper functions for manipulating and querying the filesystem. Most functions are static,
 				so they should be called directly on the cFile class itself:
 <pre class="prettyprint lang-lua">
-cFile:Delete("/usr/bin/virus.exe");
+cFile:DeleteFile("/usr/bin/virus.exe");
 </pre></p>
 			]],
 			Functions =
 			{
 				ChangeFileExt = { Params = "FileName, NewExt", Return = "string", Notes = "(STATIC) Returns FileName with its extension changed to NewExt. NewExt may begin with a dot, but needn't, the result is the same in both cases (the first dot, if present, is ignored). FileName may contain path elements, extension is recognized as the last dot after the last path separator in the string." },
 				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "(STATIC) Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
-				CreateFolder = { Params = "FolderName", Return = "bool", Notes = "(STATIC) Creates a new folder. Returns true if successful." },
-				Delete = { Params = "FileName", Return = "bool", Notes = "(STATIC) Deletes the specified file. Returns true if successful." },
-				Exists = { Params = "FileName", Return = "bool", Notes = "(STATIC) Returns true if the specified file exists." },
+				CreateFolder = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Creates a new folder. Returns true if successful. Only a single level can be created at a time, use CreateFolderRecursive() to create multiple levels of folders at once." },
+				CreateFolderRecursive = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Creates a new folder, creating its parents if needed. Returns true if successful." },
+				Delete = { Params = "Path", Return = "bool", Notes = "(STATIC) Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty.<br/><b>NOTE</b>: If you already know if the object is a file or folder, use DeleteFile() or DeleteFolder() explicitly." },
+				DeleteFile = { Params = "FilePath", Return = "bool", Notes = "(STATIC) Deletes the specified file. Returns true if successful." },
+				DeleteFolder = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty." },
+				DeleteFolderContents = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Deletes everything from the specified folder, recursively. The specified folder stays intact. Returns true if successful." },
+				Exists = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified file or folder exists.<br/><b>OBSOLETE</b>, use IsFile() or IsFolder() instead" },
 				GetExecutableExt = { Params = "", Return = "string", Notes = "(STATIC) Returns the customary executable extension (including the dot) used by the current platform (\".exe\" on Windows, empty string on Linux). " },
 				GetFolderContents = { Params = "FolderName", Return = "array table of strings", Notes = "(STATIC) Returns the contents of the specified folder, as an array table of strings. Each filesystem object is listed. Use the IsFile() and IsFolder() functions to determine the object type." },
 				GetLastModificationTime = { Params = "Path", Return = "number", Notes = "(STATIC) Returns the last modification time (in current timezone) of the specified file or folder. Returns zero if file not found / not accessible. The returned value is in the same units as values returned by os.time()." },
@@ -1049,7 +1053,7 @@ cFile:Delete("/usr/bin/virus.exe");
 			Desc = [[
 				This class implements a simple name-value storage represented on disk by an INI file. These files
 				are suitable for low-volume high-latency human-readable information storage, such as for
-				configuration. MCServer itself uses INI files for settings and options.</p>
+				configuration. Cuberite itself uses INI files for settings and options.</p>
 				<p>
 				The INI files follow this basic structure:
 <pre class="prettyprint lang-ini">
@@ -1332,7 +1336,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						Note that the object contained in a cItem class is quite complex and quite often new Minecraft
 						versions add more stuff. Therefore it is recommended to copy cItem objects using the
 						copy-constructor ("local copy = cItem(original);"), this is the only way that guarantees that
-						the object will be copied at full, even with future versions of MCServer.
+						the object will be copied at full, even with future versions of Cuberite.
 					]],
 				},
 				{
@@ -1557,7 +1561,7 @@ end
 </p>
 		<p>The contents of this window are represented by a {{cWindow|cWindow}}:GetSlot() etc. or {{cPlayer|cPlayer}}:GetInventory() to access the player inventory.
 </p>
-		<p>When creating a new cLuaWindow object, you need to specify both the window type and the contents' width and height. Note that MCServer accepts any combination of these, but opening a window for a player may crash their client if the contents' dimensions don't match the client's expectations.
+		<p>When creating a new cLuaWindow object, you need to specify both the window type and the contents' width and height. Note that Cuberite accepts any combination of these, but opening a window for a player may crash their client if the contents' dimensions don't match the client's expectations.
 </p>
 		<p>To open the window for a player, call {{cPlayer|cPlayer}}:OpenWindow(). Multiple players can open window of the same cLuaWindow object. All players see the same items in the window's contents (like chest, unlike crafting table).
 ]],
@@ -1704,7 +1708,7 @@ a_Player:OpenWindow(Window);
 				<p>
 				All the functions are static, call them using the <code>cMojangAPI:Function()</code> convention.</p>
 				<p>
-				Mojang uses two formats for UUIDs, short and dashed. MCServer works with short UUIDs internally, but
+				Mojang uses two formats for UUIDs, short and dashed. Cuberite works with short UUIDs internally, but
 				will convert to dashed UUIDs where needed - in the protocol login for example. The MakeUUIDShort()
 				and MakeUUIDDashed() functions are provided for plugins to use for conversion between the two
 				formats.</p>
@@ -1751,6 +1755,9 @@ a_Player:OpenWindow(Window);
 				StringToMobType = { Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{Globals#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
 				GetRelativeWalkSpeed = { Params = "", Return = "number", Notes = "Returns the relative walk speed of this mob. Standard is 1.0" },
 				SetRelativeWalkSpeed = { Params = "number", Return = "", Notes = "Sets the relative walk speed of this mob. Standard is 1.0" },
+				SetAge = { Params = "number", Return = "", Notes = "Sets the age of the monster" },
+				GetAge = { Params = "", Return = "number", Notes = "Returns the age of the monster" },
+				IsBaby = { Params = "", Return = "bool", Notes = "Returns true if the monster is a baby" },
 			},
 			Constants =
 			{
@@ -1815,8 +1822,9 @@ a_Player:OpenWindow(Window);
 				TakeDamage = { Return = "" },
 				KilledBy = { Return = "" },
 				GetHealth = { Return = "number" },
-				AddEntityEffect = { Params = "EffectType, {{cEntityEffect}}", Return = "", Notes = "Applies an entity effect" },
-				RemoveEntityEffect = { Params = "EffectType", Return = "", Notes = "Removes a currently applied entity effect" },
+				AddEntityEffect = { Params = "{{cEntityEffect|EffectType}}", Return = "", Notes = "Applies an entity effect" },
+				RemoveEntityEffect = { Params = "{{cEntityEffect|EffectType}}", Return = "", Notes = "Removes a currently applied entity effect" },
+				HasEntityEffect = { Return = "bool", Params = "{{cEntityEffect|EffectType}}", Notes = "Returns true, if the supplied entity effect type is currently applied" },
 				ClearEntityEffects = { Return = "", Notes = "Removes all currently applied entity effects" },
 			},
 			Inherits = "cEntity",
@@ -2030,7 +2038,7 @@ a_Player:OpenWindow(Window);
 		cRoot =
 		{
 			Desc = [[
-				This class represents the root of MCServer's object hierarchy. There is always only one cRoot
+				This class represents the root of Cuberite's object hierarchy. There is always only one cRoot
 				object. It manages and allows querying all the other objects, such as {{cServer}},
 				{{cPluginManager}}, individual {{cWorld|worlds}} etc.</p>
 				<p>
@@ -2059,22 +2067,23 @@ a_Player:OpenWindow(Window);
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
 				Get = { Params = "", Return = "Root object", Notes = "(STATIC) This function returns the cRoot object." },
+				GetBrewingRecipe = { Params = "{{cItem|cItem}}, {{cItem|cItem}}", Return = "{{cItem|cItem}}", Notes = "(STATIC) Returns the result item, if a recipe has been found. If no recipe is found, returns no value." },
 				GetBuildCommitID = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travis CI / Jenkins) it returns the exact commit hash used for the build. For unofficial local builds, returns the approximate commit hash (since the true one cannot be determined), formatted as \"approx: &lt;CommitHash&gt;\"." },
 				GetBuildDateTime = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travic CI / Jenkins) it returns the date and time of the build. For unofficial local builds, returns the approximate datetime of the commit (since the true one cannot be determined), formatted as \"approx: &lt;DateTime-iso8601&gt;\"." },
 				GetBuildID = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travis CI / Jenkins) it returns the unique ID of the build, as recognized by the build system. For unofficial local builds, returns the string \"Unknown\"." },
-				GetBuildSeriesName = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travis CI / Jenkins) it returns the series name of the build (for example \"MCServer Windows x64 Master\"). For unofficial local builds, returns the string \"local build\"." },
+				GetBuildSeriesName = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travis CI / Jenkins) it returns the series name of the build (for example \"Cuberite Windows x64 Master\"). For unofficial local builds, returns the string \"local build\"." },
 				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
 				GetFurnaceFuelBurnTime = { Params = "{{cItem|Fuel}}", Return = "number", Notes = "(STATIC) Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel." },
-				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that MCServer supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
-				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
+				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that Cuberite supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
+				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire Cuberite process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
 				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },
 				GetProtocolVersionTextFromInt = { Params = "Protocol Version", Return = "string", Notes = "Returns the Minecraft version from the given Protocol. If there is no version found, it returns 'Unknown protocol(Parameter)'" },
 				GetServer = { Params = "", Return = "{{cServer|cServer}}", Notes = "Returns the cServer object." },
 				GetServerUpTime = { Params = "", Return = "number", Notes = "Returns the uptime of the server in seconds." },
 				GetTotalChunkCount = { Params = "", Return = "number", Notes = "Returns the amount of loaded chunks." },
-				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
+				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire Cuberite process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object." },
 				GetWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Returns the cWorld object of the given world. It returns nil if there is no world with the given name." },
 				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread. The command's output will be sent to console." },
@@ -2227,7 +2236,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 		cWindow =
 		{
 			Desc = [[
-				This class is the common ancestor for all window classes used by MCServer. It is inherited by the
+				This class is the common ancestor for all window classes used by Cuberite. It is inherited by the
 				{{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be
 				used for window-related hooks in the future. It implements the basic functionality of any
 				window.</p>
@@ -2274,7 +2283,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 		{
 			Desc = [[
 				cWorld is the game world. It is the hub of all the information managed by individual classes,
-				providing convenient access to them. MCServer supports multiple worlds in any combination of
+				providing convenient access to them. Cuberite supports multiple worlds in any combination of
 				world types. You can have two overworlds, three nethers etc. To enumerate all world the server
 				provides, use the {{cRoot}}:ForEachWorld() function.</p>
 				<p>
@@ -2325,6 +2334,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				DigBlock = { Params = "X, Y, Z", Return = "", Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors." },
 				DoExplosionAt = { Params = "Force, X, Y, Z, CanCauseFire, Source, SourceData", Return = "", Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source." },
 				DoWithBlockEntityAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a block entity at the specified coords, calls the CallbackFunction with the {{cBlockEntity}} parameter representing the block entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The function returns false if there is no block entity, or if there is, it returns the bool value that the callback has returned. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
+				DoWithBrewingstandAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a brewingstand at the specified coords, calls the CallbackFunction with the {{cBrewingstandEntity}} parameter representing the brewingstand. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBrewingstandEntity|cBrewingstandEntity}})</pre> The function returns false if there is no brewingstand, or if there is, it returns the bool value that the callback has returned." },
 				DoWithBeaconAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a beacon at the specified coords, calls the CallbackFunction with the {{cBeaconEntity}} parameter representing the beacon. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBeaconEntity|BeaconEntity}})</pre> The function returns false if there is no beacon, or if there is, it returns the bool value that the callback has returned." },
 				DoWithChestAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a chest at the specified coords, calls the CallbackFunction with the {{cChestEntity}} parameter representing the chest. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}})</pre> The function returns false if there is no chest, or if there is, it returns the bool value that the callback has returned." },
 				DoWithCommandBlockAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a command block at the specified coords, calls the CallbackFunction with the {{cCommandBlockEntity}} parameter representing the command block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cCommandBlockEntity|CommandBlockEntity}})</pre> The function returns false if there is no command block, or if there is, it returns the bool value that the callback has returned." },
@@ -2345,6 +2355,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				},
 				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "bool", Notes = "Calls the given callback function for the player with the name best matching the name string provided.<br>This function is case-insensitive and will match partial names.<br>Returns false if player not found or there is ambiguity, true otherwise. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre>" },
 				ForEachBlockEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each block entity in the chunk. Returns true if all block entities in the chunk have been processed (including when there are zero block entities), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The callback should return false or no value to continue with the next block entity, or true to abort the enumeration. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
+				ForEachBrewingstandInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each brewingstand in the chunk. Returns true if all brewingstands in the chunk have been processed (including when there are zero brewingstands), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBrewingstandEntity|cBrewingstandEntity}})</pre> The callback should return false or no value to continue with the next brewingstand, or true to abort the enumeration." },
 				ForEachChestInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each chest in the chunk. Returns true if all chests in the chunk have been processed (including when there are zero chests), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}})</pre> The callback should return false or no value to continue with the next chest, or true to abort the enumeration." },
 				ForEachEntity = { Params = "CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each entity in the loaded world. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
 				ForEachEntityInBox = { Params = "{{cBoundingBox|Box}}, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each entity in the specified bounding box. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. If any chunk within the bounding box is not valid, it is silently skipped without any notification. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
@@ -2379,8 +2390,12 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				GetLinkedOverworldName = { Params = "", Return = "string", Notes = "Returns the name of the world this world is linked to." },
 				GetMapManager = { Params = "", Return = "{{cMapManager}}", Notes = "Returns the {{cMapManager|MapManager}} object used by this world." },
 				GetMaxCactusHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which cacti will grow naturally." },
+				GetMaxNetherPortalHeight = { Params = "", Return = "number", Notes = "Returns the maximum height for a nether portal" },
+				GetMaxNetherPortalWidth = { Params = "", Return = "number", Notes = "Returns the maximum width for a nether portal" },
 				GetMaxSugarcaneHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which sugarcane will grow naturally." },
 				GetMaxViewDistance = { Params = "", Return = "number", Notes = "Returns the maximum viewdistance that players can see in this world. The view distance is the amount of chunks around the player that the player can see." },
+				GetMinNetherPortalHeight = { Params = "", Return = "number", Notes = "Returns the minimum height for a nether portal" },
+				GetMinNetherPortalWidth = { Params = "", Return = "number", Notes = "Returns the minimum width for a nether portal" },
 				GetName = { Params = "", Return = "string", Notes = "Returns the name of the world, as specified in the settings.ini file." },
 				GetNumChunks = { Params = "", Return = "number", Notes = "Returns the number of chunks currently loaded." },
 				GetScoreBoard = { Params = "", Return = "{{cScoreBoard}}", Notes = "Returns the {{cScoreBoard|ScoreBoard}} object used by this world. " },
@@ -2423,10 +2438,10 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				QueueBlockForTick = { Params = "BlockX, BlockY, BlockZ, TicksToWait", Return = "", Notes = "Queues the specified block to be ticked after the specified number of gameticks." },
 				QueueSaveAllChunks = { Params = "", Return = "", Notes = "Queues all chunks to be saved in the world storage thread" },
 				QueueSetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta, TickDelay", Return = "", Notes = "Queues the block to be set to the specified blocktype and meta after the specified amount of game ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are handled correctly." },
-				QueueTask = { Params = "TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns. Note that it is unsafe to store references to MCServer objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
+				QueueTask = { Params = "TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
 				QueueUnloadUnusedChunks = { Params = "", Return = "", Notes = "Queues a cTask that unloads chunks that are no longer needed and are saved." },
 				RegenerateChunk = { Params = "ChunkX, ChunkZ", Return = "", Notes = "Queues the specified chunk to be re-generated, overwriting the current data. To queue a chunk for generating only if it doesn't exist, use the GenerateChunk() instead." },
-				ScheduleTask = { Params = "DelayTicks, TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the world's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cWorld|World}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to MCServer objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
+				ScheduleTask = { Params = "DelayTicks, TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the world's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cWorld|World}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
 				SendBlockTo = { Params = "BlockX, BlockY, BlockZ, {{cPlayer|Player}}", Return = "", Notes = "Sends the block at the specified coords to the specified player's client, as an UpdateBlock packet." },
 				SetAreaBiome = {
 					{ Params = "MinX, MaxX, MinZ, MaxZ, EMCSBiome", Return = "bool", Notes = "Sets the biome in the rectangular area specified. Returns true if successful, false if any of the chunks were unloaded." },
@@ -2448,6 +2463,10 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				SetLinkedNetherWorldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the nether portal should link to." },
 				SetLinkedOverworldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the nether portal should link to?" },
 				SetMaxViewDistance = { Params = "number", Return = "", Notes = "Sets the maximum viewdistance of the players in the world." },
+				SetMaxNetherPortalHeight = { Params = "number", Return = "", Notes = "Sets the maximum height for a nether portal" },
+				SetMaxNetherPortalWidth = { Params = "number", Return = "", Notes = "Sets the maximum width for a nether portal" },
+				SetMinNetherPortalHeight = { Params = "number", Return = "", Notes = "Sets the minimum height for a nether portal" },
+				SetMinNetherPortalWidth = { Params = "number", Return = "", Notes = "Sets the minimum width for a nether portal" },
 				SetShouldUseChatPrefixes = { Params = "", Return = "ShouldUse (bool)", Notes = "Sets whether coloured chat prefixes such as [INFO] is used with the SendMessageXXX() or BroadcastChatXXX(), or simply the entire message is coloured in the respective colour." },
 				SetSignLines = { Params = "X, Y, Z, Line1, Line2, Line3, Line4, [{{cPlayer|Player}}]", Return = "", Notes = "Sets the sign text at the specified coords. The sign-updating hooks are called for the change. The Player parameter is used to indicate the player from whom the change has come, it may be nil." },
 				SetTicksUntilWeatherChange = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks after which the weather will be changed." },
@@ -2465,7 +2484,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 					{ Params = "{{cItems|Pickups}}, X, Y, Z, SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Spawns the specified pickups at the position specified. All the pickups fly away from the spawn position using the specified speed." },
 				},
 				SpawnMinecart = { Params = "X, Y, Z, MinecartType, Item, BlockHeight", Return = "number", Notes = "Spawns a minecart at the specific coordinates. MinecartType is the item type of the minecart. If the minecart is an empty minecart then the given item is the block inside the minecart, and blockheight is the distance of the block and the minecart." },
-				SpawnMob = { Params = "X, Y, Z, {{cMonster|MonsterType}}", Return = "EntityID", Notes = "Spawns the specified type of mob at the specified coords. Returns the EntityID of the creates entity, or -1 on failure. " },
+				SpawnMob = { Params = "X, Y, Z, {{cMonster|MonsterType}}, [Baby]", Return = "EntityID", Notes = "Spawns the specified type of mob at the specified coords. If the Baby parameter is true, the mob will be a baby. Returns the EntityID of the creates entity, or -1 on failure. " },
 				SpawnFallingBlock = { Params = "X, Y, Z, BlockType, BlockMeta", Return = "EntityID", Notes = "Spawns an {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta" },
 				SpawnExperienceOrb = { Params = "X, Y, Z, Reward", Return = "EntityID", Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward" },
 				SpawnPrimedTNT = { Params = "X, Y, Z, FuseTicks, InitialVelocityCoeff", Return = "", Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value." },
@@ -2752,7 +2771,7 @@ end
 		tolua =
 		{
 			Desc = [[
-				This class represents the tolua bridge between the Lua API and MCServer. It supports some low
+				This class represents the tolua bridge between the Lua API and Cuberite. It supports some low
 				level operations and queries on the objects. See also the tolua++'s documentation at
 				{{http://www.codenix.com/~tolua/tolua++.html#utilities}}. Normally you shouldn't use any of these
 				functions except for type()
@@ -2894,7 +2913,7 @@ end
 				{
 					Include = "^dim.*",
 					TextBefore = [[
-						These constants represent dimension of a world. In MCServer, the dimension is only reflected in
+						These constants represent dimension of a world. In Cuberite, the dimension is only reflected in
 						the world's overall tint - overworld gets sky-like colors and dark shades, the nether gets
 						reddish haze and the end gets dark haze. World generator is not directly affected by the
 						dimension, same as fluid simulators; those only default to the expected values if not set
@@ -2928,7 +2947,7 @@ end
 				{
 					Include = { "^eWeather_.*", "wSunny", "wRain", "wStorm", "wThunderstorm" },
 					TextBefore = [[
-						These constants represent the weather in the world. Note that unlike vanilla, MCServer allows
+						These constants represent the weather in the world. Note that unlike vanilla, Cuberite allows
 						different weathers even in non-overworld {{Globals#WorldDimension|dimensions}}.
 					]],
 				},
@@ -3014,6 +3033,7 @@ end
 		"cFurnaceEntity.__cBlockEntityWindowOwner__",
 		"cHopperEntity.__cBlockEntityWindowOwner__",
 		"cLuaWindow.__cItemGrid__cListener__",
+		"Globals._CuberiteInternal_.*",  -- Ignore all internal Cuberite constants
 	},
 
 	IgnoreVariables =
@@ -3024,7 +3044,7 @@ end
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
-		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
+		{ FileName = "Writing-a-Cuberite-plugin.html", Title = "Writing a Cuberite plugin" },
 		{ FileName = "InfoFile.html",                  Title = "Using the Info.lua file" },
 		{ FileName = "SettingUpDecoda.html",           Title = "Setting up the Decoda Lua IDE" },
 		{ FileName = "SettingUpZeroBrane.html",        Title = "Setting up the ZeroBrane Studio Lua IDE" },

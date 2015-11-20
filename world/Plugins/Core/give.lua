@@ -6,8 +6,8 @@ local ItemBlackList = {}
 
 
 local CommandUsage = "Usage: %s %s"
-local ItemCommandUsageTail = "<ItemName> [Amount] [Data] [DataTag]"
-local GiveCommandUsageTail = "<PlayerName> " .. ItemCommandUsageTail
+local ItemCommandUsageTail = "<item> [amount] [data] [dataTag]"
+local GiveCommandUsageTail = "<player> " .. ItemCommandUsageTail
 
 local MessagePlayerFailure = "Player not found"
 local MessageAmountFailure = "The number you have entered ( %d ) is too big, it must be at most 64"
@@ -359,7 +359,7 @@ end
 
 
 --- Handle the `give` console and in-game command
---  Usage: give <PlayerName> <item> [amount] [data] [dataTag]
+--  Usage: give <player> <item> [amount] [data] [dataTag]
 --  
 function HandleGiveCommand( Split, Player )
 
@@ -385,7 +385,7 @@ end
 
 
 --- Handle the `unsafegive` console and in-game command
---  Usage: unsafegive <PlayerName> <item> [amount] [data] [dataTag]
+--  Usage: unsafegive <player> <item> [amount] [data] [dataTag]
 --  
 function HandleUnsafeGiveCommand( Split, Player )
 
@@ -442,53 +442,53 @@ function IntializeItemBlacklist( Plugin )
 	-- Technical blocks that should NOT be given to players by default
 	local DefaultBlackList =
 	{
-		[E_BLOCK_PISTON_EXTENSION]         = true,
-		[E_BLOCK_PISTON_MOVED_BLOCK]       = true,
-		[E_BLOCK_FLOWER_POT]               = true,
-		[E_BLOCK_BED]                      = true,
-		[E_BLOCK_HEAD]                     = true,
-		[E_BLOCK_SIGN_POST]                = true,
-		[E_BLOCK_WALLSIGN]                 = true,
-		[E_BLOCK_BREWING_STAND]            = true,
-		[E_BLOCK_CAULDRON]                 = true,
-		[E_BLOCK_WOODEN_DOOR]              = true,
-		[E_BLOCK_SPRUCE_DOOR]              = true,
-		[E_BLOCK_BIRCH_DOOR]               = true,
-		[E_BLOCK_JUNGLE_DOOR]              = true,
-		[E_BLOCK_ACACIA_DOOR]              = true,
-		[E_BLOCK_DARK_OAK_DOOR]            = true,
-		[E_BLOCK_IRON_DOOR]                = true,
-		[E_BLOCK_TRIPWIRE]                 = true,
-		[E_BLOCK_REDSTONE_WIRE]            = true,
-		[E_BLOCK_REDSTONE_ORE_GLOWING]     = true,
-		[E_BLOCK_REDSTONE_TORCH_OFF]       = true,
-		[E_BLOCK_REDSTONE_REPEATER_ON]     = true,
-		[E_BLOCK_REDSTONE_REPEATER_OFF]    = true,
-		[E_BLOCK_REDSTONE_LAMP_ON]         = true,
-		[E_BLOCK_ACTIVE_COMPARATOR]        = true,
-		[E_BLOCK_INACTIVE_COMPARATOR]      = true,
-		[E_BLOCK_INVERTED_DAYLIGHT_SENSOR] = true,
-		[E_BLOCK_STATIONARY_WATER]         = true,
-		[E_BLOCK_WATER]                    = true,
-		[E_BLOCK_LAVA]                     = true,
-		[E_BLOCK_STATIONARY_LAVA]          = true,
-		[E_BLOCK_CROPS]                    = true,
-		[E_BLOCK_POTATOES]                 = true,
-		[E_BLOCK_CARROTS]                  = true,
-		[E_BLOCK_PUMPKIN_STEM]             = true,
-		[E_BLOCK_MELON_STEM]               = true,
-		[E_BLOCK_REEDS]                    = true,
-		[E_BLOCK_NETHER_WART]              = true,
-		[E_BLOCK_COCOA_POD]                = true,
-		[E_BLOCK_CAKE]                     = true,
-		[E_BLOCK_END_PORTAL]               = true,
-		[E_BLOCK_NETHER_PORTAL]            = true,
-		[E_BLOCK_FIRE]                     = true,
-		[E_BLOCK_DOUBLE_NEW_STONE_SLAB]    = true,
-		[E_BLOCK_DOUBLE_WOODEN_SLAB]       = true,
-		[E_BLOCK_DOUBLE_STONE_SLAB]        = true,
-		[E_BLOCK_WALL_BANNER]              = true,
-		[E_BLOCK_STANDING_BANNER]          = true,
+		[E_BLOCK_PISTON_EXTENSION]          = true,
+		[E_BLOCK_PISTON_MOVED_BLOCK]        = true,
+		[E_BLOCK_FLOWER_POT]                = true,
+		[E_BLOCK_BED]                       = true,
+		[E_BLOCK_HEAD]                      = true,
+		[E_BLOCK_SIGN_POST]                 = true,
+		[E_BLOCK_WALLSIGN]                  = true,
+		[E_BLOCK_BREWING_STAND]             = true,
+		[E_BLOCK_CAULDRON]                  = true,
+		[E_BLOCK_OAK_DOOR]                  = true,
+		[E_BLOCK_SPRUCE_DOOR]               = true,
+		[E_BLOCK_BIRCH_DOOR]                = true,
+		[E_BLOCK_JUNGLE_DOOR]               = true,
+		[E_BLOCK_ACACIA_DOOR]               = true,
+		[E_BLOCK_DARK_OAK_DOOR]             = true,
+		[E_BLOCK_IRON_DOOR]                 = true,
+		[E_BLOCK_TRIPWIRE]                  = true,
+		[E_BLOCK_REDSTONE_WIRE]             = true,
+		[E_BLOCK_REDSTONE_ORE_GLOWING]      = true,
+		[E_BLOCK_REDSTONE_TORCH_OFF]        = true,
+		[E_BLOCK_REDSTONE_REPEATER_ON]      = true,
+		[E_BLOCK_REDSTONE_REPEATER_OFF]     = true,
+		[E_BLOCK_REDSTONE_LAMP_ON]          = true,
+		[E_BLOCK_ACTIVE_COMPARATOR]         = true,
+		[E_BLOCK_INACTIVE_COMPARATOR]       = true,
+		[E_BLOCK_INVERTED_DAYLIGHT_SENSOR]  = true,
+		[E_BLOCK_STATIONARY_WATER]          = true,
+		[E_BLOCK_WATER]                     = true,
+		[E_BLOCK_LAVA]                      = true,
+		[E_BLOCK_STATIONARY_LAVA]           = true,
+		[E_BLOCK_CROPS]                     = true,
+		[E_BLOCK_POTATOES]                  = true,
+		[E_BLOCK_CARROTS]                   = true,
+		[E_BLOCK_PUMPKIN_STEM]              = true,
+		[E_BLOCK_MELON_STEM]                = true,
+		[E_BLOCK_REEDS]                     = true,
+		[E_BLOCK_NETHER_WART]               = true,
+		[E_BLOCK_COCOA_POD]                 = true,
+		[E_BLOCK_CAKE]                      = true,
+		[E_BLOCK_END_PORTAL]                = true,
+		[E_BLOCK_NETHER_PORTAL]             = true,
+		[E_BLOCK_FIRE]                      = true,
+		[E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB] = true,
+		[E_BLOCK_DOUBLE_WOODEN_SLAB]        = true,
+		[E_BLOCK_DOUBLE_STONE_SLAB]         = true,
+		[E_BLOCK_WALL_BANNER]               = true,
+		[E_BLOCK_STANDING_BANNER]           = true,
 	}
 
 	-- First, try to open the Item BlackList file if it exists

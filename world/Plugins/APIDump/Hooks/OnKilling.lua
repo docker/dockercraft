@@ -16,7 +16,7 @@ return
 			{ Name = "TDI", Type = "{{TakeDamageInfo}}", Notes = "The damage type, cause and effects." },
 		},
 		Returns = [[
-			If the function returns false or no value, MCServer calls other plugins with this event. If the
+			If the function returns false or no value, Cuberite calls other plugins with this event. If the
 			function returns true, no other plugin is called for this event.</p>
 			<p>
 			In either case, the victim's health is then re-checked and if it is greater than zero, the victim is

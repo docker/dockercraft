@@ -20,7 +20,7 @@ local g_TrackedPages = {}
 local function LoadAPIFiles(a_Folder, a_DstTable)
 	assert(type(a_Folder) == "string")
 	assert(type(a_DstTable) == "table")
-	
+
 	local Folder = g_PluginFolder .. a_Folder;
 	for _, fnam in ipairs(cFile:GetFolderContents(Folder)) do
 		local FileName = Folder .. fnam;
@@ -79,7 +79,7 @@ local function CreateAPITables()
 			},
 			...
 		},
-		
+
 		cCuboid = {}  -- Each array item also has the map item by its name
 	};
 	local Globals = {
@@ -94,7 +94,7 @@ local function CreateAPITables()
 
 	local Globals = {Functions = {}, Constants = {}, Variables = {}, Descendants = {}};
 	local API = {};
-	
+
 	local function Add(a_APIContainer, a_ObjName, a_ObjValue)
 		if (type(a_ObjValue) == "function") then
 			table.insert(a_APIContainer.Functions, {Name = a_ObjName});
@@ -105,14 +105,14 @@ local function CreateAPITables()
 			table.insert(a_APIContainer.Constants, {Name = a_ObjName, Value = a_ObjValue});
 		end
 	end
-	
+
 	local function ParseClass(a_ClassName, a_ClassObj)
 		local res = {Name = a_ClassName, Functions = {}, Constants = {}, Variables = {}, Descendants = {}};
 		-- Add functions and constants:
 		for i, v in pairs(a_ClassObj) do
 			Add(res, i, v);
 		end
-		
+
 		-- Member variables:
 		local SetField = a_ClassObj[".set"] or {};
 		if ((a_ClassObj[".get"] ~= nil) and (type(a_ClassObj[".get"]) == "table")) then
@@ -128,7 +128,7 @@ local function CreateAPITables()
 		end
 		return res;
 	end
-	
+
 	for i, v in pairs(_G) do
 		if (
 			(v ~= _G) and           -- don't want the global namespace
@@ -145,7 +145,7 @@ local function CreateAPITables()
 			end
 		end
 	end
-	
+
 	return API, Globals;
 end
 
@@ -174,11 +174,9 @@ local function WriteArticles(f)
 	]]);
 	for _, extra in ipairs(g_APIDesc.ExtraPages) do
 		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
-		if (cFile:Exists(SrcFileName)) then
+		if (cFile:IsFile(SrcFileName)) then
 			local DstFileName = "API/" .. extra.FileName;
-			if (cFile:Exists(DstFileName)) then
-				cFile:Delete(DstFileName);
-			end
+			cFile:Delete(DstFileName);
 			cFile:Copy(SrcFileName, DstFileName);
 			f:write("<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
 		else
@@ -196,14 +194,14 @@ end
 local function LinkifyString(a_String, a_Referrer)
 	assert(a_Referrer ~= nil);
 	assert(a_Referrer ~= "");
-	
+
 	--- Adds a page to the list of tracked pages (to be checked for existence at the end)
 	local function AddTrackedPage(a_PageName)
 		local Pg = (g_TrackedPages[a_PageName] or {});
 		table.insert(Pg, a_Referrer);
 		g_TrackedPages[a_PageName] = Pg;
 	end
-	
+
 	--- Creates the HTML for the specified link and title
 	local function CreateLink(Link, Title)
 		if (Link:sub(1, 7) == "http://") then
@@ -226,7 +224,7 @@ local function LinkifyString(a_String, a_Referrer)
 		AddTrackedPage(Link);
 		return "<a href=\"" .. Link .. ".html\">" .. Title .. "</a>";
 	end
-	
+
 	-- Linkify the strings using the CreateLink() function:
 	local txt = a_String:gsub("{{([^|}]*)|([^}]*)}}", CreateLink)  -- {{link|title}}
 	txt = txt:gsub("{{([^|}]*)}}",  -- {{LinkAndTitle}}
@@ -254,10 +252,10 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 		return;
 	end
 	local HookName = a_Hook.DefaultFnName;
-	
+
 	f:write([[<!DOCTYPE html><html>
 		<head>
-		<title>MCServer API - ]], HookName, [[ Hook</title>
+		<title>Cuberite API - ]], HookName, [[ Hook</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -330,7 +328,7 @@ local function WriteHooks(f, a_Hooks, a_UndocumentedHooks, a_HookNav)
 		A plugin can decide whether it will let the event pass through to the rest of the plugins, or hide it
 		from them. This is determined by the return value from the hook callback function. If the function
 		returns false or no value, the event is propagated further. If the function returns true, the processing
-		is	stopped, no other plugin receives the notification (and possibly MCServer disables the default
+		is	stopped, no other plugin receives the notification (and possibly Cuberite disables the default
 		behavior for the event). See each hook's details to see the exact behavior.</p>
 		<table>
 		<tr>
@@ -371,7 +369,7 @@ local function ReadDescriptions(a_API)
 		end
 		return false;
 	end
-	
+
 	-- Returns true if the function is to be ignored
 	local function IsFunctionIgnored(a_ClassName, a_FnName)
 		if (g_APIDesc.IgnoreFunctions == nil) then
@@ -389,7 +387,7 @@ local function ReadDescriptions(a_API)
 		end
 		return false;
 	end
-	
+
 	-- Returns true if the constant (specified by its fully qualified name) is to be ignored
 	local function IsConstantIgnored(a_CnName)
 		if (g_APIDesc.IgnoreConstants == nil) then
@@ -402,7 +400,7 @@ local function ReadDescriptions(a_API)
 		end
 		return false;
 	end
-	
+
 	-- Returns true if the member variable (specified by its fully qualified name) is to be ignored
 	local function IsVariableIgnored(a_VarName)
 		if (g_APIDesc.IgnoreVariables == nil) then
@@ -415,7 +413,7 @@ local function ReadDescriptions(a_API)
 		end
 		return false;
 	end
-	
+
 	-- Remove ignored classes from a_API:
 	local APICopy = {};
 	for _, cls in ipairs(a_API) do
@@ -433,7 +431,7 @@ local function ReadDescriptions(a_API)
 		cls.ConstantGroups = {};
 		cls.NumConstantsInGroups = 0;
 		cls.NumConstantsInGroupsForDescendants = 0;
-		
+
 		-- Rename special functions:
 		for _, fn in ipairs(cls.Functions) do
 			if (fn.Name == ".call") then
@@ -456,13 +454,13 @@ local function ReadDescriptions(a_API)
 				fn.Name = "<i>operator ==</i>";
 			end
 		end
-		
+
 		local APIDesc = g_APIDesc.Classes[cls.Name];
 		if (APIDesc ~= nil) then
 			APIDesc.IsExported = true;
 			cls.Desc = APIDesc.Desc;
 			cls.AdditionalInfo = APIDesc.AdditionalInfo;
-			
+
 			-- Process inheritance:
 			if (APIDesc.Inherits ~= nil) then
 				for _, icls in ipairs(a_API) do
@@ -476,13 +474,13 @@ local function ReadDescriptions(a_API)
 			cls.UndocumentedFunctions = {};  -- This will contain names of all the functions that are not documented
 			cls.UndocumentedConstants = {};  -- This will contain names of all the constants that are not documented
 			cls.UndocumentedVariables = {};  -- This will contain names of all the variables that are not documented
-			
+
 			local DoxyFunctions = {};  -- This will contain all the API functions together with their documentation
-			
+
 			local function AddFunction(a_Name, a_Params, a_Return, a_Notes)
 				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Return = a_Return, Notes = a_Notes});
 			end
-			
+
 			if (APIDesc.Functions ~= nil) then
 				-- Assign function descriptions:
 				for _, func in ipairs(cls.Functions) do
@@ -508,7 +506,7 @@ local function ReadDescriptions(a_API)
 						FnDesc.IsExported = true;
 					end
 				end  -- for j, func
-				
+
 				-- Replace functions with their described and overload-expanded versions:
 				cls.Functions = DoxyFunctions;
 			else  -- if (APIDesc.Functions ~= nil)
@@ -519,7 +517,7 @@ local function ReadDescriptions(a_API)
 					end
 				end
 			end  -- if (APIDesc.Functions ~= nil)
-			
+
 			if (APIDesc.Constants ~= nil) then
 				-- Assign constant descriptions:
 				for _, cons in ipairs(cls.Constants) do
@@ -541,7 +539,7 @@ local function ReadDescriptions(a_API)
 					end
 				end
 			end  -- else if (APIDesc.Constants ~= nil)
-			
+
 			-- Assign member variables' descriptions:
 			if (APIDesc.Variables ~= nil) then
 				for _, var in ipairs(cls.Variables) do
@@ -565,7 +563,7 @@ local function ReadDescriptions(a_API)
 					end
 				end
 			end  -- else if (APIDesc.Variables ~= nil)
-			
+
 			if (APIDesc.ConstantGroups ~= nil) then
 				-- Create links between the constants and the groups:
 				local NumInGroups = 0;
@@ -590,7 +588,7 @@ local function ReadDescriptions(a_API)
 					if (group.ShowInDescendants) then
 						NumInDescendantGroups = NumInDescendantGroups + NumInGroup;
 					end
-					
+
 					-- Sort the constants:
 					table.sort(group.Constants,
 						function(c1, c2)
@@ -601,7 +599,7 @@ local function ReadDescriptions(a_API)
 				cls.ConstantGroups = APIDesc.ConstantGroups;
 				cls.NumConstantsInGroups = NumInGroups;
 				cls.NumConstantsInGroupsForDescendants = NumInDescendantGroups;
-				
+
 				-- Remove grouped constants from the normal list:
 				local NewConstants = {};
 				for _, cons in ipairs(cls.Constants) do
@@ -611,9 +609,9 @@ local function ReadDescriptions(a_API)
 				end
 				cls.Constants = NewConstants;
 			end  -- if (ConstantGroups ~= nil)
-			
+
 		else  -- if (APIDesc ~= nil)
-		
+
 			-- Class is not documented at all, add all its members to Undocumented lists:
 			cls.UndocumentedFunctions = {};
 			cls.UndocumentedConstants = {};
@@ -637,7 +635,7 @@ local function ReadDescriptions(a_API)
 				end
 			end  -- for j, var - cls.Variables[]
 		end  -- else if (APIDesc ~= nil)
-		
+
 		-- Remove ignored functions:
 		local NewFunctions = {};
 		for _, fn in ipairs(cls.Functions) do
@@ -660,7 +658,7 @@ local function ReadDescriptions(a_API)
 				return (f1.Name < f2.Name);
 			end
 		);
-		
+
 		-- Remove ignored constants:
 		local NewConstants = {};
 		for _, cn in ipairs(cls.Constants) do
@@ -669,14 +667,14 @@ local function ReadDescriptions(a_API)
 			end
 		end  -- for j, cn
 		cls.Constants = NewConstants;
-		
+
 		-- Sort the constants:
 		table.sort(cls.Constants,
 			function(c1, c2)
 				return (c1.Name < c2.Name);
 			end
 		);
-		
+
 		-- Remove ignored member variables:
 		local NewVariables = {};
 		for _, var in ipairs(cls.Variables) do
@@ -685,7 +683,7 @@ local function ReadDescriptions(a_API)
 			end
 		end  -- for j, var
 		cls.Variables = NewVariables;
-		
+
 		-- Sort the member variables:
 		table.sort(cls.Variables,
 			function(v1, v2)
@@ -693,7 +691,7 @@ local function ReadDescriptions(a_API)
 			end
 		);
 	end  -- for i, cls
-	
+
 	-- Sort the descendants lists:
 	for _, cls in ipairs(a_API) do
 		table.sort(cls.Descendants,
@@ -738,7 +736,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		LOGINFO("Cannot write HTML API for class " .. a_ClassAPI.Name .. ": " .. err)
 		return;
 	end
-	
+
 	-- Writes a table containing all functions in the specified list, with an optional "inherited from" header when a_InheritedName is valid
 	local function WriteFunctions(a_Functions, a_InheritedName)
 		if (#a_Functions == 0) then
@@ -757,7 +755,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		end
 		cf:write("</table>\n");
 	end
-	
+
 	local function WriteConstantTable(a_Constants, a_Source)
 		cf:write("<table>\n<tr><th>Name</th><th>Value</th><th>Notes</th></tr>\n");
 		for _, cons in ipairs(a_Constants) do
@@ -767,22 +765,22 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		end
 		cf:write("</table>\n\n");
 	end
-	
+
 	local function WriteConstants(a_Constants, a_ConstantGroups, a_NumConstantGroups, a_InheritedName)
 		if ((#a_Constants == 0) and (a_NumConstantGroups == 0)) then
 			return;
 		end
-		
+
 		local Source = a_ClassAPI.Name
 		if (a_InheritedName ~= nil) then
 			cf:write("<h2>Constants inherited from ", a_InheritedName, "</h2>\n");
 			Source = a_InheritedName;
 		end
-		
+
 		if (#a_Constants > 0) then
 			WriteConstantTable(a_Constants, Source);
 		end
-		
+
 		for _, group in pairs(a_ConstantGroups) do
 			if ((a_InheritedName == nil) or group.ShowInDescendants) then
 				cf:write("<a name='", group.Name, "'><p>");
@@ -792,16 +790,16 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 			end
 		end
 	end
-	
+
 	local function WriteVariables(a_Variables, a_InheritedName)
 		if (#a_Variables == 0) then
 			return;
 		end
-		
+
 		if (a_InheritedName ~= nil) then
 			cf:write("<h2>Member variables inherited from ", a_InheritedName, "</h2>\n");
 		end
-		
+
 		cf:write("<table><tr><th>Name</th><th>Type</th><th>Notes</th></tr>\n");
 		for _, var in ipairs(a_Variables) do
 			cf:write("<tr><td>", var.Name, "</td>\n");
@@ -810,7 +808,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		end
 		cf:write("</table>\n\n");
 	end
-	
+
 	local function WriteDescendants(a_Descendants)
 		if (#a_Descendants == 0) then
 			return;
@@ -823,7 +821,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		end
 		cf:write("</ul>\n");
 	end
-	
+
 	local ClassName = a_ClassAPI.Name;
 
 	-- Build an array of inherited classes chain:
@@ -833,10 +831,10 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		table.insert(InheritanceChain, CurrInheritance);
 		CurrInheritance = CurrInheritance.Inherits;
 	end
-	
+
 	cf:write([[<!DOCTYPE html><html>
 		<head>
-		<title>MCServer API - ]], a_ClassAPI.Name, [[ Class</title>
+		<title>Cuberite API - ]], a_ClassAPI.Name, [[ Class</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -861,9 +859,9 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		</td><td style="vertical-align: top;"><h1>Contents</h1>
 		<p><ul>
 	]]);
-	
+
 	local HasInheritance = ((#a_ClassAPI.Descendants > 0) or (a_ClassAPI.Inherits ~= nil));
-	
+
 	local HasConstants = (#a_ClassAPI.Constants > 0) or (a_ClassAPI.NumConstantsInGroups > 0);
 	local HasFunctions = (#a_ClassAPI.Functions > 0);
 	local HasVariables = (#a_ClassAPI.Variables > 0);
@@ -872,7 +870,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		HasFunctions = HasFunctions or (#cls.Functions > 0);
 		HasVariables = HasVariables or (#cls.Variables > 0);
 	end
-	
+
 	-- Write the table of contents:
 	if (HasInheritance) then
 		cf:write("<li><a href=\"#inherits\">Inheritance</a></li>\n");
@@ -892,7 +890,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		end
 	end
 	cf:write("</ul></p>\n");
-	
+
 	-- Write the class description:
 	cf:write("<hr /><a name=\"desc\"><h1>", ClassName, " class</h1></a>\n");
 	if (a_ClassAPI.Desc ~= nil) then
@@ -900,7 +898,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		cf:write(LinkifyString(a_ClassAPI.Desc, ClassName));
 		cf:write("</p>\n\n");
 	end;
-	
+
 	-- Write the inheritance, if available:
 	if (HasInheritance) then
 		cf:write("<hr /><a name=\"inherits\"><h1>Inheritance</h1></a>\n");
@@ -917,7 +915,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 			cf:write("</p>\n\n");
 		end
 	end
-	
+
 	-- Write the constants:
 	if (HasConstants) then
 		cf:write("<a name=\"constants\"><hr /><h1>Constants</h1></a>\n");
@@ -927,7 +925,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 			WriteConstants(cls.Constants, cls.ConstantGroups, cls.NumConstantsInGroupsForDescendants, cls.Name);
 		end;
 	end;
-	
+
 	-- Write the member variables:
 	if (HasVariables) then
 		cf:write("<a name=\"variables\"><hr /><h1>Member variables</h1></a>\n");
@@ -937,7 +935,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 			WriteVariables(cls.Variables, cls.Name);
 		end;
 	end
-	
+
 	-- Write the functions, including the inherited ones:
 	if (HasFunctions) then
 		cf:write("<a name=\"functions\"><hr /><h1>Functions</h1></a>\n");
@@ -947,7 +945,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 			WriteFunctions(cls.Functions, cls.Name);
 		end
 	end
-	
+
 	-- Write the additional infos:
 	if (a_ClassAPI.AdditionalInfo ~= nil) then
 		for i, additional in ipairs(a_ClassAPI.AdditionalInfo) do
@@ -969,7 +967,7 @@ end
 local function WriteClasses(f, a_API, a_ClassMenu)
 	f:write([[
 		<a name="classes"><h2>Class index</h2></a>
-		<p>The following classes are available in the MCServer Lua scripting language:
+		<p>The following classes are available in the Cuberite Lua scripting language:
 		<ul>
 	]]);
 	for _, cls in ipairs(a_API) do
@@ -1002,10 +1000,10 @@ local function ListUndocumentedObjects(API, UndocumentedHooks)
 			if (HasFunctions or HasConstants or HasVariables) then
 				f:write("\t\t" .. cls.Name .. " =\n\t\t{\n");
 				if ((cls.Desc == nil) or (cls.Desc == "")) then
-					f:write("\t\t\tDesc = \"\"\n");
+					f:write("\t\t\tDesc = \"\",\n");
 				end
 			end
-			
+
 			if (HasFunctions) then
 				f:write("\t\t\tFunctions =\n\t\t\t{\n");
 				table.sort(cls.UndocumentedFunctions);
@@ -1014,7 +1012,7 @@ local function ListUndocumentedObjects(API, UndocumentedHooks)
 				end  -- for j, fn - cls.UndocumentedFunctions[]
 				f:write("\t\t\t},\n\n");
 			end
-			
+
 			if (HasConstants) then
 				f:write("\t\t\tConstants =\n\t\t\t{\n");
 				table.sort(cls.UndocumentedConstants);
@@ -1023,7 +1021,7 @@ local function ListUndocumentedObjects(API, UndocumentedHooks)
 				end  -- for j, fn - cls.UndocumentedConstants[]
 				f:write("\t\t\t},\n\n");
 			end
-			
+
 			if (HasVariables) then
 				f:write("\t\t\tVariables =\n\t\t\t{\n");
 				table.sort(cls.UndocumentedVariables);
@@ -1032,13 +1030,13 @@ local function ListUndocumentedObjects(API, UndocumentedHooks)
 				end  -- for j, fn - cls.UndocumentedVariables[]
 				f:write("\t\t\t},\n\n");
 			end
-			
+
 			if (HasFunctions or HasConstants or HasVariables) then
 				f:write("\t\t},\n\n");
 			end
 		end  -- for i, cls - API[]
 		f:write("\t},\n");
-		
+
 		if (#UndocumentedHooks > 0) then
 			f:write("\n\tHooks =\n\t{\n");
 			for i, hook in ipairs(UndocumentedHooks) do
@@ -1112,25 +1110,25 @@ local function ListMissingPages()
 	local NumLinks = 0;
 	for PageName, Referrers in pairs(g_TrackedPages) do
 		NumLinks = NumLinks + 1;
-		if not(cFile:Exists("API/" .. PageName .. ".html")) then
+		if not(cFile:IsFile("API/" .. PageName .. ".html")) then
 			table.insert(MissingPages, {Name = PageName, Refs = Referrers} );
 		end
 	end;
 	g_Stats.NumTrackedLinks = NumLinks;
 	g_TrackedPages = {};
-	
+
 	if (#MissingPages == 0) then
 		-- No missing pages, congratulations!
 		return;
 	end
-	
+
 	-- Sort the pages by name:
 	table.sort(MissingPages,
 		function (Page1, Page2)
 			return (Page1.Name < Page2.Name);
 		end
 	);
-	
+
 	-- Output the pages:
 	local f, err = io.open("API/_missingPages.txt", "w");
 	if (f == nil) then
@@ -1163,7 +1161,7 @@ local function WriteStats(f)
 		else
 			Color = "red";
 		end
-		
+
 		local meter = {
 			"\n",
 			"<div style=\"background-color: black; padding: 1px; width: 100px\">\n",
@@ -1177,7 +1175,7 @@ local function WriteStats(f)
 		};
 		return table.concat(meter, "");
 	end
-	
+
 	f:write([[
 		<hr /><a name="docstats"><h2>Documentation statistics</h2></a>
 		<table><tr><th>Object</th><th>Total</th><th>Documented</th><th>Undocumented</th><th colspan="2">Documented %</th></tr>
@@ -1205,13 +1203,13 @@ local function WriteStats(f)
 	f:write("</td><td>", g_Stats.NumUndocumentedConstants);
 	f:write("</td><td>", ExportMeter(100 * (g_Stats.NumTotalConstants - g_Stats.NumUndocumentedConstants) / g_Stats.NumTotalConstants));
 	f:write("</td></tr>\n");
-	
+
 	f:write("<tr><td>Hooks</td><td>", g_Stats.NumTotalHooks);
 	f:write("</td><td>", g_Stats.NumTotalHooks - g_Stats.NumUndocumentedHooks);
 	f:write("</td><td>", g_Stats.NumUndocumentedHooks);
 	f:write("</td><td>", ExportMeter(100 * (g_Stats.NumTotalHooks - g_Stats.NumUndocumentedHooks) / g_Stats.NumTotalHooks));
 	f:write("</td></tr>\n");
-	
+
 	f:write([[
 		</table>
 		<p>There are ]], g_Stats.NumTrackedLinks, " internal links, ", g_Stats.NumInvalidLinks, " of them are invalid.</p>"
@@ -1224,7 +1222,7 @@ end
 
 local function DumpAPIHtml(a_API)
 	LOG("Dumping all available functions and constants to API subfolder...");
-	
+
 	-- Create the output folder
 	if not(cFile:IsFolder("API")) then
 		cFile:CreateFolder("API");
@@ -1257,7 +1255,7 @@ local function DumpAPIHtml(a_API)
 		end
 	);
 	ReadHooks(Hooks);
-	
+
 	-- Create a "class index" file, write each class as a link to that file,
 	-- then dump class contents into class-specific file
 	LOG("Writing HTML files...");
@@ -1277,7 +1275,7 @@ local function DumpAPIHtml(a_API)
 		table.insert(ClassMenuTab, "</a><br />");
 	end
 	local ClassMenu = table.concat(ClassMenuTab, "");
-	
+
 	-- Create a hook navigation menu that will be inserted into each hook file for faster navigation(#403)
 	local HookNavTab = {};
 	for _, hook in ipairs(Hooks) do
@@ -1288,18 +1286,18 @@ local function DumpAPIHtml(a_API)
 		table.insert(HookNavTab, "</a><br />");
 	end
 	local HookNav = table.concat(HookNavTab, "");
-	
+
 	-- Write the HTML file:
 	f:write([[<!DOCTYPE html>
 		<html>
 		<head>
-		<title>MCServer API - Index</title>
+		<title>Cuberite API - Index</title>
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		</head>
 		<body>
 		<div id="content">
 		<header>
-		<h1>MCServer API - Index</h1>
+		<h1>Cuberite API - Index</h1>
 		<hr />
 		</header>
 		<p>The API reference is divided into the following sections:</p>
@@ -1311,11 +1309,11 @@ local function DumpAPIHtml(a_API)
 		</ul>
 		<hr />
 	]]);
-	
+
 	WriteArticles(f);
 	WriteClasses(f, a_API, ClassMenu);
 	WriteHooks(f, Hooks, UndocumentedHooks, HookNav);
-	
+
 	-- Copy the static files to the output folder:
 	local StaticFiles =
 	{
@@ -1328,7 +1326,7 @@ local function DumpAPIHtml(a_API)
 		cFile:Delete("API/" .. fnam);
 		cFile:Copy(g_Plugin:GetLocalFolder() .. "/" .. fnam, "API/" .. fnam);
 	end
-	
+
 	-- List the documentation problems:
 	LOG("Listing leftovers...");
 	ListUndocumentedObjects(a_API, UndocumentedHooks);
@@ -1336,12 +1334,12 @@ local function DumpAPIHtml(a_API)
 	ListMissingPages();
 
 	WriteStats(f);
-	
+
 	f:write([[</ul></div>]])
 	f:write(GetHtmlTimestamp())
 	f:write([[</body></html>]])
 	f:close()
-	
+
 	LOG("API subfolder written");
 end
 
@@ -1354,16 +1352,16 @@ local function CleanUpDescription(a_Desc)
 	-- Get rid of indent and newlines, normalize whitespace:
 	local res = a_Desc:gsub("[\n\t]", "")
 	res = a_Desc:gsub("%s%s+", " ")
-	
+
 	-- Replace paragraph marks with newlines:
 	res = res:gsub("<p>", "\n")
 	res = res:gsub("</p>", "")
-	
+
 	-- Replace list items with dashes:
 	res = res:gsub("</?ul>", "")
 	res = res:gsub("<li>", "\n    - ")
 	res = res:gsub("</li>", "")
-	
+
 	return res
 end
 
@@ -1405,21 +1403,21 @@ end
 
 
 
---- Writes one MCS class definition into the specified file in ZBS format
+--- Writes one Cuberite class definition into the specified file in ZBS format
 local function WriteZBSClass(f, a_Class)
 	assert(type(a_Class) == "table")
-	
+
 	-- Write class header:
 	f:write("\t", a_Class.Name, " =\n\t{\n")
 	f:write("\t\ttype = \"class\",\n")
 	f:write("\t\tdescription = [[", CleanUpDescription(a_Class.Desc or ""), " ]],\n")
 	f:write("\t\tchilds =\n")
 	f:write("\t\t{\n")
-	
+
 	-- Export methods and constants:
 	WriteZBSMethods(f, a_Class.Functions)
 	WriteZBSConstants(f, a_Class.Constants)
-	
+
 	-- Finish the class definition:
 	f:write("\t\t},\n")
 	f:write("\t},\n\n")
@@ -1432,17 +1430,17 @@ end
 --- Dumps the entire API table into a file in the ZBS format
 local function DumpAPIZBS(a_API)
 	LOG("Dumping ZBS API description...")
-	local f, err = io.open("mcserver_api.lua", "w")
+	local f, err = io.open("cuberite_api.lua", "w")
 	if (f == nil) then
-		LOG("Cannot open mcserver_lua.lua for writing, ZBS API will not be dumped. " .. err)
+		LOG("Cannot open cuberite_api.lua for writing, ZBS API will not be dumped. " .. err)
 		return
 	end
-	
+
 	-- Write the file header:
-	f:write("-- This is a MCServer API file automatically generated by the APIDump plugin\n")
+	f:write("-- This is a Cuberite API file automatically generated by the APIDump plugin\n")
 	f:write("-- Note that any manual changes will be overwritten by the next dump\n\n")
 	f:write("return {\n")
-	
+
 	-- Export each class except Globals, store those aside:
 	local Globals
 	for _, cls in ipairs(a_API) do
@@ -1452,13 +1450,13 @@ local function DumpAPIZBS(a_API)
 			Globals = cls
 		end
 	end
-	
+
 	-- Export the globals:
 	if (Globals) then
 		WriteZBSMethods(f, Globals.Functions)
 		WriteZBSConstants(f, Globals.Constants)
 	end
-	
+
 	-- Finish the file:
 	f:write("}\n")
 	f:close()
@@ -1480,21 +1478,21 @@ local function IsDeclaredDescendant(a_DescendantName, a_BaseName, a_API)
 	end
 	assert(type(a_API[a_BaseName]) == "table", "Not a class name: " .. a_BaseName)
 	assert(type(a_API[a_BaseName].Descendants) == "table")
-	
+
 	-- Check direct inheritance:
 	for _, desc in ipairs(a_API[a_BaseName].Descendants) do
 		if (desc.Name == a_DescendantName) then
 			return true
 		end
 	end  -- for desc - a_BaseName's descendants
-	
+
 	-- Check indirect inheritance:
 	for _, desc in ipairs(a_API[a_BaseName].Descendants) do
 		if (IsDeclaredDescendant(a_DescendantName, desc.Name, a_API)) then
 			return true
 		end
 	end  -- for desc - a_BaseName's descendants
-	
+
 	return false
 end
 
@@ -1509,7 +1507,7 @@ local function CheckClassInheritance(a_Class, a_API, a_Report)
 	assert(type(a_Class) == "table")
 	assert(type(a_API) == "table")
 	assert(type(a_Report) == "table")
-	
+
 	-- Check that the declared descendants are really descendants:
 	local registry = debug.getregistry()
 	for _, desc in ipairs(a_Class.Descendants or {}) do
@@ -1519,7 +1517,7 @@ local function CheckClassInheritance(a_Class, a_API, a_Report)
 			table.insert(a_Report, desc.Name .. " is not a descendant of " .. a_Class.Name)
 		end
 	end  -- for desc - a_Class.Descendants[]
-	
+
 	-- Check that all inheritance is listed for the class:
 	local parents = registry["tolua_super"][_G[a_Class.Name]]  -- map of "classname" -> true for each class that a_Class inherits
 	for clsName, isParent in pairs(parents or {}) do
@@ -1544,7 +1542,7 @@ local function CheckAPIDescendants(a_API)
 			CheckClassInheritance(cls, a_API, report)
 		end
 	end
-	
+
 	-- If there's anything to report, output it to a file:
 	if (report[1] ~= nil) then
 		LOG("There are inheritance errors in the API description:")
@@ -1566,9 +1564,8 @@ end
 
 
 
-local function DumpApi()
-	LOG("Dumping the API...")
-	
+--- Prepares the API and Globals tables containing the documentation
+local function PrepareApi()
 	-- Load the API descriptions from the Classes and Hooks subfolders:
 	-- This needs to be done each time the command is invoked because the export modifies the tables' contents
 	dofile(g_PluginFolder .. "/APIDesc.lua")
@@ -1598,10 +1595,10 @@ local function DumpApi()
 		NumTrackedLinks = 0,
 		NumInvalidLinks = 0,
 	}
-	
+
 	-- Create the API tables:
 	local API, Globals = CreateAPITables();
-	
+
 	-- Sort the classes by name:
 	table.sort(API,
 		function (c1, c2)
@@ -1609,24 +1606,37 @@ local function DumpApi()
 		end
 	);
 	g_Stats.NumTotalClasses = #API;
-	
+
 	-- Add Globals into the API:
 	Globals.Name = "Globals";
 	table.insert(API, Globals);
-	
+
 	-- Read in the descriptions:
 	LOG("Reading descriptions...");
 	ReadDescriptions(API);
 
+	return API, Globals
+end
+
+
+
+
+
+local function DumpApi()
+	LOG("Dumping the API...")
+
+	-- Match the currently exported API with the available documentation:
+	local API, Globals = PrepareApi()
+
 	-- Check that the API lists the inheritance properly, report any problems to a file:
 	CheckAPIDescendants(API)
-	
+
 	-- Dump all available API objects in HTML format into a subfolder:
 	DumpAPIHtml(API);
-	
+
 	-- Dump all available API objects in format used by ZeroBraneStudio API descriptions:
 	DumpAPIZBS(API)
-	
+
 	LOG("APIDump finished");
 	return true
 end
@@ -1668,23 +1678,100 @@ end
 
 
 
-function Initialize(Plugin)
-	g_Plugin = Plugin;
-	g_PluginFolder = Plugin:GetLocalFolder();
+local function HandleCmdApiCheck(a_Split, a_EntireCmd)
+	-- Download the official API stats on undocumented stuff:
+	-- (We need a blocking downloader, which is impossible with the current cNetwork API)
+	assert(os.execute("wget -O official_undocumented.lua http://apidocs.cuberite.org/_undocumented.lua"))
+	local OfficialStats = cFile:ReadWholeFile("official_undocumented.lua")
+	if (OfficialStats == "") then
+		return true, "Cannot load official stats"
+	end
 	
-	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	-- Load the API stats as a Lua file, process into usable dictionary:
+	local Loaded, Msg = loadstring(OfficialStats)
+	if not(Loaded) then
+		return true, "Cannot load official stats: " .. (Msg or "<unknown error>")
+	end
+	local OfficialStatsDict = {}
+	setfenv(Loaded, OfficialStatsDict)
+	local IsSuccess, ErrMsg = pcall(Loaded)
+	if not(IsSuccess) then
+		return true, "Cannot parse official stats: " .. tostring(ErrMsg or "<unknown error>")
+	end
+	local Parsed = {}
+	for clsK, clsV in pairs(OfficialStatsDict.g_APIDesc.Classes) do
+		local cls =
+		{
+			Desc = not(clsV.Desc),  -- set to true if the Desc was not documented in the official docs
+			Functions = {},
+			Constants = {}
+		}
+		for funK, _ in pairs(clsV.Functions or {}) do
+			cls.Functions[funK] = true
+		end
+		for conK, _ in pairs(clsV.Constants or {}) do
+			cls.Constants[conK] = true
+		end
+		Parsed[clsK] = cls
+	end
 	
-	-- Bind a console command to dump the API:
-	cPluginManager:BindConsoleCommand("api", HandleCmdApi, "Dumps the Lua API docs into the API/ subfolder")
-	cPluginManager:BindConsoleCommand("apishow", HandleCmdApiShow, "Runs the default browser to show the API docs")
+	-- Get the current API's undocumented stats:
+	local API = PrepareApi()
+	
+	-- Compare the two sets of undocumented stats, list anything extra in current:
+	local res = {}
+	local ins = table.insert
+	for _, cls in ipairs(API) do
+		local ParsedOfficial = Parsed[cls.Name] or {}
+		if (not(cls.Desc) and ParsedOfficial.Desc) then
+			ins(res, cls.Name .. ".Desc")
+		end
+		local ParsedOfficialFns = ParsedOfficial.Functions or {}
+		for _, funK in ipairs(cls.UndocumentedFunctions or {}) do
+			if not(ParsedOfficialFns[funK]) then
+				ins(res, cls.Name .. "." .. funK .. " (function)")
+			end
+		end
+		local ParsedOfficialCons = ParsedOfficial.Constants or {}
+		for _, conK in ipairs(cls.UndocumentedConstants or {}) do
+			if not(ParsedOfficialCons[conK]) then
+				ins(res, cls.Name .. "." .. conK .. " (constant)")
+			end
+		end
+	end
+	table.sort(res)
+	
+	-- Bail out if no items found:
+	if not(res[1]) then
+		return true, "No new undocumented functions"
+	end
 
-	-- Add a WebAdmin tab that has a Dump button
-	g_Plugin:AddWebTab("APIDump", HandleWebAdminDump)
+	-- Save any found items to a file:
+	local f = io.open("NewlyUndocumented.lua", "w")
+	f:write(table.concat(res, "\n"))
+	f:write("\n")
+	f:close()
 	
-	return true
+	return true, "Newly undocumented items: " .. #res .. "\n" .. table.concat(res, "\n")
 end
 
 
 
 
 
+function Initialize(Plugin)
+	g_Plugin = Plugin;
+	g_PluginFolder = Plugin:GetLocalFolder();
+
+	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+
+	-- Bind a console command to dump the API:
+	cPluginManager:BindConsoleCommand("api",      HandleCmdApi,      "Dumps the Lua API docs into the API/ subfolder")
+	cPluginManager:BindConsoleCommand("apicheck", HandleCmdApiCheck, "Checks the Lua API documentation stats against the official stats")
+	cPluginManager:BindConsoleCommand("apishow",  HandleCmdApiShow,  "Runs the default browser to show the API docs")
+
+	-- Add a WebAdmin tab that has a Dump button
+	g_Plugin:AddWebTab("APIDump", HandleWebAdminDump)
+
+	return true
+end

@@ -28,7 +28,7 @@ return
 			{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "The block meta of the block" },
 		},
 		Returns = [[
-			If this function returns false or no value, MCServer calls other plugins with the same event. If
+			If this function returns false or no value, Cuberite calls other plugins with the same event. If
 			this function returns true, no other plugin is called for this event.
 		]],
 	},  -- HOOK_PLAYER_PLACED_BLOCK

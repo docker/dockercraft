@@ -31,7 +31,6 @@ function HandleSpawnCommand(Split, Player)
 		end
 	else
 		World = Player:GetWorld()
-		SetBackCoordinates(Player)
 		local OnAllChunksAvaliable = function()
 			Player:TeleportToCoords(SpawnX, SpawnY, SpawnZ)
 			SendMessageSuccess( Player, "Returned to world spawn" )

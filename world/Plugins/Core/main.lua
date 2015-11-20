@@ -16,12 +16,10 @@ g_UsePrefixes = true
 
 
 -- Global variables
-BackCoords = {}
 Messages = {}
 WorldsSpawnProtect = {}
 WorldsWorldLimit = {}
 WorldsWorldDifficulty = {}
-TpRequestTimeLimit = 0
 lastsender = {}
 
 
@@ -43,8 +41,6 @@ function Initialize(Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_PLACING_BLOCK,  OnPlayerPlacingBlock)
 	cPluginManager:AddHook(cPluginManager.HOOK_SPAWNING_ENTITY,       OnSpawningEntity)
 	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,           OnTakeDamage)
-	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,            OnWorldTick)
-	cPluginManager:AddHook(cPluginManager.HOOK_TICK,                  OnTick)
 
 	-- Bind ingame commands:
 	
@@ -61,10 +57,6 @@ function Initialize(Plugin)
 	IniFile = cIniFile()
 	IniFile:ReadFile("settings.ini")
 	HardCore = IniFile:GetValueSet("GameMode", "Hardcore", "false")
-	TpRequestTimeLimit = IniFile:GetValueSetI("Teleport", "RequestTimeLimit", 0)
-	if IniFile:GetNumKeyComments("Teleport") == 0 then
-		IniFile:AddKeyComment("Teleport", "RequestTimeLimit: Time after which tpa/tpahere will timeout, 0 - disabled");
-	end
 	IniFile:WriteFile("settings.ini")
 	
 	-- Load SpawnProtection and WorldLimit settings for individual worlds:

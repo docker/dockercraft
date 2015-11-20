@@ -27,8 +27,8 @@ local WeatherChanges =
 
 local ToggleDownfall = "Toggled downfall in world: "
 
-local WeatherUsage        = "Usage: /weather <clear|rain|thunder> [duration in seconds] [WorldName]"
-local WeatherConsoleUsage = "Usage: weather <clear|rain|thunder> [duration in seconds] [WorldName]"
+local WeatherUsage        = "Usage: /weather <clear|rain|thunder> [duration in seconds] [world]"
+local WeatherConsoleUsage = "Usage: weather <clear|rain|thunder> [duration in seconds] [world]"
 
 
 --- Handle the weather console command, wrapper for HandleWeatherCommand
@@ -99,7 +99,7 @@ end
 
 
 --- Handles in-game and console `toggledownfall` command
---  Command Usage: `toggledownfall [WorldName]'
+--  Command Usage: `toggledownfall [world]'
 -- 
 --  @param Player is nil when called by console command
 --

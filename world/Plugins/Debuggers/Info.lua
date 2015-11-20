@@ -124,6 +124,12 @@ g_PluginInfo =
 			Handler = HandlePickups,
 			HelpString = "Spawns random pickups around you"
 		},
+		["/plugmsg"] =
+		{
+			Permission = "debuggers",
+			Handler = HandlePlugMsg,
+			HelpString = "Sends a test plugin message to the client",
+		},
 		["/poison"] =
 		{
 			Permission = "debuggers",

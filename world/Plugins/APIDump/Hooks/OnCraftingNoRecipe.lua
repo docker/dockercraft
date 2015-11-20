@@ -6,7 +6,7 @@ return
 		DefaultFnName = "OnCraftingNoRecipe",  -- also used as pagename
 		Desc = [[
 			This callback is called when a player places items in their {{cCraftingGrid|crafting grid}} and
-			MCServer cannot find a built-in {{cCraftingRecipe|recipe}} for the combination. Plugins may provide
+			Cuberite cannot find a built-in {{cCraftingRecipe|recipe}} for the combination. Plugins may provide
 			a recipe for the ingredients given.
 		]],
 		Params =
@@ -17,7 +17,7 @@ return
 		},
 		Returns = [[
 			If the function returns false or no value, no recipe will be used. If the function returns true, no
-			other plugin will have their callback called for this event and MCServer will use the crafting
+			other plugin will have their callback called for this event and Cuberite will use the crafting
 			recipe in Recipe.</p>
 			<p>
 			FIXME: To allow plugins give suggestions and overwrite other plugins' suggestions, we should change

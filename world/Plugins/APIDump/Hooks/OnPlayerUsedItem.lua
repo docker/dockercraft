@@ -7,7 +7,7 @@ return
 		Desc = [[
 			This hook is called after a {{cPlayer|player}} has right-clicked a block with an {{cItem|item}} that
 			can be used (is not placeable, is not food and clicked block is not use-able), such as a bucket or a
-			hoe. It is called after MCServer processes the usage (places fluid / turns dirt to farmland).
+			hoe. It is called after Cuberite processes the usage (places fluid / turns dirt to farmland).
 			This is an information-only hook, there is no way to cancel the event anymore.</p>
 			<p>
 			Note that the block coords given in this callback are for the (solid) block that is being clicked,

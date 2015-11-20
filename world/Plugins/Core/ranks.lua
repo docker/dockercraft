@@ -21,7 +21,7 @@ function HandleRankCommand(a_Split, a_Player)
 	-- Check the params:
 	if ((a_Split[2] == nil) or (a_Split[4] ~= nil)) then
 		-- Too many or too few parameters, print the usage:
-		SendMessage(a_Player, "Usage: /rank <PlayerName> [<RankName>]")
+		SendMessage(a_Player, "Usage: " .. a_Split[1] .. " <player> [rank]")
 		return true
 	end
 
@@ -64,7 +64,7 @@ function HandleRankCommand(a_Split, a_Player)
 	cRoot:Get():ForEachPlayer(
 		function(a_CBPlayer)
 			if (a_CBPlayer:GetName() == PlayerName) then
-				a_CBPlayer:SendMessage("You were assigned the rank " .. NewRank .. " by " .. a_Player:GetName() .. ".")
+				a_CBPlayer:SendMessageInfo("You were assigned the rank " .. NewRank .. " by " .. a_Player:GetName() .. ".")
 				a_CBPlayer:LoadRank()
 			end
 		end

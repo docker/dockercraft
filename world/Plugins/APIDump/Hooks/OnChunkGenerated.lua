@@ -21,10 +21,10 @@ return
 			{ Name = "ChunkDesc", Type = "{{cChunkDesc}}", Notes = "Generated chunk data. Plugins may still modify the chunk data contained." },
 		},
 		Returns = [[
-			If the plugin returns false or no value, MCServer will call other plugins' callbacks for this event.
+			If the plugin returns false or no value, Cuberite will call other plugins' callbacks for this event.
 			If a plugin returns true, no other callback is called for this event.</p>
 			<p>
-			In either case, MCServer will then store the data from ChunkDesc as the chunk's contents in the world.
+			In either case, Cuberite will then store the data from ChunkDesc as the chunk's contents in the world.
 		]],
 		CodeExamples =
 		{
@@ -34,7 +34,7 @@ return
 				Code = [[
 function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	-- Generate a psaudorandom value that is always the same for the same X/Z pair, but is otherwise random enough:
-	-- This is actually similar to how MCServer does its noise functions
+	-- This is actually similar to how Cuberite does its noise functions
 	local PseudoRandom = (a_ChunkX * 57 + a_ChunkZ) * 57 + 19785486
 	PseudoRandom = PseudoRandom * 8192 + PseudoRandom;
 	PseudoRandom = ((PseudoRandom * (PseudoRandom * PseudoRandom * 15731 + 789221) + 1376312589) % 0x7fffffff;

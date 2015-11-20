@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Cuberite Plugin Tutorial</title>
+		<link rel="stylesheet" type="text/css" href="main.css" />
+		<link rel="stylesheet" type="text/css" href="prettify.css" />
+		<script src="prettify.js"></script>
+		<script src="lang-lua.js"></script>
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<div id="content">
+			<h1>Writing a Cuberite plugin</h1>
+			<p>
+			This article will explain how to write a basic plugin. It details basic requirements
+			for a plugin, explains how to register a hook and bind a command, and gives plugin
+			standards details.
+			</p>
+			<p>
+			Let us begin. In order to begin development, we must firstly obtain a compiled copy
+			of Cuberite, and make sure that the Core plugin is within the Plugins folder, and activated.
+			Core handles much of the Cuberite end-user experience and gameplay will be very bland without it.
+			</p>
+			<h2>Creating the basic template</h2>
+			<p>
+			Plugins are written in Lua. Therefore, create a new Lua file. You can create as many files as you wish, with
+			any filename - Cuberite bungs them all together at runtime, however, let us create a file called main.lua for now.
+			Format it like so:
+			</p>
+			<pre class="prettyprint lang-lua">
+PLUGIN = nil
+
+function Initialize(Plugin)
+	Plugin:SetName("NewPlugin")
+	Plugin:SetVersion(1)
+
+	-- Hooks
+
+	PLUGIN = Plugin -- NOTE: only needed if you want OnDisable() to use GetName() or something like that
+
+	-- Command Bindings
+
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	return true
+end
+
+function OnDisable()
+	LOG(PLUGIN:GetName() .. " is shutting down...")
+end
+			</pre>
+			<p>
+			Now for an explanation of the basics.
+			<ul>
+				<li><b>function Initialize</b> is called on plugin startup. It is the place where the plugin is set up.</li>
+				<li><b>Plugin:SetName</b> sets the name of the plugin.</li>
+				<li><b>Plugin:SetVersion</b> sets the revision number of the plugin. This must be an integer.</li>
+				<li><b>LOG</b> logs to console a message, in this case, it prints that the plugin was initialised.</li>
+				<li>The <b>PLUGIN</b> variable just stores this plugin's object, so GetName() can be called in OnDisable (as no Plugin parameter is passed there, contrary to Initialize).
+					This global variable is only needed if you want to know the plugin details (name, etc.) when shutting down.</li>
+				<li><b>function OnDisable</b> is called when the plugin is disabled, commonly when the server is shutting down. Perform cleanup and logging here.</li>
+			</ul>
+			Be sure to return true for this function, else Cuberite thinks you plugin had failed to initialise and prints a stacktrace with an error message.
+			</p>
+
+			<h2>Registering hooks</h2>
+			<p>
+			Hooks are things that Cuberite calls when an internal event occurs. For example, a hook is fired when a player places a block, moves,
+			logs on, eats, and many other things. For a full list, see <a href="index.html">the API documentation</a>.
+			</p>
+			<p>
+			A hook can be either informative or overridable. In any case, returning false will not trigger a response, but returning true will cancel
+			the hook and prevent it from being propagated further to other plugins. An overridable hook simply means that there is visible behaviour
+			to a hook's cancellation, such as a chest being prevented from being opened. There are some exceptions to this where only changing the value the
+			hook passes has an effect, and not the actual return value, an example being the HOOK_KILLING hook. See the API docs for details.
+			</p>
+			<p>
+			To register a hook, insert the following code template into the "-- Hooks" area in the previous code example.
+			</p>
+			<pre class="prettyprint lang-lua">
+cPluginManager.AddHook(cPluginManager.HOOK_NAME_HERE, FunctionNameToBeCalled)
+			</pre>
+			<p>
+			What does this code do?
+			<ul>
+				<li><b>cPluginManager.AddHook</b> registers the hook. The hook name is the second parameter. See the previous API documentation link for a list of all hooks.</li>
+			</ul>
+			What about the third parameter, you ask? Well, it is the name of the function that Cuberite calls when the hook fires. It is in this
+			function that you should handle or cancel the hook.
+			</p>
+			<p>
+			So in total, this is a working representation of what we have so far covered.
+			</p>
+			<pre class="prettyprint lang-lua">
+function Initialize(Plugin)
+	Plugin:SetName("DerpyPlugin")
+	Plugin:SetVersion(1)
+
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
+
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	return true
+end
+
+function OnPlayerMoving(Player) -- See API docs for parameters of all hooks
+	return true -- Prohibit player movement, see docs for whether a hook is cancellable
+end
+			</pre>
+			<p>
+			So, that code stops the player from moving. Not particularly helpful, but yes :P. Note that ALL documentation is available
+			on the main API docs page, so if ever in doubt, go there.
+			</p>
+			<h2>Binding a command</h2>
+			<h3>Format</h3>
+			<p>
+			So now we know how to hook into Cuberite, how do we bind a command, such as /explode, for a player to type? That is more complicated.
+			We firstly add this template to the "-- Command bindings" section of the initial example:
+			</p>
+			<pre class="prettyprint lang-lua">
+-- ADD THIS IF COMMAND DOES NOT REQUIRE A PARAMETER (/explode)
+cPluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " - Description of command")
+
+-- ADD THIS IF COMMAND DOES REQUIRE A PARAMETER (/explode Notch)
+cPluginManager.BindCommand("/commandname", "permissionnode", FunctionToCall, " ~ Description of command and parameter(s)")
+			</pre>
+			<p>
+			What does it do, and why are there two?
+			<ul>
+				<li><b>PluginManager:BindCommand</b> binds a command. It takes the command name (with a slash), the permission a player needs to execute the command, the function
+				to call when the command is executed, and a description of the command.</li>
+			</ul>
+			The command name is pretty self explanatory. The permission node is basically just a <b>string</b> that the player's group needs to have, so you can have anything in there,
+			though we recommend a style such as "derpyplugin.explode". The function to call is like the ones with Hooks, but with some fixed parameters which we will come on to later,
+			and the description is a description of the command which is shown when "/help" is typed.
+			</p>
+			<p>
+			So why are there two? Standards. A plugin that accepts a parameter MUST use a format for the description of " ~ Description of command and parms"
+			whereas a command that doesn't accept parameters MUST use " - Description of command" instead. Be sure to put a space before the tildes or dashes.
+			Additionally, try to keep the description brief and on one line on the client.
+			</p>
+			<h3>Parameters</h3>
+			<p>
+			What parameters are in the function Cuberite calls when the command is executed? A 'Split' array and a 'Player' object.
+			</p>
+			<h4>The Split Array</h4>
+			<p>
+			The Split array is an array of all text submitted to the server, including the actual command. Cuberite automatically splits the text into the array,
+			so plugin authors do not need to worry about that. An example of a Split array passed for the command, "/derp zubby explode" would be:<br /><br />
+				&nbsp&nbsp /derp (Split[1])<br />
+				&nbsp&nbsp zubby (Split[2])<br />
+				&nbsp&nbsp explode (Split[3])<br />
+				<br />
+				&nbsp&nbsp The total amount of parameters passed were: 3 (#Split)
+			</p>
+			<h4>The Player Object and sending them messages</h4>
+			<p>
+			The Player object is basically a pointer to the player that has executed the command. You can do things with them, but most common is sending
+			a message. Again, see the API documentation for fuller details. But, you ask, how <i>do</i> we send a message to the client?
+			</p>
+			<p>
+			There are dedicated functions used for sending a player formatted messages. By format, I refer to coloured prefixes/coloured text (depending on configuration)
+			that clearly categorise what type of message a player is being sent. For example, an informational message has a yellow coloured [INFO] prefix, and a warning message
+			has a rose coloured [WARNING] prefix. A few of the most used functions are listed here, but see the API docs for more details. Look in the cRoot, cWorld, and cPlayer sections
+			for functions that broadcast to the entire server, the whole world, and a single player, respectively.
+			</p>
+			<pre class="prettyprint lang-lua">
+-- Format: §yellow[INFO] §white%text% (yellow [INFO], white text following it)
+-- Use: Informational message, such as instructions for usage of a command
+Player:SendMessageInfo("Usage: /explode [player]")
+
+-- Format: §green[INFO] §white%text% (green [INFO] etc.)
+-- Use: Success message, like when a command executes successfully
+Player:SendMessageSuccess("Notch was blown up!")
+
+-- Format: §rose[INFO] §white%text% (rose coloured [INFO] etc.)
+-- Use: Failure message, like when a command was entered correctly but failed to run, such as when the destination player wasn't found in a /tp command
+Player:SendMessageFailure("Player Salted was not found")
+			</pre>
+			<p>
+			Those are the basics. If you want to output text to the player for a reason other than the three listed above, and you want to colour the text, simply concatenate
+			"cChatColor.*colorhere*" with your desired text, concatenate being "..". See the API docs for more details of all colours, as well as details on logging to console with
+			LOG("Text").
+			</p>
+			<h2>Final example and conclusion</h2>
+			<p>
+			So, a working example that checks the validity of a command, and blows up a player, and also refuses pickup collection to players with >100ms ping.
+			</p>
+			<pre class="prettyprint lang-lua">
+function Initialize(Plugin)
+	Plugin:SetName("DerpyPluginThatBlowsPeopleUp")
+	Plugin:SetVersion(9001)
+
+	cPluginManager.BindCommand("/explode", "derpyplugin.explode", Explode, " ~ Explode a player");
+
+	cPluginManager:AddHook(cPluginManager.HOOK_COLLECTING_PICKUP, OnCollectingPickup)
+
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	return true
+end
+
+function Explode(Split, Player)
+	if (#Split ~= 2) then
+		-- There was more or less than one argument (excluding the "/explode" bit)
+		-- Send the proper usage to the player and exit
+		Player:SendMessage("Usage: /explode [playername]")
+		return true
+	end
+
+	-- Create a callback ExplodePlayer with parameter Explodee, which Cuberite calls for every player on the server
+	local HasExploded = false
+	local ExplodePlayer = function(Explodee)
+		-- If the player we are currently at is the one we specified as the parameter
+		if (Explodee:GetName() == Split[2]) then
+			-- Create an explosion at the same position as they are; see <a href="cWorld.html">API docs</a> for further details of this function
+			Player:GetWorld():DoExplosionAt(Explodee:GetPosX(), Explodee:GetPosY(), Explodee:GetPosZ(), false, esPlugin)
+			Player:SendMessageSuccess(Split[2] .. " was successfully exploded")
+			HasExploded = true;
+			return true -- Signalize to Cuberite that we do not need to call this callback for any more players
+		end
+	end
+
+	-- Tell Cuberite to loop through all players and call the callback above with the Player object it has found
+	cRoot:Get():FindAndDoWithPlayer(Split[2], ExplodePlayer)
+
+	if not(HasExploded) then
+		-- We have not broken out so far, therefore, the player must not exist, send failure
+		Player:SendMessageFailure(Split[2] .. " was not found")
+	end
+
+	return true
+end
+
+function OnCollectingPickup(Player, Pickup) -- Again, see the API docs for parameters of all hooks. In this case, it is a Player and Pickup object
+	if (Player:GetClientHandle():GetPing() > 100) then -- Get ping of player, in milliseconds
+		return true -- Discriminate against high latency - you don't get drops :D
+	else
+		return false -- You do get the drops! Yay~
+	end
+end
+			</pre>
+			<p>
+			Make sure to read the comments for a description of what everything does. Also be sure to return true for all <b>command</b> handlers, unless you want Cuberite to print out an "Unknown command" message
+			when the command gets executed :P. Make sure to follow standards - use CoreMessaging.lua functions for messaging, dashes for no parameter commands and tildes for vice versa,
+			and finally, <a href="index.html">the API documentation</a> is your friend!
+			</p>
+			<p>
+			Happy coding ;)
+			</p>
+
+			<script>
+				prettyPrint();
+			</script>
+		</div>
+	</body>
+</html>

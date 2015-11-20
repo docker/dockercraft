@@ -1,7 +1,7 @@
 function HandleViewDistanceCommand( Split, Player )
 
 	if( #Split ~= 2 ) then
-		SendMessage( Player, "Usage: /viewdistance [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."]" )
+		SendMessage( Player, "Usage: /viewdistance <".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE ..">" )
 		return true
 	end
 

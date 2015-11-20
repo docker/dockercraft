@@ -11,7 +11,7 @@ function HandleRegenCommand(a_Split, a_Player)
 	-- Check the params:
 	local numParams = #a_Split
 	if (numParams == 2) or (numParams > 3) then
-		SendMessage(a_Player, "Usage: '" .. a_Split[1] .. "' or '" .. a_Split[1] .. " <ChunkX> <ChunkZ>'" )
+		SendMessage(a_Player, "Usage: '" .. a_Split[1] .. "' or '" .. a_Split[1] .. " <chunk x> <chunk z>'" )
 		return true
 	end
 
@@ -45,7 +45,7 @@ function HandleConsoleRegen(a_Split)
 	-- Check the params:
 	local numParams = #a_Split
 	if ((numParams ~= 3) and (numParams ~= 4)) then
-		return true, "Usage: " .. a_Split[1] .. " <ChunkX> <ChunkZ> [<WorldName>]"
+		return true, "Usage: " .. a_Split[1] .. " <chunk x> <chunk z> [world]"
 	end
 	
 	-- Get the coords of the chunk to regen:

@@ -14,7 +14,7 @@ return
 			{ Name = "Entity", Type = "{{cEntity}} descendant", Notes = "The entity that has been right-clicked" },
 		},
 		Returns = [[
-			If the functino returns false or no value, MCServer calls other plugins' callbacks and finally does
+			If the functino returns false or no value, Cuberite calls other plugins' callbacks and finally does
 			the default processing for the right-click. If the function returns true, no other callbacks are
 			called and the default processing is skipped.
 		]],

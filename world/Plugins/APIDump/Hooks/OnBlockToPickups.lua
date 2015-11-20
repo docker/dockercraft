@@ -44,7 +44,7 @@ function OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_Blo
 		return false;
 	end
 
-	-- Remove all pickups suggested by MCServer:
+	-- Remove all pickups suggested by Cuberite:
 	a_Pickups:Clear();
 
 	-- Drop a diamond:

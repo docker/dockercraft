@@ -7,7 +7,7 @@ return
 		Desc = [[
 			This hook is called when a {{cPlayer|player}} has right-clicked a block with an {{cItem|item}} that
 			can be used (is not placeable, is not food and clicked block is not use-able), such as a bucket or a
-			hoe. It is called before MCServer processes the usage (places fluid / turns dirt to farmland).
+			hoe. It is called before Cuberite processes the usage (places fluid / turns dirt to farmland).
 			Plugins may refuse the interaction by returning true.</p>
 			<p>
 			Note that the block coords given in this callback are for the (solid) block that is being clicked,
@@ -34,7 +34,7 @@ return
 			{ Name = "BlockMeta", Type = "number", Notes = "Block meta of the clicked block" },
 		},
 		Returns = [[
-			If the function returns false or no value, other plugins' callbacks are called and then MCServer
+			If the function returns false or no value, other plugins' callbacks are called and then Cuberite
 			processes the interaction. If the function returns true, no other callbacks are called for this
 			event and the interaction is silently dropped.
 		]],

@@ -27,7 +27,7 @@ return
 			{ Name = "EntireCommand", Type = "string", Notes = "The entire command as a single string" },
 		},
 		Returns = [[
-			If the plugin returns false, MCServer calls all the remaining hook handlers and finally the command
+			If the plugin returns false, Cuberite calls all the remaining hook handlers and finally the command
 			will be executed. If the plugin returns true, the none of the remaining hook handlers will be called.
 			In this case the plugin can return a second value, specifying whether what the command result should
 			be set to, one of the {{cPluginManager#CommandResult|CommandResult}} constants. If not

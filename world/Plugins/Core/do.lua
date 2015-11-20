@@ -1,7 +1,7 @@
 function HandleDoCommand( Split, Player )
 
 	if #Split < 3 then
-		SendMessage( Player, "Usage: /do <player> <command> [arguments]" )
+		SendMessage( Player, "Usage: " .. Split[1] .. " <player> <command> [arguments ...]" )
 		return true
 	end
 
@@ -29,7 +29,7 @@ end
 function HandleSudoCommand ( Split, Player )
 
 if #Split < 3 then
-		SendMessage( Player, "Usage: /sudo <player> <command> [arguments]" )
+		SendMessage( Player, "Usage: " .. Split[1] .. " <player> <command> [arguments ...]" )
 		return true
 	end
 

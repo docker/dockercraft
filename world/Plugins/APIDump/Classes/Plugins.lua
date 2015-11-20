@@ -39,7 +39,7 @@ return
 			Plugins can be identified by either the PluginFolder or PluginName. Note that these two can differ,
 			refer to <a href="http://forum.mc-server.org/showthread.php?tid=1877">the forum</a> for detailed discussion.
 			<p>
-			There is one instance of cPluginManager in MCServer, to get it, call either
+			There is one instance of cPluginManager in Cuberite, to get it, call either
 			{{cRoot|cRoot}}:Get():GetPluginManager() or cPluginManager:Get() function.</p>
 			<p>
 			Note that some functions are "static", that means that they are called using a dot operator instead
@@ -73,7 +73,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			ForceExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "{{cPluginManager#CommandResult|CommandResult}}", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
 			ForEachCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function(Command, Permission, HelpString)</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
 			ForEachConsoleCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindConsoleCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function (Command, HelpString)</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
-			ForEachPlugin = { Params = "CallbackFn", Return = "bool", Notes = "(STATIC) Calls the CallbackFn function for each plugin that is currently discovered by MCServer (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
+			ForEachPlugin = { Params = "CallbackFn", Return = "bool", Notes = "(STATIC) Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
 			Get = { Params = "", Return = "cPluginManager", Notes = "(STATIC) Returns the single instance of the plugin manager" },
 			GetAllPlugins = { Params = "", Return = "table", Notes = "Returns a table (dictionary) of all plugins, [name => value], where value is a valid {{cPlugin}} if the plugin is loaded, or the bool value false if the plugin is not loaded." },
 			GetCommandPermission = { Params = "Command", Return = "Permission", Notes = "Returns the permission needed for executing the specified command" },
@@ -110,6 +110,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			crUnknownCommand = { Notes = "When the given command doesn't exist." },
 			HOOK_BLOCK_SPREAD = { Notes = "Called when a block spreads based on world conditions" },
 			HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
+			HOOK_BREWING_COMPLETING = { "Called before a brewing stand completes a brewing process." },
+			HOOK_BREWING_COMPLETED = { "Called when a brewing stand completed a brewing process." },
 			HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
 			HOOK_CHUNK_AVAILABLE = { Notes = "Called when a chunk is loaded or generated and becomes available in the {{cWorld|world}}." },
 			HOOK_CHUNK_GENERATED = { Notes = "Called after a chunk is generated. A plugin may do last modifications on the generated chunk before it is handed of to the {{cWorld|world}}." },
@@ -120,6 +122,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			HOOK_CRAFTING_NO_RECIPE = { Notes = "Called when a player has items in the crafting slots and the server cannot locate any recipe. Plugin may provide a recipe." },
 			HOOK_DISCONNECT = { Notes = "Called after the player has disconnected." },
 			HOOK_ENTITY_ADD_EFFECT = { Notes = "Called when an effect is being added to an {{cEntity|entity}}. Plugin may refuse the effect." },
+			HOOK_ENTITY_CHANGED_WORLD = { Notes = "Called after a entity has changed the world." },
+			HOOK_ENTITY_CHANGING_WORLD = { Notes = "Called before a entity has changed the world. Plugin may disallow a entity to change the world." },
 			HOOK_ENTITY_TELEPORT = { Notes = "Called when an {{cEntity|entity}} is being teleported. Plugin may refuse the teleportation." },
 			HOOK_EXECUTE_COMMAND = { Notes = "Called when a client sends a chat message that is recognized as a command, before handing that command to the regular command handler. A plugin may stop the command from being handled. This hook is called even when the player doesn't have permissions for the command." },
 			HOOK_EXPLODED = { Notes = "Called after an explosion has been processed in a {{cWorld|world}}." },
@@ -127,6 +131,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			HOOK_HANDSHAKE = { Notes = "Called when a Handshake packet is received from a client." },
 			HOOK_HOPPER_PULLING_ITEM = { Notes = "Called when a hopper is pulling an item from the container above it." },
 			HOOK_HOPPER_PUSHING_ITEM = { Notes = "Called when a hopper is pushing an item into the container it is aimed at." },
+			HOOK_KILLED = { Notes = "Called when an entity has been killed." },
 			HOOK_KILLING = { Notes = "Called when an entity has just been killed. A plugin may resurrect the entity by setting its health to above zero." },
 			HOOK_LOGIN = { Notes = "Called when a Login packet is sent to the client, before the client is queued for authentication." },
 			HOOK_PLAYER_ANIMATION = { Notes = "Called when a client send the Animation packet." },

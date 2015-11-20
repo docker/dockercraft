@@ -26,7 +26,7 @@ return
 			{ Name = "Reason", Type = "string", Notes = "The reason that the client has sent in the disconnect packet" },
 		},
 		Returns = [[
-			If the function returns false or no value, MCServer calls other plugins' callbacks for this event.
+			If the function returns false or no value, Cuberite calls other plugins' callbacks for this event.
 			If the function returns true, no other plugins are called for this event. In either case,
 			the client is disconnected.
 		]],

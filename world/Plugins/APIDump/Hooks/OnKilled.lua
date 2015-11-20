@@ -6,7 +6,7 @@ return
 		DefaultFnName = "OnKilled",
 		Desc = [[
 			This hook is called whenever player or a mob dies. It can be used to change the death message.
-		]]
+		]],
 		Params = 
 		{
 			{ Name = "Victim", Type = "{{cEntity}}", Notes = "The player or mob that died" },
