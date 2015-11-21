@@ -7,7 +7,8 @@ ADD ./start.sh /srv/start.sh
 ADD ./go /go
 ADD ./docker_linux_x64/docker /bin/docker
 
-RUN chmod +x /bin/docker
+RUN chmod +x /bin/docker-*
 RUN cd /go/src/goproxy; go install
+RUN cd /go/src/gosetup; go install
 
 CMD ["/bin/bash","/srv/start.sh"]
