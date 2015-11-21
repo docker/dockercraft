@@ -24,18 +24,19 @@ import (
 // cuberite server, convert them into docker daemon remote API calls and send
 // them to the docker daemon.
 
-// instance of DockerClient allowing for making calls to the docker daemon
-// remote API
-var DOCKER_CLIENT *dockerclient.DockerClient
+// DockerClient in an instance of the docker client  allowing for making calls
+//to the docker daemon remote API
+var DockerClient *dockerclient.DockerClient
 
+// CPUStats holds stats about CPU usage
 type CPUStats struct {
 	TotalUsage  uint64
 	SystemUsage uint64
 }
 
-// previousCPUStats is a map containing the previous CPU stats we got from the 
+// previousCPUStats is a map containing the previous CPU stats we got from the
 // docker daemon through the docker remote API
-var previousCPUStats map[string]*CPUStats = make(map[string]*CPUStats)
+var previousCPUStats = make(map[string]*CPUStats)
 
 func main() {
 
@@ -59,13 +60,13 @@ func main() {
 
 	// init docker client object
 	var err error
-	DOCKER_CLIENT, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
+	DockerClient, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
 
 	// start monitoring docker events
-	DOCKER_CLIENT.StartMonitorEvents(eventCallback, nil)
+	DockerClient.StartMonitorEvents(eventCallback, nil)
 
 	// start a http server and listen on local port 8000
 	go func() {
@@ -90,7 +91,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+		containerInfo, err := DockerClient.InspectContainer(id)
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -111,7 +112,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+		containerInfo, err := DockerClient.InspectContainer(id)
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -126,7 +127,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageTag":  {tag}}
 
 		// Monitor stats
-		DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
+		DockerClient.StartMonitorStats(id, statCallback, nil)
 		CuberiteServerRequest(data)
 
 	case "stop":
@@ -147,7 +148,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 		// same as stop event
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+		containerInfo, err := DockerClient.InspectContainer(id)
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -185,7 +186,7 @@ func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...in
 	// logrus.Debugln("ram :", stat.MemoryStats.Usage)
 
 	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
-	var cpuPercent float64 = 0.0
+	var cpuPercent float64
 	if preCPUStats, exists := previousCPUStats[id]; exists {
 		cpuPercent = calculateCPUPercent(preCPUStats, &stat.CpuStats)
 	}
@@ -233,14 +234,14 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "OK")
 
 	go func() {
-		containers, err := DOCKER_CLIENT.ListContainers(true, false, "")
+		containers, err := DockerClient.ListContainers(true, false, "")
 
 		if err != nil {
 			logrus.Println(err.Error())
 			return
 		}
 
-		images, err := DOCKER_CLIENT.ListImages(true)
+		images, err := DockerClient.ListImages(true)
 
 		if err != nil {
 			logrus.Println(err.Error())
@@ -250,7 +251,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 		for i := 0; i < len(containers); i++ {
 
 			id := containers[i].Id
-			info, _ := DOCKER_CLIENT.InspectContainer(id)
+			info, _ := DockerClient.InspectContainer(id)
 			name := info.Name[1:]
 			imageRepo := ""
 			imageTag := ""
@@ -277,7 +278,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 
 			if info.State.Running {
 				// Monitor stats
-				DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
+				DockerClient.StartMonitorStats(id, statCallback, nil)
 			}
 		}
 	}()
