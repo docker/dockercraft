@@ -1,0 +1,28 @@
+machine:
+  pre:
+  # Install GVM
+    - bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/1.0.22/binscripts/gvm-installer)
+  post:
+    - gvm install go1.5.1 -B --name=stable
+
+environment:
+  # Convenient shortcuts to "common" locations
+    CHECKOUT: /home/ubuntu/$CIRCLE_PROJECT_REPONAME
+    BASE_DIR: src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+  # Trick circle brainflat "no absolute path" behavior
+    BASE_STABLE: ../../../$HOME/.gvm/pkgsets/stable/global/$BASE_DIR
+
+dependencies:
+  override:
+    - >
+      gvm use stable &&
+      mkdir -p "$(dirname $BASE_STABLE)" &&
+      cp -R "$CHECKOUT" "$BASE_STABLE"
+
+test:
+  override:
+    - gvm use stable && go version
+    - gvm use stable && make validate:
+        pwd: $BASE_STABLE
+    - make build
+
