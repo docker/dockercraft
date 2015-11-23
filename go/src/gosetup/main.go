@@ -24,22 +24,23 @@ func main() {
 		logrus.Fatal(err.Error())
 	}
 
-	// get the version of the docker remote API
+	// get the version of the docker daemon so we can be sure the corresponding
+	// docker client is installed and install it if necessary
 	version, err := DOCKER_CLIENT.Version()
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
-	dockerVersionNeeded := version.Version
+	dockerDaemonVersion := version.Version
 
 	// name of docker binary that is needed 
-	dockerBinaryName := "docker-" + dockerVersionNeeded
+	dockerBinaryName := "docker-" + dockerDaemonVersion
 	logrus.Println("looking for docker binary named:", dockerBinaryName)
 
 	filename := path.Join("/bin", dockerBinaryName)
 	
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		
-		logrus.Println("docker binary (version " + dockerVersionNeeded + ") not found.")
+		logrus.Println("docker binary (version " + dockerDaemonVersion + ") not found.")
 		logrus.Println("downloading", dockerBinaryName, "...")
 
 		out, err := os.Create(filename)
@@ -47,7 +48,7 @@ func main() {
 			logrus.Fatal(err.Error())
 		}
 		defer out.Close()
-		resp, err := http.Get("https://get.docker.com/builds/Linux/x86_64/docker-" + dockerVersionNeeded)
+		resp, err := http.Get("https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion)
 		if err != nil {
 			logrus.Fatal(err.Error())
 		}

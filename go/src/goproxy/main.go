@@ -27,7 +27,7 @@ import (
 // instance of DockerClient allowing for making calls to the docker daemon
 // remote API
 var DOCKER_CLIENT *dockerclient.DockerClient
-var DOCKER_VERSION_TO_USE string
+var DOCKER_DAEMON_VERSION string
 
 type CPUStats struct {
 	TotalUsage  uint64
@@ -70,7 +70,7 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
-	DOCKER_VERSION_TO_USE = version.Version
+	DOCKER_DAEMON_VERSION = version.Version
 
 	// start monitoring docker events
 	DOCKER_CLIENT.StartMonitorEvents(eventCallback, nil)
@@ -221,7 +221,7 @@ func execCmd(w http.ResponseWriter, r *http.Request) {
 		if len(arr) > 0 {
 
 			if arr[0] == "docker" {
-				arr[0] = "docker-" + DOCKER_VERSION_TO_USE
+				arr[0] = "docker-" + DOCKER_DAEMON_VERSION
 			}
 
 			cmd := exec.Command(arr[0], arr[1:]...)
