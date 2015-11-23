@@ -12,21 +12,21 @@ import (
 
 // instance of DockerClient allowing for making calls to the docker daemon
 // remote API
-var DOCKER_CLIENT *dockerclient.DockerClient
+var dockerClient *dockerclient.DockerClient
 
 
 func main() {
 
 	// init docker client object
 	var err error
-	DOCKER_CLIENT, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
+	dockerClient, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
 
 	// get the version of the docker daemon so we can be sure the corresponding
 	// docker client is installed and install it if necessary
-	version, err := DOCKER_CLIENT.Version()
+	version, err := dockerClient.Version()
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}

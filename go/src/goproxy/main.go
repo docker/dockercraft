@@ -26,8 +26,9 @@ import (
 
 // instance of DockerClient allowing for making calls to the docker daemon
 // remote API
-var DOCKER_CLIENT *dockerclient.DockerClient
-var DOCKER_DAEMON_VERSION string
+var dockerClient *dockerclient.DockerClient
+// version of the docker daemon which is exposing the remote API
+var dockerDaemonVersion string
 
 type CPUStats struct {
 	TotalUsage  uint64
@@ -60,20 +61,20 @@ func main() {
 
 	// init docker client object
 	var err error
-	DOCKER_CLIENT, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
+	dockerClient, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
 
 	// get the version of the docker remote API
-	version, err := DOCKER_CLIENT.Version()
+	version, err := dockerClient.Version()
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
-	DOCKER_DAEMON_VERSION = version.Version
+	dockerDaemonVersion = version.Version
 
 	// start monitoring docker events
-	DOCKER_CLIENT.StartMonitorEvents(eventCallback, nil)
+	dockerClient.StartMonitorEvents(eventCallback, nil)
 
 	// start a http server and listen on local port 8000
 	go func() {
@@ -98,7 +99,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+		containerInfo, err := dockerClient.InspectContainer(id)
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -119,7 +120,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+		containerInfo, err := dockerClient.InspectContainer(id)
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -134,7 +135,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 			"imageTag":  {tag}}
 
 		// Monitor stats
-		DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
+		dockerClient.StartMonitorStats(id, statCallback, nil)
 		CuberiteServerRequest(data)
 
 	case "stop":
@@ -155,7 +156,7 @@ func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}
 		// same as stop event
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := DOCKER_CLIENT.InspectContainer(id)
+		containerInfo, err := dockerClient.InspectContainer(id)
 		if err != nil {
 			logrus.Print("InspectContainer error:", err.Error())
 		} else {
@@ -221,7 +222,7 @@ func execCmd(w http.ResponseWriter, r *http.Request) {
 		if len(arr) > 0 {
 
 			if arr[0] == "docker" {
-				arr[0] = "docker-" + DOCKER_DAEMON_VERSION
+				arr[0] = "docker-" + dockerDaemonVersion
 			}
 
 			cmd := exec.Command(arr[0], arr[1:]...)
@@ -246,14 +247,14 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "OK")
 
 	go func() {
-		containers, err := DOCKER_CLIENT.ListContainers(true, false, "")
+		containers, err := dockerClient.ListContainers(true, false, "")
 
 		if err != nil {
 			logrus.Println(err.Error())
 			return
 		}
 
-		images, err := DOCKER_CLIENT.ListImages(true)
+		images, err := dockerClient.ListImages(true)
 
 		if err != nil {
 			logrus.Println(err.Error())
@@ -263,7 +264,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 		for i := 0; i < len(containers); i++ {
 
 			id := containers[i].Id
-			info, _ := DOCKER_CLIENT.InspectContainer(id)
+			info, _ := dockerClient.InspectContainer(id)
 			name := info.Name[1:]
 			imageRepo := ""
 			imageTag := ""
@@ -290,7 +291,7 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 
 			if info.State.Running {
 				// Monitor stats
-				DOCKER_CLIENT.StartMonitorStats(id, statCallback, nil)
+				dockerClient.StartMonitorStats(id, statCallback, nil)
 			}
 		}
 	}()
