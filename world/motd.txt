@@ -1,3 +1,5 @@
-@6Welcome to the MCServer test server!
-@6http://www.mc-server.org/
-@6Type /help for all commands
+@9Welcome to Dockercraft!
+@9https://github.com/docker/dockercraft
+@cWarning: Use on your local machine only
+@cDockercraft is not safe for use on production servers
+@9Type /docker to use docker CLI commands!
