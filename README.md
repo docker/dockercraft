@@ -8,6 +8,10 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 
 [YouTube video](http://www.youtube.com/watch?v=eZDlJgJf55o)
 
+> WARNING: Please use DockerCraft on your local machine only.
+> It currently doesn't support authentication. Every player 
+> should be considered a root user! 
+
 ## How to run Dockercraft
 
 1. **Install Minecraft: [minecraft.net](https://minecraft.net)**
