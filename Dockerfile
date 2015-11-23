@@ -1,13 +1,16 @@
 FROM golang:1.5.1
 
-ADD ./cuberite_server /srv/cuberite_server
-ADD ./world /srv/world
-ADD ./docs/img/logo64x64.png /srv/logo.png
-ADD ./start.sh /srv/start.sh
-ADD ./go /go
-ADD ./docker_linux_x64/docker /bin/docker
+COPY ./cuberite_server /srv/cuberite_server
+COPY ./world /srv/world
+COPY ./docs/img/logo64x64.png /srv/logo.png
+COPY ./start.sh /srv/start.sh
+COPY ./go /go
 
-RUN chmod +x /bin/docker
+# download latest docker client
+ADD https://get.docker.com/builds/Linux/x86_64/docker-1.9.1 /bin/docker-1.9.1
+
+RUN chmod +x /bin/docker-*
 RUN cd /go/src/goproxy; go install
+RUN cd /go/src/gosetup; go install
 
 CMD ["/bin/bash","/srv/start.sh"]
