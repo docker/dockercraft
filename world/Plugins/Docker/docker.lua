@@ -28,6 +28,7 @@ function Initialize(Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
 	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_FOOD_LEVEL_CHANGE, OnPlayerFoodLevelChange);
 	cPluginManager:AddHook(cPluginManager.HOOK_SERVER_PING, OnServerPing);
 	cPluginManager:AddHook(cPluginManager.HOOK_TICK, Tick);
 
@@ -376,6 +377,11 @@ function HandleRequest_Docker(Request)
 	content = content .. "[/dockerclient]"
 
 	return content
+end
+
+function OnPlayerFoodLevelChange(Player, NewFoodLevel)
+	-- Don't allow the player to get hungry
+	return true, Player, NewFoodLevel
 end
 
 function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers, Favicon)
