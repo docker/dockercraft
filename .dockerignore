@@ -1,0 +1,6 @@
+.git
+docs/*
+!docs/img/logo64x64.png
+LICENSE
+MAINTAINERS
+README.md
