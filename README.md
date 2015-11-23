@@ -8,9 +8,9 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 
 [YouTube video](http://www.youtube.com/watch?v=eZDlJgJf55o)
 
-> WARNING: Please use DockerCraft on your local machine only.
-> It currently doesn't support authentication. Every player 
-> should be considered a root user! 
+> WARNING: Please use Dockercraft on your local machine only.
+> It currently doesn't support authentication.
+> Every player should be considered a root user! 
 
 ## How to run Dockercraft
 
@@ -53,6 +53,12 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 	You should see at least one container in your world, which is the one hosting your Dockercraft server.
 
 	You can start, stop and remove containers interacting with levers and buttons. Some Docker commands are also supported directly via Minecraft's chat window, which is displayed by pressing the `T` key (default) or `/` key.
+	
+> A command always starts with a `/`.
+> 
+> If you open the prompt using the `/` key, it will be prefilled with a `/` character, but if you open it with the `T` key, it will not be prefilled and you will have to type a `/` yourself before typing your docker command.
+> 
+> example: `/docker run redis`.
 
 ![Dockercraft](../master/docs/img/landscape.png?raw=true)
 
