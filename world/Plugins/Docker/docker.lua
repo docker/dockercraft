@@ -29,6 +29,7 @@ function Initialize(Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
 	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_FOOD_LEVEL_CHANGE, OnPlayerFoodLevelChange);
+	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage);
 	cPluginManager:AddHook(cPluginManager.HOOK_SERVER_PING, OnServerPing);
 	cPluginManager:AddHook(cPluginManager.HOOK_TICK, Tick);
 
@@ -41,6 +42,7 @@ function Initialize(Plugin)
 	-- make all players admin
 	cRankManager:SetDefaultRank("Admin")
 
+	
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
 	return true
@@ -187,6 +189,9 @@ end
 
 --
 function PlayerJoined(Player)
+	-- enable flying
+	Player:SetCanFly(true)
+
 	-- refresh containers
 	LOG("player joined")
 	r = os.execute("goproxy containers")
@@ -382,6 +387,16 @@ end
 function OnPlayerFoodLevelChange(Player, NewFoodLevel)
 	-- Don't allow the player to get hungry
 	return true, Player, NewFoodLevel
+end
+
+function OnTakeDamage(Receiver, TDI)
+	-- Don't allow the player to take falling damage
+	dt_fall = 3
+	if Receiver:GetClass() == 'cPlayer' and TDI.DamageType == dt_fall
+	then
+		return true, Receiver, TDI	
+	end
+	return false, Receiver, TDI
 end
 
 function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers, Favicon)
