@@ -1,5 +1,7 @@
 json = require "json"
 
+TCP_CONN = nil
+
 TCP_CLIENT = {
 
 	OnConnected = function (TCPConn)
@@ -8,10 +10,12 @@ TCP_CLIENT = {
 		-- Not used for incoming server links
 		-- All returned values are ignored
 		LOG("TCP_CLIENT OnConnected")
+		TCP_CONN = TCPConn
+
 		LOG("TCP_CLIENT sending...")
-		v = {foo="bar",baz=2}
-		msg = json.stringify(v) .. "\n"
-		TCPConn:Send(msg)
+		-- v = {foo="bar",baz=2}
+		-- msg = json.stringify(v) .. "\n"
+		-- TCPConn:Send(msg)
 		LOG("TCP_CLIENT sent")
 	end,
 	
@@ -40,3 +44,15 @@ TCP_CLIENT = {
 		LOG("TCP_CLIENT OnRemoteClosed")
 	end,
 }
+
+function SendTCPMessage(cmd, args, id)
+	if TCP_CONN == nil
+	then
+		LOG("can't send TCP message, TCP_CLIENT not connected")
+		return
+	end
+	v = {cmd=cmd, args=args, id=id}
+	msg = json.stringify(v) .. "\n"
+	TCP_CONN:Send(msg)
+end
+
