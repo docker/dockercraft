@@ -53,6 +53,9 @@ TCP_CLIENT = {
 	end,
 }
 
+-- SendTCPMessage sends a message over global
+-- tcp connection TCP_CONN. args and id are optional
+-- id stands for the request id.
 function SendTCPMessage(cmd, args, id)
 	if TCP_CONN == nil
 	then
@@ -64,6 +67,8 @@ function SendTCPMessage(cmd, args, id)
 	TCP_CONN:Send(msg)
 end
 
+-- ParseTCPMessage parses a message received from
+-- global tcp connection TCP_CONN
 function ParseTCPMessage(message)
 	m = json.parse(message)
 	if m.cmd == "event" and table.getn(m.args) > 0 and m.args[1] == "containers"
@@ -72,6 +77,8 @@ function ParseTCPMessage(message)
 	end
 end
 
+-- handleContainerEvent handles a container
+-- event TCP message.
 function handleContainerEvent(event)	
 
 	if event.action == "containerInfos"
