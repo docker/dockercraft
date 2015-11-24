@@ -81,6 +81,21 @@ end
 -- event TCP message.
 function handleContainerEvent(event)	
 
+	if event.imageTag == nil
+	then
+		event.imageTag = ""
+	end
+
+	if event.imageRepo == nil
+	then
+		event.imageRepo = ""
+	end
+
+	if event.name == nil
+	then
+		event.name = ""
+	end
+
 	if event.action == "containerInfos"
 	then
 		state = CONTAINER_STOPPED
