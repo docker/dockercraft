@@ -1,6 +1,7 @@
 json = require "json"
 
 TCP_CONN = nil
+TCP_DATA = ""
 
 TCP_CLIENT = {
 
@@ -11,12 +12,6 @@ TCP_CLIENT = {
 		-- All returned values are ignored
 		LOG("TCP_CLIENT OnConnected")
 		TCP_CONN = TCPConn
-
-		LOG("TCP_CLIENT sending...")
-		-- v = {foo="bar",baz=2}
-		-- msg = json.stringify(v) .. "\n"
-		-- TCPConn:Send(msg)
-		LOG("TCP_CLIENT sent")
 	end,
 	
 	OnError = function (TCPConn, ErrorCode, ErrorMsg)
@@ -33,7 +28,20 @@ TCP_CLIENT = {
 		-- Will get called whenever there's new data on the link
 		-- a_Data contains the raw received data, as a string
 		-- All returned values are ignored
-		LOG("TCP_CLIENT OnReceivedData")
+		-- LOG("TCP_CLIENT OnReceivedData")
+
+		TCP_DATA = TCP_DATA .. Data 
+		shiftLen = 0
+
+		for message in string.gmatch(TCP_DATA, '([^\n]+\n)') do
+		    shiftLen = shiftLen + string.len(message)
+		    -- remove \n at the end
+		    message = string.sub(message,1,string.len(message)-1)
+		    ParseTCPMessage(message)
+		end
+
+		TCP_DATA = string.sub(TCP_DATA,shiftLen+1)
+
 	end,
 	
 	OnRemoteClosed = function (TCPConn)
@@ -56,3 +64,47 @@ function SendTCPMessage(cmd, args, id)
 	TCP_CONN:Send(msg)
 end
 
+function ParseTCPMessage(message)
+	m = json.parse(message)
+	if m.cmd == "event" and table.getn(m.args) > 0 and m.args[1] == "containers"
+	then
+		handleContainerEvent(m.data)
+	end
+end
+
+function handleContainerEvent(event)	
+
+	if event.action == "containerInfos"
+	then
+		state = CONTAINER_STOPPED
+		if event.running then
+			state = CONTAINER_RUNNING
+		end
+		updateContainer(event.id,event.name,event.imageRepo,event.imageTag,state)
+	end
+
+	if event.action == "startContainer"
+	then
+		updateContainer(event.id,event.name,event.imageRepo,event.imageTag,CONTAINER_RUNNING)
+	end
+
+	if event.action == "createContainer"
+	then
+		updateContainer(event.id,event.name,event.imageRepo,event.imageTag,CONTAINER_CREATED)
+	end
+
+	if event.action == "stopContainer"
+	then
+		updateContainer(event.id,event.name,event.imageRepo,event.imageTag,CONTAINER_STOPPED)
+	end
+
+	if event.action == "destroyContainer"
+	then
+		destroyContainer(event.id)
+	end
+
+	if event.action == "stats"
+	then
+		updateStats(event.id,event.ram,event.cpu)
+	end
+end

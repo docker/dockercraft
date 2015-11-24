@@ -38,8 +38,6 @@ function Initialize(Plugin)
 
 	cPluginManager.BindCommand("/docker", "*", DockerCommand, " - docker CLI commands")
 
-	Plugin:AddWebTab("Docker",HandleRequest_Docker)
-
 	-- make all players admin
 	cRankManager:SetDefaultRank("Admin")
 
@@ -296,102 +294,6 @@ function DockerCommand(Split, Player)
 	return true
 end
 
-
-
-function HandleRequest_Docker(Request)
-	
-	content = "[dockerclient]"
-
-	if Request.PostParams["action"] ~= nil then
-
-		action = Request.PostParams["action"]
-
-		-- receiving informations about one container
-		
-		if action == "containerInfos"
-		then
-			LOG("EVENT - containerInfos")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-			running = Request.PostParams["running"]
-
-			-- LOG("containerInfos running: " .. running)
-
-			state = CONTAINER_STOPPED
-			if running == "true" then
-				state = CONTAINER_RUNNING
-			end
-
-			updateContainer(id,name,imageRepo,imageTag,state)
-		end
-
-		if action == "startContainer"
-		then
-			LOG("EVENT - startContainer")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-
-			updateContainer(id,name,imageRepo,imageTag,CONTAINER_RUNNING)
-		end
-
-		if action == "createContainer"
-		then
-			LOG("EVENT - createContainer")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-
-			updateContainer(id,name,imageRepo,imageTag,CONTAINER_CREATED)
-		end
-
-		if action == "stopContainer"
-		then
-			LOG("EVENT - stopContainer")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-
-			updateContainer(id,name,imageRepo,imageTag,CONTAINER_STOPPED)
-		end
-
-		if action == "destroyContainer"
-		then
-			LOG("EVENT - destroyContainer")
-			id = Request.PostParams["id"]
-			destroyContainer(id)
-		end
-
-		if action == "stats"
-		then
-			id = Request.PostParams["id"]
-			cpu = Request.PostParams["cpu"]
-			ram = Request.PostParams["ram"]
-
-			updateStats(id,ram,cpu)
-		end
-
-
-		content = content .. "{action:\"" .. action .. "\"}"
-
-	else
-		content = content .. "{error:\"action requested\"}"
-
-	end
-
-	content = content .. "[/dockerclient]"
-
-	return content
-end
 
 function OnPlayerFoodLevelChange(Player, NewFoodLevel)
 	-- Don't allow the player to get hungry
