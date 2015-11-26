@@ -35,7 +35,7 @@ TCP_CLIENT = {
 		-- LOG("TCP_CLIENT OnReceivedData")
 
 		TCP_DATA = TCP_DATA .. Data 
-		shiftLen = 0
+		local shiftLen = 0
 
 		for message in string.gmatch(TCP_DATA, '([^\n]+\n)') do
 		    shiftLen = shiftLen + string.len(message)
@@ -66,15 +66,15 @@ function SendTCPMessage(cmd, args, id)
 		LOG("can't send TCP message, TCP_CLIENT not connected")
 		return
 	end
-	v = {cmd=cmd, args=args, id=id}
-	msg = json.stringify(v) .. "\n"
+	local v = {cmd=cmd, args=args, id=id}
+	local msg = json.stringify(v) .. "\n"
 	TCP_CONN:Send(msg)
 end
 
 -- ParseTCPMessage parses a message received from
 -- global tcp connection TCP_CONN
 function ParseTCPMessage(message)
-	m = json.parse(message)
+	local m = json.parse(message)
 	if m.cmd == "event" and table.getn(m.args) > 0 and m.args[1] == "containers"
 	then
 		handleContainerEvent(m.data)
@@ -85,24 +85,13 @@ end
 -- event TCP message.
 function handleContainerEvent(event)	
 
-	if event.imageTag == nil
-	then
-		event.imageTag = ""
-	end
-
-	if event.imageRepo == nil
-	then
-		event.imageRepo = ""
-	end
-
-	if event.name == nil
-	then
-		event.name = ""
-	end
+	event.imageTag = event.imageTag or ""
+	event.imageRepo = event.imageRepo or ""
+	event.name = event.name or ""
 
 	if event.action == "containerInfos"
 	then
-		state = CONTAINER_STOPPED
+		local state = CONTAINER_STOPPED
 		if event.running then
 			state = CONTAINER_RUNNING
 		end
