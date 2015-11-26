@@ -10,8 +10,12 @@ TCP_CLIENT = {
 		-- Only called if the link is being connected as a client (using cNetwork:Connect() )
 		-- Not used for incoming server links
 		-- All returned values are ignored
-		LOG("TCP_CLIENT OnConnected")
+		LOG("tcp client connected")
 		TCP_CONN = TCPConn
+
+		-- list containers
+		LOG("listing containers...")
+		SendTCPMessage("info",{"containers"},0)
 	end,
 	
 	OnError = function (TCPConn, ErrorCode, ErrorMsg)
@@ -20,7 +24,7 @@ TCP_CLIENT = {
 		-- For a client link being connected, this reports a connection error (destination unreachable etc.)
 		-- It is an Undefined Behavior to send data to a_TCPLink in or after this callback
 		-- All returned values are ignored
-		LOG("TCP_CLIENT OnError: " .. ErrorCode .. ": " .. ErrorMsg)
+		LOG("tcp client OnError: " .. ErrorCode .. ": " .. ErrorMsg)
 	end,
 	
 	OnReceivedData = function (TCPConn, Data)
@@ -49,7 +53,7 @@ TCP_CLIENT = {
 		-- The link is already closed, any data sent to it now will be lost
 		-- No other callback will be called for this link from now on
 		-- All returned values are ignored
-		LOG("TCP_CLIENT OnRemoteClosed")
+		LOG("tcp client OnRemoteClosed")
 	end,
 }
 
