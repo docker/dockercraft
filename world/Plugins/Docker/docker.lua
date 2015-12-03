@@ -30,6 +30,7 @@ function Initialize(Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_FOOD_LEVEL_CHANGE, OnPlayerFoodLevelChange);
 	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage);
+	cPluginManager:AddHook(cPluginManager.HOOK_WEATHER_CHANGING, OnWeatherChanging);
 	cPluginManager:AddHook(cPluginManager.HOOK_SERVER_PING, OnServerPing);
 	cPluginManager:AddHook(cPluginManager.HOOK_TICK, Tick);
 
@@ -411,4 +412,9 @@ function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers
 	end
 	return false, ServerDescription, OnlinePlayers, MaxPlayers, Favicon
 end				
+
+-- Make it sunny all the time!
+function OnWeatherChanging(World, Weather)
+	return true, wSunny
+end
 
