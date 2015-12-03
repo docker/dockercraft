@@ -91,6 +91,7 @@ end
 -- destroyContainer looks for the first container having the given id,
 -- removes it from the Minecraft world and from the 'Containers' array
 function destroyContainer(id)
+	LOG("destroyContainer: " .. id)
 	-- loop over the containers and remove the first having the given id
 	for i=1, table.getn(Containers)
 	do
@@ -174,7 +175,7 @@ function updateContainer(id,name,imageRepo,imageTag,state)
 end
 
 --
-function WorldStarted()
+function WorldStarted(World)
 	y = GROUND_LEVEL
 	-- just enough to fit one container
 	-- then it should be dynamic
@@ -390,11 +391,12 @@ function OnPlayerFoodLevelChange(Player, NewFoodLevel)
 end
 
 function OnTakeDamage(Receiver, TDI)
-	-- Don't allow the player to take falling damage
-	dt_fall = 3
-	if Receiver:GetClass() == 'cPlayer' and TDI.DamageType == dt_fall
+	-- Don't allow the player to take falling or explosion damage
+	if Receiver:GetClass() == 'cPlayer'
 	then
-		return true, Receiver, TDI	
+		if TDI.DamageType == dtFall or TDI.DamageType == dtExplosion then
+			return true, Receiver, TDI
+		end
 	end
 	return false, Receiver, TDI
 end

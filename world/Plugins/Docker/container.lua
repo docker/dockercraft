@@ -52,6 +52,29 @@ end
 -- Container:destroy removes all blocks of the 
 -- container, it won't be visible on the map anymore
 function Container:destroy(running)
+	X = self.x+2
+	Y = GROUND_LEVEL+2
+	Z = self.z+2
+	LOG("Exploding at X:" .. X .. " Y:" .. Y .. " Z:" .. Z)
+	local World = cRoot:Get():GetDefaultWorld()
+	World:BroadcastSoundEffect("random.explode", X, Y, Z, 1, 1)
+	World:BroadcastParticleEffect("hugeexplosion",X, Y, Z, 0, 0, 0, 1, 1)
+
+	-- if a block is removed before it's button/lever/sign, that object will drop
+	-- and the player can collect it. Remove these first
+
+	-- lever
+	digBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+1)
+	-- signs
+	digBlock(UpdateQueue,self.x+3,GROUND_LEVEL+2,self.z-1)
+	digBlock(UpdateQueue,self.x,GROUND_LEVEL+2,self.z-1)
+	digBlock(UpdateQueue,self.x+1,GROUND_LEVEL+2,self.z-1)
+	-- torch
+	digBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+1)
+	--button
+	digBlock(UpdateQueue,self.x+2,GROUND_LEVEL+3,self.z+2)
+
+	-- rest of the blocks
 	for py = GROUND_LEVEL+1, GROUND_LEVEL+4
 	do
 		for px=self.x-1, self.x+4
