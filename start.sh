@@ -1,8 +1,10 @@
-# Download the version of the docker client that matches the docker daemon present
-gosetup
+#!/bin/bash
+
+set -e
 
 # Start goproxy
-goproxy &> /srv/world/goproxy_out &
+echo Starting Dockercraft
+dockercraft -daemon &
 
 # start Minecraft C++ server
 cd /srv/world
