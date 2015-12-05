@@ -9,6 +9,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// GetDockerBinary ensures that we have the right version docker client
+// for communicating with the Docker Daemon
 func (d *Daemon) GetDockerBinary() error {
 	// name of docker binary that is needed
 	d.BinaryName = "docker-" + d.Version

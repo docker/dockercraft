@@ -27,7 +27,7 @@ func main() {
 	}
 
 	containerConfig := &dockerclient.ContainerConfig{Image: "busybox", Cmd: []string{"sh"}}
-	containerId, err := docker.CreateContainer(containerConfig, "")
+	containerId, err := docker.CreateContainer(containerConfig, "", nil)
 	if err != nil {
 		log.Fatal(err)
 	}

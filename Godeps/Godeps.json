@@ -8,13 +8,13 @@
 			"Rev": "467d9d55c2d2c17248441a8fc661561161f40d5e"
 		},
 		{
-			"ImportPath": "github.com/docker/docker/pkg/units",
-			"Comment": "v1.4.1-4106-g637023a",
-			"Rev": "637023a5f8d8347a0e271c09d5c9bc84fbc97693"
+			"ImportPath": "github.com/docker/go-units",
+			"Comment": "v0.1.0-14-g651fc22",
+			"Rev": "651fc226e7441360384da338d0fd37f2440ffbe3"
 		},
 		{
 			"ImportPath": "github.com/samalba/dockerclient",
-			"Rev": "5ba36c1ad5b75c34be407bfaac51bd02ccb8c654"
+			"Rev": "0cba4a962c5a4dfcc4a83b8e64a946837a6ed913"
 		}
 	]
 }

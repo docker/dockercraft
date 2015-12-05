@@ -25,6 +25,7 @@ import (
 // cuberite server, convert them into docker daemon remote API calls and send
 // them to the docker daemon.
 
+// Daemon maintains state when the dockercraft daemon is running
 type Daemon struct {
 	// Client is an instance of the DockerClient
 	Client *dockerclient.DockerClient
@@ -37,17 +38,20 @@ type Daemon struct {
 	previousCPUStats map[string]*CPUStats
 }
 
+// NewDaemon returns a new instance of Daemon
 func NewDaemon() *Daemon {
 	return &Daemon{
 		previousCPUStats: make(map[string]*CPUStats),
 	}
 }
 
+// CPUStats contains the Total and System CPU stats
 type CPUStats struct {
 	TotalUsage  uint64
 	SystemUsage uint64
 }
 
+// ProxyCmd submits a command to a running Daemon
 func ProxyCmd(args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("Only 1 argument expected. Received %d", len(args))
@@ -61,6 +65,7 @@ func ProxyCmd(args []string) error {
 	return nil
 }
 
+// Init initializes a Daemon
 func (d *Daemon) Init() error {
 	var err error
 	d.Client, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
@@ -91,7 +96,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		containerName := "<name>"
 		containerInfo, err := d.Client.InspectContainer(id)
 		if err != nil {
-			log.Errorf("InspectContainer error:", err.Error())
+			log.Errorf("InspectContainer error: %s", err.Error())
 		} else {
 			containerName = containerInfo.Name
 		}
@@ -112,7 +117,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		containerName := "<name>"
 		containerInfo, err := d.Client.InspectContainer(id)
 		if err != nil {
-			log.Errorf("InspectContainer error:", err.Error())
+			log.Errorf("InspectContainer error: %s", err.Error())
 		} else {
 			containerName = containerInfo.Name
 		}
@@ -148,7 +153,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		containerName := "<name>"
 		containerInfo, err := d.Client.InspectContainer(id)
 		if err != nil {
-			log.Errorf("InspectContainer error:", err.Error())
+			log.Errorf("InspectContainer error: %s", err.Error())
 		} else {
 			containerName = containerInfo.Name
 		}
@@ -184,7 +189,7 @@ func (d *Daemon) statCallback(id string, stat *dockerclient.Stats, ec chan error
 	// log.Debugln("ram :", stat.MemoryStats.Usage)
 
 	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
-	var cpuPercent float64 = 0.0
+	var cpuPercent float64
 	if preCPUStats, exists := d.previousCPUStats[id]; exists {
 		cpuPercent = calculateCPUPercent(preCPUStats, &stat.CpuStats)
 	}
