@@ -7,18 +7,18 @@ IMAGE = golang:1.6
 IMAGE_NAME = dockercraft-dev
 CONTAINER_NAME = dockercraft-dev-container
 
-all: test
+all: test build
 
 test-local: install-deps fmt lint vet
 	@echo "+ $@"
 	@go test -v .
-
 test:
 	@docker run -v ${shell pwd}:/go/src/${PKG_NAME} -w /go/src/${PKG_NAME} ${IMAGE} make test-local
 
 install-deps:
 	@echo "+ $@"
 	@go get -u github.com/golang/lint/golint
+	@apt-get -qq update && apt-get -qq -y install lua5.1
 
 lint:
 	@echo "+ $@"
@@ -27,6 +27,7 @@ lint:
 fmt:
 	@echo "+ $@"
 	@test -z "$$(gofmt -s -l . | grep -v vendor/ | tee /dev/stderr)"
+	@luac -p ./world/Plugins/Docker/*.lua
 
 vet:
 	@echo "+ $@"
@@ -39,6 +40,8 @@ build:
 serve:
 	@docker run -it --rm \
 		--name ${CONTAINER_NAME} \
+		-p 8080:8080 \
 		-p 25566:25565 \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		${IMAGE_NAME}
+		-v /Users/$$USER/.docker/machine:/root/.docker/machine \
+		${IMAGE_NAME} -debug

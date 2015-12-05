@@ -3,6 +3,8 @@ dockercraft:
   build: .
   volumes:
     - "/var/run/docker.sock:/var/run/docker.sock"
+    - "/Users/dave/.docker/machine:/root/.docker/machine"  
   ports:
     - "25565:25565"
   tty: true
+  stdin_open: true

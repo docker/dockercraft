@@ -21,5 +21,4 @@ RUN ln -s /srv/cuberite_server/Cuberite /usr/bin/cuberite
 COPY ./world world
 COPY ./docs/img/logo64x64.png logo.png
 
-COPY ./start.sh start.sh
-CMD ["/bin/sh", "/srv/start.sh"]
+ENTRYPOINT ["/go/bin/dockercraft", "-daemon"]

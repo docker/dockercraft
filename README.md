@@ -38,7 +38,14 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 	gaetan/dockercraft
 	```
 
-	Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
+	You must mount one or both of the following:
+	  
+            -  `/var/run/docker.sock` for a local docker instance
+	    -  `~/.docker/machine/machines` for your docker machines!
+
+	Please do not mount BOTH where `/var/run/docker.sock` is located on a machine managed by docker machine.
+	Bad things may happen! In this case there will be a "local" and "<machine_name>" world both subscribed to
+        events from the same daemon.
 
 	The default port for a Minecraft server is *25565*, if you prefer a different one: `-p <port>:25565`
 
@@ -62,11 +69,25 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 
 ![Dockercraft](../master/docs/img/landscape.png?raw=true)
 
+## (Experimental) Docker Machine support
+
+If you mount the `~/.docker/machine/machines` directory, Dockercraft will attempt to manage your machines for you. This has only been tested with Docker Machine version 0.7.0.
+
+When you log in, you will be placed in the default world. The criteria for selecting this are as follows:
+
+- `local` world if you've also mounted `/var/run/docker.sock`
+- `default` world if you have a machine called `default`
+- the first world discovered by docker-machine in alphabetical order
+
+To view all available worlds, use the `/worlds` command from within your minecraft client
+
+To portal to another world, `/portal <world>`.
+For example, to portal to the default world I would `/portal default`
+
 ## Upcoming features
 
 This is just the beginning for Dockercraft! We should be able to support a lot more Docker features like:
 
-- List [Docker Machines](https://docs.docker.com/machine/) and use portals to see what's inside
 - Support more Docker commands
 - Display [logs](https://docs.docker.com/v1.8/reference/commandline/logs/) (for each container, pushing a simple button)
 - Represent links

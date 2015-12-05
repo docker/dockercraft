@@ -27,21 +27,13 @@ import (
 
 // Daemon maintains state when the dockercraft daemon is running
 type Daemon struct {
-	// Client is an instance of the DockerClient
-	Client *dockerclient.DockerClient
-	// Version is the version of the Docker Daemon
-	Version string
-	// BinaryName is the name of the Docker Binary
-	BinaryName string
-	// previouscpustats is a map containing the previous cpu stats we got from the
-	// docker daemon through the docker remote api
-	previousCPUStats map[string]*CPUStats
+	Machines map[string]*Machine
 }
 
 // NewDaemon returns a new instance of Daemon
 func NewDaemon() *Daemon {
 	return &Daemon{
-		previousCPUStats: make(map[string]*CPUStats),
+		Machines: make(map[string]*Machine),
 	}
 }
 
@@ -54,38 +46,53 @@ type CPUStats struct {
 // ProxyCmd submits a command to a running Daemon
 func ProxyCmd(args []string) error {
 	if len(args) != 1 {
-		return fmt.Errorf("Only 1 argument expected. Received %d", len(args))
+		return fmt.Errorf("One argument expected. Received %d", len(args))
 	}
 	reqPath := "http://127.0.0.1:8000/" + os.Args[1]
 	resp, err := http.Get(reqPath)
 	if err != nil {
 		return fmt.Errorf("Error on request: %s, ERROR: %s", reqPath, err.Error())
 	}
-	log.Infof("Request sent: %s, StatusCode: %d", reqPath, resp.StatusCode)
+	log.Debugf("Request sent: %s, StatusCode: %d", reqPath, resp.StatusCode)
 	return nil
 }
 
 // Init initializes a Daemon
 func (d *Daemon) Init() error {
-	var err error
-	d.Client, err = dockerclient.NewDockerClient("unix:///var/run/docker.sock", nil)
-	if err != nil {
+
+	if err := d.GetMachines(); err != nil {
 		return err
 	}
 
-	// get the version of the docker remote API
-	version, err := d.Client.Version()
-	if err != nil {
-		return err
+	if len(d.Machines) == 0 {
+		return fmt.Errorf("No Machines Found!")
 	}
-	d.Version = version.Version
+
+	for m, machine := range d.Machines {
+		var err error
+		machine.Client, err = dockerclient.NewDockerClient(machine.URL, machine.TLSConfig)
+		if err != nil {
+			log.Warn("Error connecting to machine %s: %s", m, err)
+			delete(d.Machines, m)
+			continue
+		}
+
+		// get the version of the docker remote API
+		version, err := machine.Client.Version()
+		if err != nil {
+			log.Warn("Error connecting to machine %s: %s", m, err)
+			delete(d.Machines, m)
+			continue
+
+		}
+		machine.Version = version.Version
+	}
 	return nil
 }
 
 // eventCallback receives and handles the docker events
-func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}) {
+func (m *Machine) eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}) {
 	log.Debugf("--\n%+v", *event)
-
 	id := event.ID
 
 	switch event.Status {
@@ -94,7 +101,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := d.Client.InspectContainer(id)
+		containerInfo, err := m.Client.InspectContainer(id)
 		if err != nil {
 			log.Errorf("InspectContainer error: %s", err.Error())
 		} else {
@@ -102,6 +109,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		}
 
 		data := url.Values{
+			"world":     {m.Name},
 			"action":    {"createContainer"},
 			"id":        {id},
 			"name":      {containerName},
@@ -115,7 +123,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := d.Client.InspectContainer(id)
+		containerInfo, err := m.Client.InspectContainer(id)
 		if err != nil {
 			log.Errorf("InspectContainer error: %s", err.Error())
 		} else {
@@ -123,6 +131,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		}
 
 		data := url.Values{
+			"world":     {m.Name},
 			"action":    {"startContainer"},
 			"id":        {id},
 			"name":      {containerName},
@@ -130,7 +139,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 			"imageTag":  {tag}}
 
 		// Monitor stats
-		d.Client.StartMonitorStats(id, d.statCallback, nil)
+		m.Client.StartMonitorStats(id, m.statCallback, nil)
 		CuberiteServerRequest(data)
 
 	case "stop":
@@ -151,7 +160,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		// same as stop event
 		repo, tag := splitRepoAndTag(event.From)
 		containerName := "<name>"
-		containerInfo, err := d.Client.InspectContainer(id)
+		containerInfo, err := m.Client.InspectContainer(id)
 		if err != nil {
 			log.Errorf("InspectContainer error: %s", err.Error())
 		} else {
@@ -159,6 +168,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		}
 
 		data := url.Values{
+			"world":     {m.Name},
 			"action":    {"stopContainer"},
 			"id":        {id},
 			"name":      {containerName},
@@ -171,6 +181,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 		log.Debug("destroy event")
 
 		data := url.Values{
+			"world":  {m.Name},
 			"action": {"destroyContainer"},
 			"id":     {id},
 		}
@@ -181,7 +192,7 @@ func (d *Daemon) eventCallback(event *dockerclient.Event, ec chan error, args ..
 
 // statCallback receives the stats (cpu & ram) from containers and send them to
 // the cuberite server
-func (d *Daemon) statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...interface{}) {
+func (m *Machine) statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...interface{}) {
 
 	// log.Debugln("STATS", id, stat)
 	// log.Debugln("---")
@@ -190,13 +201,18 @@ func (d *Daemon) statCallback(id string, stat *dockerclient.Stats, ec chan error
 
 	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
 	var cpuPercent float64
-	if preCPUStats, exists := d.previousCPUStats[id]; exists {
+	m.previousCPUStatsLock.RLock()
+	if preCPUStats, exists := m.previousCPUStats[id]; exists {
 		cpuPercent = calculateCPUPercent(preCPUStats, &stat.CpuStats)
 	}
+	m.previousCPUStatsLock.RUnlock()
 
-	d.previousCPUStats[id] = &CPUStats{TotalUsage: stat.CpuStats.CpuUsage.TotalUsage, SystemUsage: stat.CpuStats.SystemUsage}
+	m.previousCPUStatsLock.Lock()
+	m.previousCPUStats[id] = &CPUStats{TotalUsage: stat.CpuStats.CpuUsage.TotalUsage, SystemUsage: stat.CpuStats.SystemUsage}
+	m.previousCPUStatsLock.Unlock()
 
 	data := url.Values{
+		"world":  {m.Name},
 		"action": {"stats"},
 		"id":     {id},
 		"cpu":    {strconv.FormatFloat(cpuPercent, 'f', 2, 64) + "%"},
@@ -211,15 +227,19 @@ func (d *Daemon) execCmd(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "OK")
 
 	go func() {
+		machine := r.URL.Query().Get("world")
 		cmd := r.URL.Query().Get("cmd")
 		cmd, _ = url.QueryUnescape(cmd)
 		arr := strings.Split(cmd, " ")
 		if len(arr) > 0 {
-
-			if arr[0] == "docker" {
-				arr[0] = d.BinaryName
+			if arr[0] != "docker" {
+				log.Errorf("Aborting. %s is not a supported command", arr[0])
 			}
-
+			// switch "docker" for the binary name
+			arr[0] = d.Machines[machine].BinaryName
+			hostArgs := d.Machines[machine].GetDockerConfig()
+			arr = append(arr[:1], append(hostArgs, arr[1:]...)...)
+			log.Debugf("Command: %+v\n", arr)
 			cmd := exec.Command(arr[0], arr[1:]...)
 			// Stdout buffer
 			// cmdOutput := &bytes.Buffer{}
@@ -241,25 +261,31 @@ func (d *Daemon) listContainers(w http.ResponseWriter, r *http.Request) {
 	// answer right away to avoid dead locks in LUA
 	io.WriteString(w, "OK")
 
-	go func() {
-		containers, err := d.Client.ListContainers(true, false, "")
+	go func(r *http.Request) {
+		log.Debug("Entering goroutine")
+		machine := r.URL.Query().Get("world")
+		log.Debugf("Machine is %s", machine)
+		log.Debugf("Getting containers")
+		containers, err := d.Machines[machine].Client.ListContainers(true, false, "")
 
 		if err != nil {
 			log.Error(err.Error())
 			return
 		}
 
-		images, err := d.Client.ListImages(true)
+		log.Debugf("Getting images")
+		images, err := d.Machines[machine].Client.ListImages(true)
 
 		if err != nil {
 			log.Error(err.Error())
 			return
 		}
 
+		log.Debugf("%d containers found in %s", len(containers), machine)
 		for i := 0; i < len(containers); i++ {
-
 			id := containers[i].Id
-			info, _ := d.Client.InspectContainer(id)
+			log.Debugf("Looking at container %s", id)
+			info, _ := d.Machines[machine].Client.InspectContainer(id)
 			name := info.Name[1:]
 			imageRepo := ""
 			imageTag := ""
@@ -274,6 +300,7 @@ func (d *Daemon) listContainers(w http.ResponseWriter, r *http.Request) {
 			}
 
 			data := url.Values{
+				"world":     {machine},
 				"action":    {"containerInfos"},
 				"id":        {id},
 				"name":      {name},
@@ -282,14 +309,15 @@ func (d *Daemon) listContainers(w http.ResponseWriter, r *http.Request) {
 				"running":   {strconv.FormatBool(info.State.Running)},
 			}
 
+			log.Debugf("Sending  %+v", data)
 			CuberiteServerRequest(data)
 
 			if info.State.Running {
 				// Monitor stats
-				d.Client.StartMonitorStats(id, d.statCallback, nil)
+				d.Machines[machine].Client.StartMonitorStats(id, d.Machines[machine].statCallback, nil)
 			}
 		}
-	}()
+	}(r)
 }
 
 // Utility functions
