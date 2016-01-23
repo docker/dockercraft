@@ -5,4 +5,4 @@ world/logs/*
 world/players
 world/whitelist.sqlite
 world/world/stats/Pixowl.json
-goproxy/goproxy
+*-openstackrc.sh
