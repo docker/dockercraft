@@ -1,5 +1,5 @@
 function request(Host, Port, Method, Path, Body, ReceiveCallback)
-	data = ""
+	local data = ""
 	local ConnectCallbacks =
 	{
 		OnConnected = function (a_Link)
@@ -28,8 +28,10 @@ function request(Host, Port, Method, Path, Body, ReceiveCallback)
 		
 		OnRemoteClosed = function (a_Link)
 			LOG(data)
-			res, data = string.match(data, '^%S+ (%d+) .+\r\n\r\n(.*)$')
-			ReceiveCallback(res, data)
+			res, body = string.match(data, '^%S+ (%d+) .+\r\n\r\n(.*)$')
+			if  ReceiveCallback ~= nil then
+				ReceiveCallback(res, body)
+			end
 			LOG("Connection to " .. Host .. " closed")
 		end,
 	}
@@ -42,12 +44,15 @@ function request(Host, Port, Method, Path, Body, ReceiveCallback)
 end
 
 function listen(Port, ReceiveCallback)
+	local data = {}
+	local length = {}
 
 	-- Define the callbacks used for the incoming connections:
 	local Callbacks =
 	{
 		OnConnected = function (a_Link)
 			-- This will not be called for a server connection, ever
+			LOG("Port" .. Port .. "connected")
 			assert(false, "Unexpected Connect callback call")
 		end,
 		
@@ -58,9 +63,21 @@ function listen(Port, ReceiveCallback)
 		end,
 		
 		OnReceivedData = function (a_Link, a_Data)
+			local key = a_Link:GetRemoteIP() .. '_' .. a_Link:GetRemotePort()
+			LOG(key)
 			-- Send the received data back to the remote peer
-			ReceiveCallback()
-			a_Link:Close()
+			if data[key] == nil then
+				length_str, data[key] = string.match(a_Data, '^.+Content%-Length: (%d+).+\r\n\r\n(.*)$')
+				length[key] = tonumber(length_str)
+			else
+				data[key] = data[key] .. a_Data
+			end
+			if string.len(data[key]) >= length[key] then
+				ReceiveCallback(data[key])
+				a_Link:Close()
+				data[key] = nil
+				length[key] = nil
+			end
 		end,
 		
 		OnRemoteClosed = function (a_Link)

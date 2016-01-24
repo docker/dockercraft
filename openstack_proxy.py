@@ -1,8 +1,10 @@
 import sys
+import copy
 import novaclient.client
 import novaclient.shell
 import novaclient.exceptions
 import json
+import urllib2
 import uuid
 import threading
 import time
@@ -189,69 +191,104 @@ class Notification():
     def poll(self):
         while True:
             time.sleep(1)
-            for task in self.notifications:
-                self.check_state(task)
+            tasks = copy.copy(self.notifications)
+            for task in tasks:
+                try:
+                    self.check_state(task)
+                except Exception as e:
+                    print e.message
 
-    def add(self, notification_url, metric_func,
-            comparator_func=lambda a, b: a != b):
+    def add(self, notification_func, metric_func,
+            comparator_func=lambda previous, current: previous != current):
         notify_id = uuid.uuid4()
         self.notifications[notify_id] = (metric_func,
                                          comparator_func,
-                                         notification_url)
+                                         notification_func)
         self.check_state(notify_id)
         return notify_id
 
     def check_state(self, notify_id):
         m, c, n = self.notifications[notify_id]
-        current_metric = m()
+        current_value = m()
         if notify_id in self.state:
-            previous_metric = self.state[notify_id]
-            if c(previous_metric, current_metric):
-                self.notify(n)
-        self.state[notify_id] = current_metric
+            previous_value = self.state[notify_id]
+            if c(previous_value, current_value):
+                print 'notify'
+                n(previous_value, current_value)
+        self.state[notify_id] = current_value
 
     def delete(self, notify_id):
         notifications.pop(notify_id)
         state.pop(notify_id)
 
-    def notify(self, url):
-        print url
-
 notification = Notification()
 
 
-def servers_notification_metric():
-    return {server.id for server in _get_servers()}
-
-
-def server_status_notification_metric(server):
-    servers = _get_servers(server)
-    if not servers:
-        return "GONE"
-    return servers[0].status
-
-
-@app.route('/nova/servers/notifications/', methods=['POST'])
-def add_notification_on_servers():
+@app.route('/notifications/', methods=['POST'])
+def add_notification():
     req = request.json
-    notification_url = req['notification_url']
-    notify_id = notification.add(notification_url,
-                                 servers_notification_metric)
+    notification_url = req['notificationUrl']
+    monitor = req['monitor']
+    response = Response()
+    if monitor == 'servers':
+        notify_id = add_notification_on_servers(notification_url)
+    if monitor == 'specifiedServer':
+        server = req['server']
+        notify_id = add_notification_on_server_status(notification_url, server)
     response = jsonify(notifyId=notify_id)
     response.code = 200
     return response
 
 
-@app.route('/nova/servers/<server>/notifications/', methods=['POST'])
-def add_notification_on_server_status(server):
-    req = request.json
-    notification_url = req['notification_url']
-    metric_func = lambda: server_status_notification_metric(server)
-    notify_id = notification.add(notification_url,
-                                 metric_func)
-    response = jsonify(notifyId=notify_id)
-    response.code = 200
-    return response
+def add_notification_on_servers(notification_url):
+    def evaluate_metric():
+        servers = _get_servers()
+        #return set([server.to_dict() for server in servers])
+        return {server.id: server for server in servers}
+
+    def notify_func(previous, current):
+        increase_servers = set(current) - set(previous)
+        decrease_servers = set(previous) - set(current)
+        data = {'monitor': 'servers',
+                'increaseServers': [current[x].to_dict()
+                                    for x in increase_servers],
+                'decreaseServers': [previous[x].to_dict()
+                                    for x in decrease_servers],
+                }
+        notify_cuberite_callback(notification_url, data)
+
+    notify_id = notification.add(notify_func, evaluate_metric)
+    return notify_id
+
+
+def add_notification_on_server_status(notification_url, server):
+    server_obj = _get_servers(server)[0]
+
+    def evaluate_metric():
+        servers = _get_servers(server)
+        if not servers:
+            return None, "GONE"
+        return servers[0].status
+
+    def notify_func(previous_metric, current):
+        data = {'monitor': 'specifiedServer',
+                'server': server_obj.to_dict(),
+                'status': current}
+        notify_cuberite_callback(notification_url, data)
+
+    notify_id = notification.add(notify_func, evaluate_metric)
+    return notify_id
+
+
+def notify_cuberite_callback(notification_url, data):
+    req = urllib2.Request(notification_url)
+    req.add_header('Content-Type', 'application/json')
+    data_str = json.dumps(data)
+    try:
+        urllib2.urlopen(req, data_str)
+    except:
+        # FIXME: cuberite openstack plugin responds illegal status.
+        pass
 
 
 if __name__ == '__main__':

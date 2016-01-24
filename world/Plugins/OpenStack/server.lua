@@ -228,7 +228,7 @@ function UpdateServer(a_Id, a_Name, a_Status)
 
 	for i, server in ipairs(g_Servers) do
 		if server.m_Id == a_Id then
-			server.SetRunning(a_Status)
+			server:SetRunning(a_Status)
 			LOG("found. updated. now return")
 			return
 		end

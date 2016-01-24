@@ -26,30 +26,61 @@ function Initialize(Plugin)
 	-- Command Bindings
 
 	cPluginManager.BindCommand("/nova", "*", NovaCommand, " - nova CLI commands")
-
-	-- Plugin:AddWebTab("OpenStack",HandleRequest_OpenStack)
 	
 	-- make all players admin
 	cRankManager:SetDefaultRank("Admin")
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
-	function callback()
-		SyncNova()
-	end
-
-	listen(8010, callback)
+	ListenUpdater()
 
 	return true
 end
 
+function ListenUpdater()
+	function callback(body)
+		LOG("Received via HTTP: " .. body)
+		changes = json.parse(body)
+		if changes.monitor == "servers" then
+			for i, server in ipairs(changes.decreaseServers) do
+				DeleteServer(server.id)
+				-- TODO: delete notification
+			end
+			for i, server in ipairs(changes.increaseServers) do
+				status = SERVER_STOPPED
+				if (server.status == 'ACTIVE') then
+					status = SERVER_RUNNING
+				end
+				UpdateServer(server.id, server.name, status)
+				body = json.stringify({notificationUrl = 'http://localhost:8010',
+					                   monitor = 'specifiedServer',
+				    	               server = server.id})
+				request("localhost", 8000, "POST", "/notifications/", body, nil)
+			end
+		end
+		if changes.monitor == "specifiedServer" then
+			if changes.status == 'GONE' then
+				DeleteServer(changes.server.id)
+				-- TODO: delete notification
+			else
+				status = SERVER_STOPPED
+				if (changes.status == 'ACTIVE') then
+					status = SERVER_RUNNING
+				end
+				UpdateServer(changes.server.id, changes.server.name, status)
+			end
+		end
+	end
+
+	listen(8010, callback)
+end
 
 function WorldStarted()
 	y = GROUND_LEVEL
 	-- just enough to fit one server
 	-- then it should be dynamic
 	for x = GROUND_MIN_X, GROUND_MAX_X do
-		for z = GROUND_MIN_Z,GROUND_MAX_Z do
+		for z = GROUND_MIN_Z, GROUND_MAX_Z do
 			setBlock(UpdateQueue, x, y, z, E_BLOCK_WOOL, E_META_WOOL_WHITE)
 		end
 	end	
@@ -104,14 +135,17 @@ function SyncNova()
 			end
 			UpdateServer(server.id, server.name, status)
 			LOG(server.id .. "," .. server.name)
-			function callback2(a,b)
-				LOG(a .. "," .. b)
-			end
-			body = json.stringify({notification_url = 'http://localhost:8010'})
-			-- request("localhost", 8000, "POST", "/nova/servers/" .. server.id .. "/notifications/", body, callback2)
+			body = json.stringify({notificationUrl = 'http://localhost:8010',
+				                   monitor = 'specifiedServer',
+				                   server = server.id})
+			request("localhost", 8000, "POST", "/notifications/", body, nil)
 		end
 	end
 	request("localhost", 8000, "GET", "/nova/servers", "", callback)
+
+	body = json.stringify({notificationUrl = 'http://localhost:8010',
+		                   monitor = 'servers'})
+	request("localhost", 8000, "POST", "/notifications/", body, nil)
 end
 
 
@@ -132,7 +166,6 @@ function NovaCreate(Name, Image, Flavor)
 	body = json.stringify({name = Name, image = Image, flavor = Flavor})
 	function callback(a,data)
 		server = json.parse(data)
-		UpdateServer(server.id, Name, SERVER_RUNNING)
 	end
 	request("localhost", 8000, "POST", "/nova/servers", body, callback)
 end
@@ -140,7 +173,6 @@ end
 function NovaDelete(Name)
 	function callback(a,data)
 		server = json.parse(data)
-		DeleteServer(server.id)
 	end
 	request("localhost", 8000, "DELETE", "/nova/server/" .. Name, "", callback)
 end
