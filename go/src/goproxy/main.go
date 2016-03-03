@@ -27,6 +27,7 @@ import (
 // instance of DockerClient allowing for making calls to the docker daemon
 // remote API
 var dockerClient *dockerclient.DockerClient
+
 // version of the docker daemon which is exposing the remote API
 var dockerDaemonVersion string
 
@@ -35,7 +36,7 @@ type CPUStats struct {
 	SystemUsage uint64
 }
 
-// previousCPUStats is a map containing the previous CPU stats we got from the 
+// previousCPUStats is a map containing the previous CPU stats we got from the
 // docker daemon through the docker remote API
 var previousCPUStats map[string]*CPUStats = make(map[string]*CPUStats)
 
@@ -91,7 +92,7 @@ func main() {
 func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}) {
 	logrus.Debugln("--\n%+v", *event)
 
-	id := event.Id
+	id := event.ID
 
 	switch event.Status {
 	case "create":
