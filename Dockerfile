@@ -1,4 +1,4 @@
-FROM golang:1.5.1
+FROM golang:1.6
 
 # Copy latest docker client inside the container
 COPY ./docker/docker-1.10.2 /bin/docker-1.10.2
