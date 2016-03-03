@@ -1,7 +1,8 @@
 FROM golang:1.5.1
 
-# Copy latest docker client(s)
-COPY ./docker/docker-1.9.1 /bin/docker-1.9.1
+# Copy latest docker client inside the container
+COPY ./docker/docker-1.10.2 /bin/docker-1.10.2
+# and make it executable
 RUN chmod +x /bin/docker-*
 
 # Copy Go code and install applications
