@@ -10,6 +10,9 @@ SignsToUpdate = {}
 -- in the "Containers" array to indicate that there is no container at an index
 EmptyContainerSpace = {}
 
+-- array of docker networks objects
+Networks = {}
+
 -- Tick is triggered by cPluginManager.HOOK_TICK
 function Tick(TimeDelta)
 	UpdateQueue:update(MAX_BLOCK_UPDATE_PER_TICK)
@@ -17,13 +20,12 @@ end
 
 -- Plugin initialization
 function Initialize(Plugin)
-	Plugin:SetName("Docker")
+	Plugin:SetName("Docker") -- set the name of the plugin
 	Plugin:SetVersion(1)
 
 	UpdateQueue = NewUpdateQueue()
 
 	-- Hooks
-
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
@@ -35,17 +37,14 @@ function Initialize(Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_TICK, Tick);
 
 	-- Command Bindings
-
 	cPluginManager.BindCommand("/docker", "*", DockerCommand, " - docker CLI commands")
-
 	Plugin:AddWebTab("Docker",HandleRequest_Docker)
 
 	-- make all players admin
 	cRankManager:SetDefaultRank("Admin")
 
-	
-	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
-
+	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() .. " plugin")
+	-- return true to tell Cuberite the plugin has been initialized successfully
 	return true
 end
 
@@ -120,6 +119,40 @@ function destroyContainer(id)
 			end
 			-- we removed the container, we can exit the loop
 			break
+		end
+	end
+end
+
+-- updateNetwork 
+function updateNetwork(containerId, networkId, networkName, networkType)
+	LOG("[UPDATE NETWORK] network " .. networkName .. " (" .. networkId .. ") (" .. networkType .. ") now contains container " .. containerId)
+
+	-- create network object based on the function arguments
+	network = NewNetwork()
+	network:init(networkId, networkName, networkType)
+
+	-- first: check whether this network is already known
+	networkFound = false
+	for i=1, table.getn(Networks) do
+		-- if network is found
+		if Networks[i].id == networkId then
+			networkFound = true
+			LOG("[UPDATE NETWORK] network has been found")
+			break
+		end
+	end
+
+	-- second: if network is not found, we add it
+	if networkFound == false then
+		LOG("[UPDATE NETWORK] network has NOT been found, we add it to the list of networks")
+		table.insert(Networks, network)
+	end
+
+	-- third: update the container so it knows it is part of the network
+	for i=1, table.getn(Containers) do
+		if Containers[i] ~= EmptyContainerSpace and Containers[i].id == containerId then
+			-- tell container object, it is connected to a network
+			Containers[i]:connectNetwork(network)
 		end
 	end
 end
@@ -290,17 +323,29 @@ function DockerCommand(Split, Player)
 end
 
 
-
+-- handle http requests received from the dockercraft goproxy
 function HandleRequest_Docker(Request)
-	
+
 	content = "[dockerclient]"
 
+	-- test if the request contains an "action" field
 	if Request.PostParams["action"] ~= nil then
 
+		-- retrieving the value of the "action" field
 		action = Request.PostParams["action"]
 
+		-- network actions
+		if action == "network_connect"
+		then
+			containerId = Request.PostParams["containerId"]
+			networkId = Request.PostParams["networkId"]
+			networkName = Request.PostParams["networkName"]
+			networkType = Request.PostParams["networkType"]
+			LOG("EVENT - network_connect "..containerId.." "..networkId.." "..networkName.." "..networkType)
+			updateNetwork(containerId, networkId, networkName, networkType)
+		end
+
 		-- receiving informations about one container
-		
 		if action == "containerInfos"
 		then
 			LOG("EVENT - containerInfos")
@@ -373,12 +418,10 @@ function HandleRequest_Docker(Request)
 			updateStats(id,ram,cpu)
 		end
 
-
 		content = content .. "{action:\"" .. action .. "\"}"
 
 	else
 		content = content .. "{error:\"action requested\"}"
-
 	end
 
 	content = content .. "[/dockerclient]"

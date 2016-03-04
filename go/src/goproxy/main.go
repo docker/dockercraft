@@ -28,9 +28,10 @@ import (
 // remote API
 var dockerClient *dockerclient.DockerClient
 
-// version of the docker daemon which is exposing the remote API
+// version of the docker daemon goproxy is connected to
 var dockerDaemonVersion string
 
+//
 type CPUStats struct {
 	TotalUsage  uint64
 	SystemUsage uint64
@@ -40,6 +41,7 @@ type CPUStats struct {
 // docker daemon through the docker remote API
 var previousCPUStats map[string]*CPUStats = make(map[string]*CPUStats)
 
+// main function of goproxy
 func main() {
 
 	// goproxy is executed as a short lived process to send a request to the
@@ -59,6 +61,8 @@ func main() {
 		}
 		return
 	}
+
+	logrus.Println("[goproxy] starting dockercraft goproxy daemon...")
 
 	// init docker client object
 	var err error
@@ -90,104 +94,142 @@ func main() {
 
 // eventCallback receives and handles the docker events
 func eventCallback(event *dockerclient.Event, ec chan error, args ...interface{}) {
-	logrus.Debugln("--\n%+v", *event)
+	// logrus.Println("[goproxy] [event] ----- event -----")
+	// logrus.Println("[goproxy] [event] | type  :", event.Type)
+	// logrus.Println("[goproxy] [event] | action:", event.Action)
 
-	id := event.ID
-
-	switch event.Status {
-	case "create":
-		logrus.Debugln("create event")
-
-		repo, tag := splitRepoAndTag(event.From)
-		containerName := "<name>"
-		containerInfo, err := dockerClient.InspectContainer(id)
-		if err != nil {
-			logrus.Print("InspectContainer error:", err.Error())
-		} else {
-			containerName = containerInfo.Name
+	// handle different kind of events
+	switch event.Type {
+	case "container":
+		// TODO: gdevillele: maybe check for "event.Action" instead of
+		// "event.Status" for event of type "container"
+		switch event.Status {
+		case "create":
+			// logrus.Println("[goproxy] [event received] create")
+			// get container ID
+			containerId := event.ID
+			repo, tag := splitRepoAndTag(event.From)
+			containerName := "<name>"
+			containerInfo, err := dockerClient.InspectContainer(containerId)
+			if err != nil {
+				logrus.Print("InspectContainer error:", err.Error())
+			} else {
+				containerName = containerInfo.Name
+			}
+			data := url.Values{
+				"action":    {"createContainer"},
+				"id":        {containerId},
+				"name":      {containerName},
+				"imageRepo": {repo},
+				"imageTag":  {tag}}
+			CuberiteServerRequest(data)
+		case "start":
+			// logrus.Println("[goproxy] [event received] start")
+			// get container ID
+			containerId := event.ID
+			repo, tag := splitRepoAndTag(event.From)
+			containerName := "<name>"
+			containerInfo, err := dockerClient.InspectContainer(containerId)
+			if err != nil {
+				logrus.Print("InspectContainer error:", err.Error())
+			} else {
+				containerName = containerInfo.Name
+			}
+			data := url.Values{
+				"action":    {"startContainer"},
+				"id":        {containerId},
+				"name":      {containerName},
+				"imageRepo": {repo},
+				"imageTag":  {tag}}
+			// Monitor stats
+			dockerClient.StartMonitorStats(containerId, statCallback, nil)
+			CuberiteServerRequest(data)
+		case "stop":
+			// die event is enough
+			// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
+		case "restart":
+			// start event is enough
+			// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
+		case "kill":
+			// die event is enough
+			// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
+		case "die":
+			// logrus.Println("[goproxy] [event received] die")
+			// same as stop event
+			// get container ID
+			containerId := event.ID
+			repo, tag := splitRepoAndTag(event.From)
+			containerName := "<name>"
+			containerInfo, err := dockerClient.InspectContainer(containerId)
+			if err != nil {
+				logrus.Print("InspectContainer error:", err.Error())
+			} else {
+				containerName = containerInfo.Name
+			}
+			data := url.Values{
+				"action":    {"stopContainer"},
+				"id":        {containerId},
+				"name":      {containerName},
+				"imageRepo": {repo},
+				"imageTag":  {tag}}
+			CuberiteServerRequest(data)
+		case "destroy":
+			// logrus.Println("[goproxy] [event received] destroy")
+			// get container ID
+			containerId := event.ID
+			data := url.Values{
+				"action": {"destroyContainer"},
+				"id":     {containerId},
+			}
+			CuberiteServerRequest(data)
 		}
+	// TODO: gdevillele: disable network events for now
+	case "network":
+		switch event.Action {
+		case "connect":
+			// a container has been connected to a network
 
-		data := url.Values{
-			"action":    {"createContainer"},
-			"id":        {id},
-			"name":      {containerName},
-			"imageRepo": {repo},
-			"imageTag":  {tag}}
+			// id of the network
+			networkID := event.Actor.ID
+			// name of network
+			networkName := event.Actor.Attributes["name"]
+			// type of network
+			networkType := event.Actor.Attributes["type"]
+			// id of container affected
+			containerID := event.Actor.Attributes["container"]
 
-		CuberiteServerRequest(data)
+			// TODO: gdevillele: clean this
+			if networkName == "bridge" || networkName == "none" || networkName == "host" {
+				// those are default network values
+				// we do nothing for now
+				return
+			}
 
-	case "start":
-		logrus.Debugln("start event")
+			logrus.Println("[goproxy] [event]     ----- custom network connect -----")
+			logrus.Println("[goproxy] [event]     | networkID:", networkID)
+			logrus.Println("[goproxy] [event]     | networkName:", networkName)
+			logrus.Println("[goproxy] [event]     | networkType:", networkType)
+			logrus.Println("[goproxy] [event]     | containerID:", containerID)
 
-		repo, tag := splitRepoAndTag(event.From)
-		containerName := "<name>"
-		containerInfo, err := dockerClient.InspectContainer(id)
-		if err != nil {
-			logrus.Print("InspectContainer error:", err.Error())
-		} else {
-			containerName = containerInfo.Name
+			// send a HTTP request to the Cuberite server
+			data := url.Values{
+				"action":      {"network_connect"},
+				"networkId":   {networkID},
+				"networkName": {networkName},
+				"networkType": {networkType},
+				"containerId": {containerID},
+			}
+			CuberiteServerRequest(data)
 		}
-
-		data := url.Values{
-			"action":    {"startContainer"},
-			"id":        {id},
-			"name":      {containerName},
-			"imageRepo": {repo},
-			"imageTag":  {tag}}
-
-		// Monitor stats
-		dockerClient.StartMonitorStats(id, statCallback, nil)
-		CuberiteServerRequest(data)
-
-	case "stop":
-		// die event is enough
-		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
-
-	case "restart":
-		// start event is enough
-		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
-
-	case "kill":
-		// die event is enough
-		// http://docs.docker.com/reference/api/docker_remote_api/#docker-events
-
-	case "die":
-		logrus.Debugln("die event")
-
-		// same as stop event
-		repo, tag := splitRepoAndTag(event.From)
-		containerName := "<name>"
-		containerInfo, err := dockerClient.InspectContainer(id)
-		if err != nil {
-			logrus.Print("InspectContainer error:", err.Error())
-		} else {
-			containerName = containerInfo.Name
-		}
-
-		data := url.Values{
-			"action":    {"stopContainer"},
-			"id":        {id},
-			"name":      {containerName},
-			"imageRepo": {repo},
-			"imageTag":  {tag}}
-
-		CuberiteServerRequest(data)
-
-	case "destroy":
-		logrus.Debugln("destroy event")
-
-		data := url.Values{
-			"action": {"destroyContainer"},
-			"id":     {id},
-		}
-
-		CuberiteServerRequest(data)
 	}
 }
 
 // statCallback receives the stats (cpu & ram) from containers and send them to
 // the cuberite server
 func statCallback(id string, stat *dockerclient.Stats, ec chan error, args ...interface{}) {
+
+	// TODO: gdevillele: re-activate stats later
+	return
 
 	// logrus.Debugln("STATS", id, stat)
 	// logrus.Debugln("---")
@@ -244,32 +286,28 @@ func execCmd(w http.ResponseWriter, r *http.Request) {
 // listContainers handles and reply to http requests having the path "/containers"
 func listContainers(w http.ResponseWriter, r *http.Request) {
 
-	// answer right away to avoid dead locks in LUA
+	// answer right away to avoid deadlocks in LUA
 	io.WriteString(w, "OK")
 
 	go func() {
 		containers, err := dockerClient.ListContainers(true, false, "")
-
 		if err != nil {
 			logrus.Println(err.Error())
 			return
 		}
 
 		images, err := dockerClient.ListImages(true)
-
 		if err != nil {
 			logrus.Println(err.Error())
 			return
 		}
 
 		for i := 0; i < len(containers); i++ {
-
 			id := containers[i].Id
 			info, _ := dockerClient.InspectContainer(id)
 			name := info.Name[1:]
 			imageRepo := ""
 			imageTag := ""
-
 			for _, image := range images {
 				if image.Id == info.Image {
 					if len(image.RepoTags) > 0 {
