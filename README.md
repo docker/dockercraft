@@ -2,6 +2,9 @@
 
 Minecraft OpenStack client.
 
+This project is rehash of [DockerCraft](https://github.com/docker/dockercraft).
+Many codes are brought from DockerCraft. 
+
 ## How to run
 1. **Install Minecraft: [minecraft.net](https://minecraft.net)**
 
