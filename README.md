@@ -9,6 +9,8 @@ Minecraft OpenStack client.
 	
   > NOTE: Current Cuberite (Minecraft server) does not support version 1.9.0+.
   > Please edit profile when launch minecraft client as following.
+  
+  ![openstackcraft](../master/docs/img/edit_profile.png?raw=true)
 
 2. **Clone repo:**
   ```
