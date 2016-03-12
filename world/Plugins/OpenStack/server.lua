@@ -20,7 +20,10 @@ function cServer.new(a_X, a_Z, a_Id, a_Name, a_Status)
 	self.m_Name = a_Name
 	self.m_Id = a_Id
 	self.m_ImageName = ""
-	self.m_IsRnning = a_Status == SERVER_RUNNING
+	self.m_IsRunning = false
+	if a_Status == SERVER_RUNNING then
+		self.m_IsRunning = true
+	end
 
 	self:AddGround()
 	self:Display()
@@ -125,7 +128,7 @@ function cServer:Display()
 	updateSign(UpdateQueue, self.m_X + 1, GROUND_LEVEL + 3, self.m_Z + 2, "", "START/STOP", "---->", "", 2)
 
 
-	if self.m_IsRunning then
+	if self.m_IsRunning == true then
 		setBlock(UpdateQueue, self.m_X + 1, GROUND_LEVEL + 3, self.m_Z + 1, E_BLOCK_LEVER, 1)
 	else
 		setBlock(UpdateQueue, self.m_X + 1, GROUND_LEVEL + 3, self.m_Z + 1, E_BLOCK_LEVER, 9)
@@ -228,7 +231,11 @@ function UpdateServer(a_Id, a_Name, a_Status)
 
 	for i, server in ipairs(g_Servers) do
 		if server.m_Id == a_Id then
-			server:SetRunning(a_Status)
+			if a_Status == SERVER_RUNNING then
+				server:SetRunning(true)
+			else
+				server:SetRunning(false)
+			end
 			LOG("found. updated. now return")
 			return
 		end
@@ -277,6 +284,16 @@ function GetDeleteButtonServer(a_X, a_Z)
 	-- TODO refactor
 	for i, server in ipairs(g_Servers) do
 		if a_X == server.m_X + 2 and a_Z == server.m_Z + 3 then
+			return server.m_Id
+		end
+	end
+	return ""
+end
+
+function GetStartStopLeverServer(a_X, a_Z)
+	-- TODO refactor
+	for i, server in ipairs(g_Servers) do
+		if a_X == server.m_X + 1 and a_Z == server.m_Z + 1 then
 			return server.m_Id
 		end
 	end

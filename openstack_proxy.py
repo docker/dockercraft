@@ -267,7 +267,7 @@ def add_notification_on_server_status(notification_url, server):
     def evaluate_metric():
         servers = _get_servers(server)
         if not servers:
-            return None, "GONE"
+            return "GONE"
         return servers[0].status
 
     def notify_func(previous_metric, current):

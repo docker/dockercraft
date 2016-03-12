@@ -151,6 +151,24 @@ end
 
 function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
 	LOG("Using block: " .. tostring(BlockX) .. "," .. tostring(BlockY) .. "," .. tostring(BlockZ) .. " - " .. tostring(BlockType) .. " - " .. tostring(BlockMeta))
+	
+	-- lever: 1->OFF 9->ON (in that orientation)
+	-- lever
+	if BlockType == 69
+	then
+		serverID = GetStartStopLeverServer(BlockX, BlockZ)
+
+		-- stop
+		if BlockMeta == 1
+		then
+			Player:SendMessage("server stop " .. string.sub(serverID,1,8))
+			NovaStop(serverID)
+		-- start
+		else 
+			Player:SendMessage("server start " .. string.sub(serverID,1,8))
+			NovaStart(serverID)
+		end
+	end
 
 	-- stone button
 	if BlockType == 77 then
