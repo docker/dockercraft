@@ -42,8 +42,10 @@ Minecraft OpenStack client.
 	The server address is the IP of Docker host. No need to specify a port if you used the default one.
 
 7. **Join Server!**
+
   To create server isnatnce:
     execute following command.
+
     ```
     /nova create name cirros m1.tiny
     ```
