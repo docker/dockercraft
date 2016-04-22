@@ -13,12 +13,12 @@ function HandleSpawnCommand(Split, Player)
 			local FoundPlayerCallback = function(OtherPlayer)
 				if (OtherPlayer:GetName() == Split[2]) then
 					World = OtherPlayer:GetWorld()
-					local OnAllChunksAvaliable = function()
+					local OnAllChunksAvailable = function()
 						OtherPlayer:TeleportToCoords(SpawnX, SpawnY, SpawnZ)
 						SendMessageSuccess( Player, "Returned " .. OtherPlayer:GetName() .. " to world spawn" )
 						flag=1
 					end
-					World:ChunkStay({{SpawnX/16, SpawnZ/16}}, OnChunkAvailable, OnAllChunksAvaliable)		
+					World:ChunkStay({{SpawnX/16, SpawnZ/16}}, OnChunkAvailable, OnAllChunksAvailable)		
 				end
 			end
 			cRoot:Get():FindAndDoWithPlayer(Split[2], FoundPlayerCallback)
@@ -31,11 +31,11 @@ function HandleSpawnCommand(Split, Player)
 		end
 	else
 		World = Player:GetWorld()
-		local OnAllChunksAvaliable = function()
+		local OnAllChunksAvailable = function()
 			Player:TeleportToCoords(SpawnX, SpawnY, SpawnZ)
 			SendMessageSuccess( Player, "Returned to world spawn" )
 		end
-		World:ChunkStay({{SpawnX/16, SpawnZ/16}}, OnChunkAvailable, OnAllChunksAvaliable)
+		World:ChunkStay({{SpawnX/16, SpawnZ/16}}, OnChunkAvailable, OnAllChunksAvailable)
 	end
 	
 	return true
