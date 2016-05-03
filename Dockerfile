@@ -1,13 +1,15 @@
 FROM golang:1.5.1
 
+RUN go get github.com/tools/godep
+
 # Copy latest docker client(s)
 COPY ./docker/docker-1.9.1 /bin/docker-1.9.1
 RUN chmod +x /bin/docker-*
 
 # Copy Go code and install applications
-COPY ./go /go
-RUN cd /go/src/goproxy; go install
-RUN cd /go/src/gosetup; go install
+WORKDIR /go/src/github.com/docker/dockercraft
+COPY . .
+RUN godep go install
 
 # Download Cuberite server (Minecraft C++ server)
 # and load up a special empty world for Dockercraft

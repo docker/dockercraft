@@ -1,0 +1,20 @@
+{
+	"ImportPath": "github.com/docker/dockercraft",
+	"GoVersion": "go1.5.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.6.4-12-g467d9d5",
+			"Rev": "467d9d55c2d2c17248441a8fc661561161f40d5e"
+		},
+		{
+			"ImportPath": "github.com/docker/go-units",
+			"Comment": "v0.1.0-14-g651fc22",
+			"Rev": "651fc226e7441360384da338d0fd37f2440ffbe3"
+		},
+		{
+			"ImportPath": "github.com/samalba/dockerclient",
+			"Rev": "0cba4a962c5a4dfcc4a83b8e64a946837a6ed913"
+		}
+	]
+}
