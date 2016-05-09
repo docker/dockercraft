@@ -1,4 +1,3 @@
-
 -- Print contents of `tbl`, with indentation.
 -- `indent` sets the initial level of indentation.
 function logTable (tbl, indent)

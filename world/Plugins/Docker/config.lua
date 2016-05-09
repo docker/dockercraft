@@ -18,7 +18,7 @@ GROUND_MAX_X = CONTAINER_START_X + 5
 GROUND_MIN_Z = -4
 GROUND_MAX_Z = CONTAINER_START_Z + 6
 
--- block updates are queued, this defines the 
+-- block updates are queued, this defines the
 -- maximum of block updates that can be handled
 -- in one single tick, for performance issues.
 MAX_BLOCK_UPDATE_PER_TICK = 50
