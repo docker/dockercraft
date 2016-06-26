@@ -5,7 +5,8 @@ import (
 	"path"
 	"net/http"
 	"io"
-
+	"archive/tar"
+	"compress/gzip"
 	"github.com/Sirupsen/logrus"
 	"github.com/samalba/dockerclient"
 )
@@ -36,7 +37,7 @@ func main() {
 	dockerBinaryName := "docker-" + dockerDaemonVersion
 	logrus.Println("looking for docker binary named:", dockerBinaryName)
 
-	filename := path.Join("/bin", dockerBinaryName)
+        filename := path.Join("/bin", dockerBinaryName)
 	
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		
@@ -48,16 +49,37 @@ func main() {
 			logrus.Fatal(err.Error())
 		}
 		defer out.Close()
-		resp, err := http.Get("https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion)
+		resp, err := http.Get("https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion + ".tgz")
 		if err != nil {
 			logrus.Fatal(err.Error())
 		}
 		defer resp.Body.Close()
-		
-		_, err = io.Copy(out, resp.Body)
-		if err != nil {
-			logrus.Fatal(err.Error())
-		}
+
+		gr, err := gzip.NewReader(resp.Body)
+                defer gr.Close()
+                if err != nil {
+                       logrus.Fatal(err.Error())
+                }
+
+                tr := tar.NewReader(gr)
+                for {
+                        hdr, err := tr.Next()
+                        if err == io.EOF {
+                               break
+                        }
+                        if err != nil {
+                               logrus.Fatal(err.Error())
+                        }
+
+                        if hdr.Typeflag == tar.TypeReg && hdr.Name == "docker/docker" {
+                                _, err = io.Copy(out, tr)
+                                if err != nil {
+                                        logrus.Fatal(err.Error())
+		                }
+                                break
+                        }
+                        logrus.Println("not yet")
+                }
 
 		err = os.Chmod(filename, 0700)
 		if err != nil {
