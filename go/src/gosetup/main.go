@@ -1,20 +1,19 @@
 package main
 
 import (
-	"os"
-	"path"
-	"net/http"
-	"io"
 	"archive/tar"
 	"compress/gzip"
 	"github.com/Sirupsen/logrus"
 	"github.com/samalba/dockerclient"
+	"io"
+	"net/http"
+	"os"
+	"path"
 )
 
 // instance of DockerClient allowing for making calls to the docker daemon
 // remote API
 var dockerClient *dockerclient.DockerClient
-
 
 func main() {
 
@@ -33,14 +32,14 @@ func main() {
 	}
 	dockerDaemonVersion := version.Version
 
-	// name of docker binary that is needed 
+	// name of docker binary that is needed
 	dockerBinaryName := "docker-" + dockerDaemonVersion
 	logrus.Println("looking for docker binary named:", dockerBinaryName)
 
-        filename := path.Join("/bin", dockerBinaryName)
-	
+	filename := path.Join("/bin", dockerBinaryName)
+
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		
+
 		logrus.Println("docker binary (version " + dockerDaemonVersion + ") not found.")
 		logrus.Println("downloading", dockerBinaryName, "...")
 
@@ -56,34 +55,34 @@ func main() {
 		defer resp.Body.Close()
 
 		gr, err := gzip.NewReader(resp.Body)
-                defer gr.Close()
-                if err != nil {
-                       logrus.Fatal(err.Error())
-                }
+		defer gr.Close()
+		if err != nil {
+			logrus.Fatal(err.Error())
+		}
 
-                tr := tar.NewReader(gr)
-                for {
-                        hdr, err := tr.Next()
-                        if err == io.EOF {
-                               break
-                        }
-                        if err != nil {
-                               logrus.Fatal(err.Error())
-                        }
+		tr := tar.NewReader(gr)
+		for {
+			hdr, err := tr.Next()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				logrus.Fatal(err.Error())
+			}
 
-                        if hdr.Typeflag == tar.TypeReg && hdr.Name == "docker/docker" {
-                                _, err = io.Copy(out, tr)
-                                if err != nil {
-                                        logrus.Fatal(err.Error())
-		                }
-                                break
-                        }
-                        logrus.Println("not yet")
-                }
+			if hdr.Typeflag == tar.TypeReg && hdr.Name == "docker/docker" {
+				_, err = io.Copy(out, tr)
+				if err != nil {
+					logrus.Fatal(err.Error())
+				}
+				break
+			}
+			logrus.Println("not yet")
+		}
 
 		err = os.Chmod(filename, 0700)
 		if err != nil {
 			logrus.Fatal(err.Error())
 		}
-    }
+	}
 }
