@@ -9,11 +9,19 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
+	"strconv"
+)
+
+const (
+	baseURL = "https://get.docker.com/builds/Linux/x86_64"
 )
 
 // instance of DockerClient allowing for making calls to the docker daemon
 // remote API
 var dockerClient *dockerclient.DockerClient
+
+type copier func(out *os.File, resp *http.Response)
 
 func main() {
 
@@ -48,36 +56,16 @@ func main() {
 			logrus.Fatal(err.Error())
 		}
 		defer out.Close()
-		resp, err := http.Get("https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion + ".tgz")
-		if err != nil {
-			logrus.Fatal(err.Error())
-		}
-		defer resp.Body.Close()
 
-		gr, err := gzip.NewReader(resp.Body)
-		defer gr.Close()
+		versionComp, err := CompareVersions(dockerDaemonVersion, "1.11.0");
 		if err != nil {
 			logrus.Fatal(err.Error())
 		}
 
-		tr := tar.NewReader(gr)
-		for {
-			hdr, err := tr.Next()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				logrus.Fatal(err.Error())
-			}
-
-			if hdr.Typeflag == tar.TypeReg && hdr.Name == "docker/docker" {
-				_, err = io.Copy(out, tr)
-				if err != nil {
-					logrus.Fatal(err.Error())
-				}
-				break
-			}
-			logrus.Println("not yet")
+		if versionComp >= 0 {
+			getClient(out,"https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion + ".tgz", extractClient)
+		} else {
+			getClient(out,"https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion, copyClient)
 		}
 
 		err = os.Chmod(filename, 0700)
@@ -85,4 +73,79 @@ func main() {
 			logrus.Fatal(err.Error())
 		}
 	}
+}
+
+func CompareVersions(v1 string, v2 string) (comp int, err error) {
+	v1Parts := strings.Split(v1, ".")
+	v2Parts := strings.Split(v2, ".")
+
+	for i := 0; i < len(v1Parts) && i < len(v2Parts); i++ {
+		v1int, err := strconv.Atoi(v1Parts[i])
+		if err != nil {
+			return -2, err
+		}
+
+		v2int, err := strconv.Atoi(v2Parts[i])
+		if err != nil {
+			return -2, err
+		}
+
+		if v1int < v2int {
+			return -1, nil
+		} else if v1int > v2int {
+			return 1, nil
+		}
+	}
+
+	if len(v1Parts) < len(v2Parts) {
+		return -1, nil
+	} else if len(v1Parts) > len(v2Parts) {
+		return 1, nil
+	}
+	return 0, nil
+}
+
+
+func copyClient(out *os.File, resp *http.Response) {
+	_, err := io.Copy(out, resp.Body)
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+}
+
+func extractClient(out *os.File, resp *http.Response) {
+	gr, err := gzip.NewReader(resp.Body)
+	defer gr.Close()
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	tr := tar.NewReader(gr)
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logrus.Fatal(err.Error())
+		}
+
+		if hdr.Typeflag == tar.TypeReg && hdr.Name == "docker/docker" {
+			_, err = io.Copy(out, tr)
+			if err != nil {
+				logrus.Fatal(err.Error())
+			}
+			break
+		}
+		logrus.Println("not yet")
+	}
+}
+
+func getClient(out *os.File, URL string, cp copier) {
+	resp, err := http.Get(URL)
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+	defer resp.Body.Close()
+	cp(out, resp)
 }
