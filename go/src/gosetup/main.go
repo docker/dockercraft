@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -57,15 +57,15 @@ func main() {
 		}
 		defer out.Close()
 
-		versionComp, err := CompareVersions(dockerDaemonVersion, "1.11.0");
+		versionComp, err := CompareVersions(dockerDaemonVersion, "1.11.0")
 		if err != nil {
 			logrus.Fatal(err.Error())
 		}
 
 		if versionComp >= 0 {
-			getClient(out,"https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion + ".tgz", extractClient)
+			getClient(out, "https://get.docker.com/builds/Linux/x86_64/docker-"+dockerDaemonVersion+".tgz", extractClient)
 		} else {
-			getClient(out,"https://get.docker.com/builds/Linux/x86_64/docker-" + dockerDaemonVersion, copyClient)
+			getClient(out, "https://get.docker.com/builds/Linux/x86_64/docker-"+dockerDaemonVersion, copyClient)
 		}
 
 		err = os.Chmod(filename, 0700)
@@ -104,7 +104,6 @@ func CompareVersions(v1 string, v2 string) (comp int, err error) {
 	}
 	return 0, nil
 }
-
 
 func copyClient(out *os.File, resp *http.Response) {
 	_, err := io.Copy(out, resp.Body)
