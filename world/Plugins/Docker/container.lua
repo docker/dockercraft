@@ -11,6 +11,7 @@ CONTAINER_STOPPED = 2
 -- the Minecraft world
 function NewContainer()
 	c = {
+			-- attributes
 			displayed = false, 
 			x = 0, 
 			z = 0, 
@@ -19,18 +20,31 @@ function NewContainer()
 			imageRepo="",
 			imageTag="",
 			running=false,
+			networks={}, -- array of network objects
+			-- methods
 			init=Container.init,
 			setInfos=Container.setInfos,
 			destroy=Container.destroy,
 			display=Container.display,
 			updateMemSign=Container.updateMemSign,
 			updateCPUSign=Container.updateCPUSign,
-			addGround=Container.addGround
+			addGround=Container.addGround,
+			connectNetwork=Container.connectNetwork
 		}
 	return c
 end
 
-Container = {displayed = false, x = 0, z = 0, name="",id="",imageRepo="",imageTag="",running=false}
+Container = {
+				displayed = false,
+				x = 0, 
+				z = 0, 
+				name="",
+				id="",
+				imageRepo="",
+				imageTag="",
+				running=false,
+				networks={}
+			}
 
 -- Container:init sets Container's position
 function Container:init(x,z)
@@ -152,7 +166,6 @@ function Container:display(running)
 		setBlock(UpdateQueue,self.x+1,GROUND_LEVEL+3,self.z+1,E_BLOCK_LEVER,9)
 	end
 
-
 	-- remove button
 
 	setBlock(UpdateQueue,self.x+2,GROUND_LEVEL + 3,self.z + 2,E_BLOCK_WALLSIGN,E_META_CHEST_FACING_XM)
@@ -160,11 +173,9 @@ function Container:display(running)
 
 	setBlock(UpdateQueue,self.x+2,GROUND_LEVEL+3,self.z+3,E_BLOCK_STONE_BUTTON,E_BLOCK_BUTTON_XM)
 
-
 	-- door
 	-- Cuberite bug with Minecraft 1.8 apparently, doors are not displayed correctly
 	-- setBlock(UpdateQueue,self.x+2,GROUND_LEVEL+2,self.z,E_BLOCK_WOODEN_DOOR,E_META_CHEST_FACING_ZM)
-
 
 	for px=self.x, self.x+3
 	do
@@ -211,5 +222,25 @@ function Container:addGround()
 				setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
 			end
 		end	
+	end
+end
+
+-- Container:connectNetwork
+function Container:connectNetwork(network)
+	-- check if the container is already connected to this network
+	found = false
+	for i=1, table.getn(self.networks) do
+		if self.networks[i].id == network.id then
+			found = true
+			break
+		end
+	end
+	if found == false then
+		-- TODO: gdevillele: support multiple networks per container
+		LOG("[CONTAINER] [connectNetwork] container is connected to a new network")
+		table.insert(self.networks, network)
+		setBlock(UpdateQueue, self.x+3, GROUND_LEVEL+5, self.z, E_BLOCK_WOOL, E_META_WOOL_RED)
+	else
+		-- container already know it is connected to this network, we do noting
 	end
 end
