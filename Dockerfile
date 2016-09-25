@@ -1,6 +1,6 @@
 FROM golang:1.6
 
-ENV DOCKER_VERSION 1.11.1
+ENV DOCKER_VERSION 1.12.1
 
 # Copy latest docker client(s)
 RUN curl -sSL -o docker.tgz https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION}.tgz &&\
