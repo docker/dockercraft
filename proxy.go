@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/samalba/dockerclient"
@@ -36,6 +37,7 @@ type Daemon struct {
 	// previouscpustats is a map containing the previous cpu stats we got from the
 	// docker daemon through the docker remote api
 	previousCPUStats map[string]*CPUStats
+	sync.Mutex
 }
 
 // NewDaemon returns a new instance of Daemon
@@ -187,7 +189,8 @@ func (d *Daemon) statCallback(id string, stat *dockerclient.Stats, ec chan error
 	// log.Debugln("---")
 	// log.Debugln("cpu :", float64(stat.CpuStats.CpuUsage.TotalUsage)/float64(stat.CpuStats.SystemUsage))
 	// log.Debugln("ram :", stat.MemoryStats.Usage)
-
+	d.Lock()
+	defer d.Unlock()
 	memPercent := float64(stat.MemoryStats.Usage) / float64(stat.MemoryStats.Limit) * 100.0
 	var cpuPercent float64
 	if preCPUStats, exists := d.previousCPUStats[id]; exists {
