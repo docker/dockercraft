@@ -33,7 +33,7 @@ end
 
 --- Adds the specified player to the banlist, with the specified ban reason
 -- Resolves the player UUID, if needed, but only through cache, not to block
-local function AddPlayerToBanlist(a_PlayerName, a_Reason, a_BannedBy)
+function AddPlayerToBanlist(a_PlayerName, a_Reason, a_BannedBy)
 	-- Check params:
 	assert(type(a_PlayerName) == "string")
 	assert(type(a_BannedBy) == "string")

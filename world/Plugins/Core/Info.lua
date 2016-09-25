@@ -8,7 +8,7 @@ g_PluginInfo =
 	Name = "Core",
 	Version = "14",
 	Date = "2014-06-11",
-	SourceLocation = "https://github.com/mc-server/Core",
+	SourceLocation = "https://github.com/cuberite/Core",
 	Description = [[Implements some of the basic commands needed to run a simple server.]],
 	
 	Commands =

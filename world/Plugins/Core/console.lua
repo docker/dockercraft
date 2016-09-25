@@ -255,7 +255,7 @@ function HandleConsoleRank(a_Split)
 	-- Check parameters:
 	if ((a_Split[2] == nil) or (a_Split[4] ~= nil)) then
 		-- Not enough or too many parameters
-		return true, "Usage: " .. Split[1] .. " <player> [rank]"
+		return true, "Usage: " .. a_Split[1] .. " <player> [rank]"
 	end
 	
 	-- Translate the PlayerName to a UUID:
@@ -396,7 +396,7 @@ function HandleConsoleUnrank(a_Split)
 	-- Check params:
 	if ((a_Split[2] == nil) or (a_Split[3] ~= nil)) then
 		-- Too few or too many parameters:
-		return true, "Usage: " .. Split[1] .. " <player>"
+		return true, "Usage: " .. a_Split[1] .. " <player>"
 	end
 
 	-- Translate the PlayerName to a UUID:

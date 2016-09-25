@@ -32,9 +32,25 @@ return
 			Cuberite will process the spread. If the function
 			returns true, no other callback is called for this event and the spread will not occur.
 		]],
+		Examples =
+		{
+			{
+				Title = "Stop fire spreading",
+				Desc = "Stops fire from spreading, but does not remove any player-placed fire.",
+				Code = [[
+					function OnBlockSpread(World, BlockX, Blocky, BlockZ, source)
+						if (source == ssFireSpread) then
+							-- Return true to block the fire spreading.
+							return true
+						end
+						-- We don't care about any other events, let them continue.
+						return false
+					end
+
+					-- Add the callback.
+					cPluginManager:AddHook(cPluginManager.HOOK_BLOCK_SPREAD, OnBlockSpread);
+				]],
+			},
+		},
 	},  -- HOOK_BLOCK_SPREAD
 }
-
-
-
-

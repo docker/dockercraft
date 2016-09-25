@@ -202,6 +202,18 @@ g_PluginInfo =
 			Handler = HandleRemoveXp,
 			HelpString = "Remove all xp"
 		},
+		["/blk"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleBlkCmd,
+			HelpString = "Gets info about the block you are looking at"
+		},
+		["/teams"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleTeamsCmd,
+			HelpString = "List the teams"
+		},
 	},  -- Commands
 	
 	ConsoleCommands =
@@ -210,6 +222,12 @@ g_PluginInfo =
 		{
 			Handler = HandleConsoleBBox,
 			HelpString = "Performs cBoundingBox API tests",
+		},
+		
+		["download"] =
+		{
+			Handler = HandleConsoleDownload,
+			HelpString = "Downloads a file from a specified URL",
 		},
 		
 		["hash"] =
@@ -242,10 +260,46 @@ g_PluginInfo =
 			HelpString = "Tests the world scheduling",
 		},
 		
+		["testbbox"] =
+		{
+			Handler = HandleConsoleTestBbox,
+			HelpString = "Tests cBoundingBox API"
+		},
+
+		["testcall"] =
+		{
+			Handler = HandleConsoleTestCall,
+			HelpString = "Tests inter-plugin calls with various values"
+		},
+		
+		["testjson"] =
+		{
+			Handler = HandleConsoleTestJson,
+			HelpString = "Tests the cJson parser and serializer",
+		},
+
 		["testtracer"] =
 		{
 			Handler = HandleConsoleTestTracer,
 			HelpString = "Tests the cLineBlockTracer",
+		},
+		
+		["testurlclient"] =
+		{
+			Handler = HandleConsoleTestUrlClient,
+			HelpString = "Tests the cUrlClient",
+		},
+		
+		["testurlparser"] =
+		{
+			Handler = HandleConsoleTestUrlParser,
+			HelpString = "Tests the cUrlParser",
+		},
+		
+		["uuid"] =
+		{
+			Handler = HandleConsoleUuid,
+			HelpString = "Queries the cMojangAPI for a player's UUID",
 		}
 	},  -- ConsoleCommands
 }  -- g_PluginInfo

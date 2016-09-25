@@ -1,4 +1,4 @@
-/* Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 */
+/* Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 */
 * {
     margin: 0;
 }
@@ -41,9 +41,8 @@ h1 {
 
 .row1 {
     border-bottom: 1px #000 solid;
-    height: 100px;
-    max-height: 100px;
     background: #fff url(header.png) repeat-x top left;
+    padding: 13px 0 13px 0;
 }
 
 .row2 {
@@ -153,7 +152,6 @@ h1 {
 }
 
 #footer {
-    display:none;
 	position: fixed;
 	left:0;
 	bottom:0;

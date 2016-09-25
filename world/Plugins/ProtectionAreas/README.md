@@ -2,10 +2,10 @@ This plugin lets VIP users define areas of the world where only specified users 
 
 An area is defined by the VIP by using a Wand item (by default, a stick with a meta 1) by left-clicking and right-clicking in two opposite corners of the area, then issuing a /protection add command. Multiple users can be allowed in a single area. There is no hardcoded limit on the number of areas or the number of players allowed in a single area. Areas can overlap; in such a case, if a user is allowed in any one of the overlapping areas, they are allowed to build / dig.
 
-The protected areas are stored in an SQLite database in a file "ProtectionAreas.sqlite" that is created next to the MCServer executable. The plugin has its configuration options stored in a "ProtectionAreas.ini" file. 	
+The protected areas are stored in an SQLite database in a file "ProtectionAreas.sqlite" that is created next to the Cuberite executable. The plugin has its configuration options stored in a "ProtectionAreas.ini" file. 	
 
 # Configuration
-The configuration is stored in the ProtectionAreas.ini file next to the MCServer executable in a regular manner.
+The configuration is stored in the ProtectionAreas.ini file next to the Cuberite executable in a regular manner.
 
 The wand item can be specified in the configuration. By default, a stick with meta 1 is used, but any valid item can be used. Stored in the [ProtectionAreas].WandItem value.
 

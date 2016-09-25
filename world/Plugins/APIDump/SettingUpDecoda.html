@@ -3,6 +3,7 @@
 <html>
 	<head>
 		<title>Cuberite - Setting up Decoda</title>
+		<link rel="canonical" href="http://api-docs.cuberite.org/">
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -16,7 +17,7 @@
 		This article will explain how to set up Decoda, an IDE for writing Lua code, so that you can develop Cuberite plugins with the comfort of an IDE.</p>
 
 		<h2><img src="Static/decoda_logo.png" /> About Decoda</h2>
-		
+
 		<p>To quickly introduce Decoda, it is an IDE for writing Lua code. It has the basic features expected of an IDE - you can group files into project, you can edit multiple files in a tabbed editor, the code is syntax-highlighted. Code completion, symbol browsing, and more. It also features a Lua debugger that allows you to debug your Lua code within any application that embeds the Lua runtime or uses Lua as a dynamic-link library (DLL). Although it is written using the multiplatform WxWidgets toolkit, it hasn't yet been ported to any platform other than 32-bit Windows. This unfortunately means that Linux users will not be able to use it. It can be used on 64-bit Windows, but the debugger only works for 32-bit programs.</p>
 		<p>Here's a screenshot of a default Decoda window with the debugger stepping through the code (scaled down):<br />
 		<img src="Static/decoda_workspace.png" /></p>
@@ -45,5 +46,22 @@
 		<li>Unfortunately for us Windows users, the Decoda project file uses Unix-lineends (CR only). This makes it problematic when checking the file into a version control system, since those usually expect windows (CRLF) lineends; I personally convert the lineends each time I edit the project file using <a href="http://jsimlo.sk/notepad/">TED Notepad</a>.</li>
 		</ul>
 		</div>
+
+		<!-- Piwik -->
+		<script type="text/javascript">
+		  var _paq = _paq || [];
+		  _paq.push(['trackPageView']);
+		  _paq.push(['enableLinkTracking']);
+		  (function() {
+		    var u="https://analytics.cuberite.org/";
+		    _paq.push(['setTrackerUrl', u+'piwik.php']);
+		    _paq.push(['setSiteId', 5]);
+		    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+		    g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
+		  })();
+		</script>
+		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
+		<!-- End Piwik Code -->
+
 	</body>
 </html>

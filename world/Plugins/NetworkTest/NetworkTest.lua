@@ -107,7 +107,7 @@ local g_Services =
 			
 			-- Send a welcome message to newly accepted connections:
 			OnAccepted = function (a_Link)
-				a_Link:Send("Hello, " .. a_Link:GetRemoteIP() .. ", welcome to the echo server @ MCServer-Lua\r\n")
+				a_Link:Send("Hello, " .. a_Link:GetRemoteIP() .. ", welcome to the echo server @ Cuberite-Lua\r\n")
 			end,  -- OnAccepted()
 			
 			-- There was an error listening on the port:
@@ -140,7 +140,7 @@ local g_Services =
 			
 			-- Send a welcome message and the fortune to newly accepted connections:
 			OnAccepted = function (a_Link)
-				a_Link:Send("Hello, " .. a_Link:GetRemoteIP() .. ", welcome to the fortune server @ MCServer-Lua\r\n\r\nYour fortune:\r\n")
+				a_Link:Send("Hello, " .. a_Link:GetRemoteIP() .. ", welcome to the fortune server @ Cuberite-Lua\r\n\r\nYour fortune:\r\n")
 				a_Link:Send(g_Fortunes[math.random(#g_Fortunes)] .. "\r\n")
 			end,  -- OnAccepted()
 			
