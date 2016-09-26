@@ -35,11 +35,20 @@ end
 
 
 
+--- Removes any whitespace at the beginning and end of the string
+local function TrimString(a_Str)
+	return (string.match(a_Str, "^%s*(.-)%s*$"))
+end
+
+
+
+
+
 --- Replaces generic formatting with forum-specific formatting
 -- Also removes the single line-ends
 local function ForumizeString(a_Str)
 	assert(type(a_Str) == "string")
-	
+
 	-- Remove the indentation, unless in the code tag:
 	-- Only one code or /code tag per line is supported!
 	local IsInCode = false
@@ -55,24 +64,24 @@ local function ForumizeString(a_Str)
 		end
 	end
 	a_Str = a_Str:gsub("(.-)\n", RemoveIndentIfNotInCode)
-	
+
 	-- Replace multiple line ends with {%p} and single line ends with a space,
 	-- so that manual word-wrap in the Info.lua file doesn't wrap in the forum.
 	a_Str = a_Str:gsub("\n\n", "{%%p}")
 	a_Str = a_Str:gsub("\n", " ")
-	
+
 	-- Replace the generic formatting:
 	a_Str = a_Str:gsub("{%%p}", "\n\n")
 	a_Str = a_Str:gsub("{%%b}", "[b]"):gsub("{%%/b}", "[/b]")
 	a_Str = a_Str:gsub("{%%i}", "[i]"):gsub("{%%/i}", "[/i]")
 	a_Str = a_Str:gsub("{%%list}", "\n[list]"):gsub("{%%/list}", "[/list]")
 	a_Str = a_Str:gsub("{%%li}", "\n[*]"):gsub("{%%/li}", "\n")
-	
+
 	-- Process links: {%a LinkDestination}LinkText{%/a}
 	a_Str = a_Str:gsub("{%%a%s([^}]*)}([^{]*){%%/a}", "[url=%1]%2[/url]")
-	
+
 	-- TODO: Other formatting
-	
+
 	return a_Str
 end
 
@@ -84,7 +93,7 @@ end
 -- Also removes the single line-ends
 local function GithubizeString(a_Str)
 	assert(type(a_Str) == "string")
-	
+
 	-- Remove the indentation, unless in the code tag:
 	-- Only one code or /code tag per line is supported!
 	local IsInCode = false
@@ -100,12 +109,12 @@ local function GithubizeString(a_Str)
 		end
 	end
 	a_Str = a_Str:gsub("(.-)\n", RemoveIndentIfNotInCode)
-	
+
 	-- Replace multiple line ends with {%p} and single line ends with a space,
 	-- so that manual word-wrap in the Info.lua file doesn't wrap in the forum.
 	a_Str = a_Str:gsub("\n\n", "{%%p}")
 	a_Str = a_Str:gsub("\n", " ")
-	
+
 	-- Replace the generic formatting:
 	a_Str = a_Str:gsub("{%%p}", "\n\n")
 	a_Str = a_Str:gsub("{%%b}", "**"):gsub("{%%/b}", "**")
@@ -115,9 +124,9 @@ local function GithubizeString(a_Str)
 
 	-- Process links: {%a LinkDestination}LinkText{%/a}
 	a_Str = a_Str:gsub("{%%a%s([^}]*)}([^{]*){%%/a}", "[%2](%1)")
-	
+
 	-- TODO: Other formatting
-	
+
 	return a_Str
 end
 
@@ -133,7 +142,7 @@ local function BuildCategories(a_PluginInfo)
 	-- The returned result
 	-- This will contain both an array and a dict of the categories, to allow fast search
 	local res = {}
-	
+
 	-- For each command add a reference to it into all of its categories:
 	local function AddCommands(a_CmdPrefix, a_Commands)
 		for cmd, info in pairs(a_Commands or {}) do
@@ -142,7 +151,7 @@ local function BuildCategories(a_PluginInfo)
 				CommandString = a_CmdPrefix .. cmd,
 				Info = info,
 			}
-			
+
 			if ((info.HelpString ~= nil) and (info.HelpString ~= "")) then
 				-- Add to each specified category:
 				local Category = info.Category
@@ -162,16 +171,16 @@ local function BuildCategories(a_PluginInfo)
 					end
 				end  -- for idx, cat - Category[]
 			end  -- if (HelpString valid)
-			
+
 			-- Recurse all subcommands:
 			if (info.Subcommands ~= nil) then
 				AddCommands(a_CmdPrefix .. cmd .. " ", info.Subcommands)
 			end
 		end  -- for cmd, info - a_Commands[]
 	end  -- AddCommands()
-	
+
 	AddCommands("", a_PluginInfo.Commands)
-	
+
 	-- Assign descriptions to categories:
 	for name, desc in pairs(a_PluginInfo.Categories or {}) do
 		local CatEntry = res[name]
@@ -180,7 +189,7 @@ local function BuildCategories(a_PluginInfo)
 			CatEntry.Description = desc.Description
 		end
 	end
-	
+
 	-- Alpha-sort each category's command list:
 	for idx, cat in ipairs(res) do
 		table.sort(cat.Commands,
@@ -189,7 +198,7 @@ local function BuildCategories(a_PluginInfo)
 			end
 		)
 	end
-	
+
 	return res
 end
 
@@ -220,7 +229,7 @@ local function GetCommandRefGithub(a_CommandName, a_CommandParams)
 	if (a_CommandParams == nil) then
 		return "`" .. a_CommandName .. "`"
 	end
-	
+
 	assert(type(a_CommandParams) == "table")
 	if ((a_CommandParams.Params == nil) or (a_CommandParams.Params == "")) then
 		return "`" .. a_CommandName .. "`"
@@ -239,12 +248,12 @@ local function WriteCommandParameterCombinationsForum(a_CmdString, a_ParameterCo
 	assert(type(a_CmdString) == "string")
 	assert(type(a_ParameterCombinations) == "table")
 	assert(f ~= nil)
-	
+
 	if (#a_ParameterCombinations == 0) then
 		-- No explicit parameter combinations to write
 		return
 	end
-	
+
 	f:write("The following parameter combinations are recognized:\n")
 	for idx, combination in ipairs(a_ParameterCombinations) do
 		f:write("[color=blue]", a_CmdString, "[/color] [color=green]", combination.Params or "", "[/color]")
@@ -267,12 +276,12 @@ local function WriteCommandParameterCombinationsGithub(a_CmdString, a_ParameterC
 	assert(type(a_CmdString) == "string")
 	assert(type(a_ParameterCombinations) == "table")
 	assert(f ~= nil)
-	
+
 	if (#a_ParameterCombinations == 0) then
 		-- No explicit parameter combinations to write
 		return
 	end
-	
+
 	f:write("The following parameter combinations are recognized:\n\n")
 	for idx, combination in ipairs(a_ParameterCombinations) do
 		f:write(GetCommandRefGithub(a_CmdString, combination))
@@ -298,12 +307,12 @@ local function WriteCommandsCategoryForum(a_Category, f)
 		CategoryName = "General"
 	end
 	f:write("\n[size=Large]", ForumizeString(a_Category.DisplayName or CategoryName), "[/size]\n")
-	
+
 	-- Write description:
 	if (a_Category.Description ~= "") then
 		f:write(ForumizeString(a_Category.Description), "\n")
 	end
-	
+
 	-- Write commands:
 	f:write("\n[list]")
 	for idx2, cmd in ipairs(a_Category.Commands) do
@@ -333,15 +342,15 @@ local function WriteCommandsCategoryGithub(a_Category, f)
 		CategoryName = "General"
 	end
 	f:write("\n### ", GithubizeString(a_Category.DisplayName or CategoryName), "\n")
-	
+
 	-- Write description:
 	if (a_Category.Description ~= "") then
 		f:write(GithubizeString(a_Category.Description), "\n\n")
 	end
-	
+
 	f:write("| Command | Permission | Description |\n")
 	f:write("| ------- | ---------- | ----------- |\n")
-	
+
 	-- Write commands:
 	for idx2, cmd in ipairs(a_Category.Commands) do
 		f:write("|", cmd.CommandString, " | ", cmd.Info.Permission or "", " | ", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "|\n")
@@ -356,18 +365,18 @@ end
 local function DumpCommandsForum(a_PluginInfo, f)
 	-- Copy all Categories from a dictionary into an array:
 	local Categories = BuildCategories(a_PluginInfo)
-	
+
 	-- Sort the categories by name:
 	table.sort(Categories,
 		function(cat1, cat2)
 			return (string.lower(cat1.Name) < string.lower(cat2.Name))
 		end
 	)
-	
+
 	if (#Categories == 0) then
 		return
 	end
-	
+
 	f:write("\n[size=X-Large]Commands[/size]\n")
 
 	-- Dump per-category commands:
@@ -383,18 +392,18 @@ end
 local function DumpCommandsGithub(a_PluginInfo, f)
 	-- Copy all Categories from a dictionary into an array:
 	local Categories = BuildCategories(a_PluginInfo)
-	
+
 	-- Sort the categories by name:
 	table.sort(Categories,
 		function(cat1, cat2)
 			return (string.lower(cat1.Name) < string.lower(cat2.Name))
 		end
 	)
-	
+
 	if (#Categories == 0) then
 		return
 	end
-	
+
 	f:write("\n# Commands\n")
 
 	-- Dump per-category commands:
@@ -413,7 +422,7 @@ local function DumpAdditionalInfoForum(a_PluginInfo, f)
 		-- There is no AdditionalInfo in a_PluginInfo
 		return
 	end
-	
+
 	for idx, info in ipairs(a_PluginInfo.AdditionalInfo) do
 		if ((info.Title ~= nil) and (info.Contents ~= nil)) then
 			f:write("\n[size=X-Large]", ForumizeString(info.Title), "[/size]\n")
@@ -432,7 +441,7 @@ local function DumpAdditionalInfoGithub(a_PluginInfo, f)
 		-- There is no AdditionalInfo in a_PluginInfo
 		return
 	end
-	
+
 	for idx, info in ipairs(a_PluginInfo.AdditionalInfo) do
 		if ((info.Title ~= nil) and (info.Contents ~= nil)) then
 			f:write("\n# ", GithubizeString(info.Title), "\n")
@@ -472,7 +481,7 @@ local function BuildPermissions(a_PluginInfo)
 					table.insert(Permission.CommandsAffected, CommandString)
 				end
 			end
-			
+
 			-- Process the command param combinations for permissions:
 			local ParamCombinations = info.ParameterCombinations or {}
 			for idx, comb in ipairs(ParamCombinations) do
@@ -485,7 +494,7 @@ local function BuildPermissions(a_PluginInfo)
 					table.insert(Permission.CommandsAffected, {Name = CommandString, Params = comb.Params})
 				end
 			end
-			
+
 			-- Process subcommands:
 			if (info.Subcommands ~= nil) then
 				CollectPermissions(CommandString .. " ", info.Subcommands)
@@ -493,13 +502,13 @@ local function BuildPermissions(a_PluginInfo)
 		end
 	end
 	CollectPermissions("", a_PluginInfo.Commands)
-	
+
 	-- Copy the list of permissions to an array:
 	local PermArray = {}
 	for name, perm in pairs(Permissions) do
 		table.insert(PermArray, {Name = name, Info = perm})
 	end
-	
+
 	-- Sort the permissions array:
 	table.sort(PermArray,
 		function(p1, p2)
@@ -619,7 +628,7 @@ local function DumpPluginInfoGithub(a_PluginFolder, a_PluginInfo)
 	-- Check the params:
 	assert(type(a_PluginFolder) == "string")
 	assert(type(a_PluginInfo) == "table")
-	
+
 	-- Open the output file:
 	local f, msg = io.open(a_PluginFolder .. "/README.md", "w")
 	if (f == nil) then
@@ -628,7 +637,7 @@ local function DumpPluginInfoGithub(a_PluginFolder, a_PluginInfo)
 	end
 
 	-- Write the description:
-	f:write(GithubizeString(a_PluginInfo.Description), "\n")
+	f:write(TrimString(GithubizeString(a_PluginInfo.Description)), "\n")
 	DumpAdditionalInfoGithub(a_PluginInfo, f)
 	DumpCommandsGithub(a_PluginInfo, f)
 	DumpPermissionsGithub(a_PluginInfo, f)
@@ -649,7 +658,7 @@ local function LoadPluginInfo(a_FolderName)
 	if (cfg == nil) then
 		return nil, "Cannot open 'Info.lua': " .. err
 	end
-	
+
 	-- Execute the loaded file in a sandbox:
 	-- This is Lua-5.1-specific and won't work in Lua 5.2!
 	local Sandbox = {}
@@ -658,7 +667,7 @@ local function LoadPluginInfo(a_FolderName)
 	if not(isSuccess) then
 		return nil, "Cannot load Info.lua: " .. (errMsg or "<unknown error>")
 	end
-	
+
 	if (Sandbox.g_PluginInfo == nil) then
 		return nil, "Info.lua doesn't contain the g_PluginInfo declaration"
 	end
@@ -677,14 +686,14 @@ local function ProcessPluginFolder(a_FolderName)
 	if (PluginInfo == nil) then
 		return nil, "Cannot load info for plugin " .. a_FolderName .. ": " .. (Msg or "<unknown error>")
 	end
-	
+
 	-- Dump the forum format:
 	local isSuccess
 	isSuccess, Msg = DumpPluginInfoForum(a_FolderName, PluginInfo)
 	if not(isSuccess) then
 		return nil, "Cannot dump forum info for plugin " .. a_FolderName .. ": " .. (Msg or "<unknown error>")
 	end
-	
+
 	-- Dump the GitHub format:
 	isSuccess, Msg = DumpPluginInfoGithub(a_FolderName, PluginInfo)
 	if not(isSuccess) then
@@ -720,7 +729,7 @@ local function LoadLFS()
 		sudo apt-get install luarocks (Ubuntu / Debian)
 	On windows, a binary distribution can be downloaded from the LuaRocks homepage, http://luarocks.org/en/Download
 	]])
-		
+
 		print("Original error text: ", err)
 		return nil
 	end

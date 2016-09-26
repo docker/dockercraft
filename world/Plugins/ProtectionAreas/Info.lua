@@ -23,7 +23,7 @@ g_PluginInfo =
 		of the overlapping areas, they are allowed to build / dig.
 
 		The protected areas are stored in an SQLite database in a file "ProtectionAreas.sqlite" that is created
-		next to the MCServer executable. The plugin has its configuration options stored in a
+		next to the Cuberite executable. The plugin has its configuration options stored in a
 		"ProtectionAreas.ini" file.
 	]],
 	
@@ -33,7 +33,7 @@ g_PluginInfo =
 			Title = "Configuration",
 			Contents =
 			[[
-				The configuration is stored in the ProtectionAreas.ini file next to the MCServer executable in a
+				The configuration is stored in the ProtectionAreas.ini file next to the Cuberite executable in a
 				regular manner.
 
 				The wand item can be specified in the configuration. By default, a stick with meta 1 is used, but

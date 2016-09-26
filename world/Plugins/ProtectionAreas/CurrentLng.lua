@@ -2,7 +2,7 @@
 -- CurrentLng.lua
 -- This file provides all the translatable strings
 -- The expectation is that the translators will create copies of this file, translate the texts and then the users will overwrite this file with a specific language version
--- Note that the individual languages must not have ".lua" extension, otherwise MCServer will load them and the plugin won't work!
+-- Note that the individual languages must not have ".lua" extension, otherwise Cuberite will load them and the plugin won't work!
 
 
 

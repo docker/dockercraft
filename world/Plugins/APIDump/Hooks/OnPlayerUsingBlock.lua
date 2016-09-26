@@ -35,7 +35,8 @@ return
 		Returns = [[
 			If the function returns false or no value, other plugins' callbacks are called and then Cuberite
 			processes the interaction. If the function returns true, no other callbacks are called for this
-			event and the interaction is silently dropped.
+			event and the block is treated like any other block (i.e. if it's possible to place a torch on,
+			it will be placed, and so on.)
 		]],
 	},  -- HOOK_PLAYER_USING_BLOCK
 }

@@ -5,7 +5,7 @@
 Implements the entire plugin
 
 NOTE: This plugin is not meant for production servers. It is used mainly by developers to verify that things
-are working properly when implementing MCServer features. Do not enable this plugin on production servers!
+are working properly when implementing Cuberite features. Do not enable this plugin on production servers!
 
 This plugin logs a notification for each hook that is being called by the server.
 The TICK and WORLD_TICK hooks are disabled because they produce too much output.

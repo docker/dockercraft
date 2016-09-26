@@ -14,7 +14,7 @@ local function ListSubcommands(a_Player, a_Subcommands, a_CmdString)
 	else
 		a_Player:SendMessage("The " .. a_CmdString .. " command requires another verb:")
 	end
-	
+
 	-- Enum all the subcommands:
 	local Verbs = {}
 	for cmd, info in pairs(a_Subcommands) do
@@ -23,7 +23,7 @@ local function ListSubcommands(a_Player, a_Subcommands, a_CmdString)
 		end
 	end
 	table.sort(Verbs)
-	
+
 	-- Send the list:
 	if (a_Player == nil) then
 		for idx, verb in ipairs(Verbs) do
@@ -55,7 +55,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 		ListSubcommands(a_Player, a_CmdInfo.Subcommands, a_CmdString)
 		return true
 	end
-	
+
 	-- A verb was specified, look it up in the subcommands table:
 	local Subcommand = a_CmdInfo.Subcommands[Verb]
 	if (Subcommand == nil) then
@@ -72,7 +72,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 		-- This is a top-level command, let MCS handle the unknown message
 		return false;
 	end
-	
+
 	-- Check the permission:
 	if (a_Player ~= nil) then
 		if not(a_Player:HasPermission(Subcommand.Permission or "")) then
@@ -80,7 +80,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 			return true
 		end
 	end
-	
+
 	-- If the handler is not valid, check the next sublevel:
 	if (Subcommand.Handler == nil) then
 		if (Subcommand.Subcommands == nil) then
@@ -89,7 +89,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 		end
 		return MultiCommandHandler(a_Split, a_Player, a_CmdString .. " " .. Verb, Subcommand, a_Level + 1, a_EntireCommand)
 	end
-	
+
 	-- Execute:
 	return Subcommand.Handler(a_Split, a_Player, a_EntireCommand)
 end
@@ -105,10 +105,10 @@ function RegisterPluginInfoCommands()
 	-- a_Level is the depth of the subcommands being registered, with 1 being the top level command
 	local function RegisterSubcommands(a_Prefix, a_Subcommands, a_Level)
 		assert(a_Subcommands ~= nil)
-		
+
 		-- A table that will hold aliases to subcommands temporarily, during subcommand iteration
 		local AliasTable = {}
-		
+
 		-- Iterate through the subcommands, register them, and accumulate aliases:
 		for cmd, info in pairs(a_Subcommands) do
 			local CmdName = a_Prefix .. cmd
@@ -119,7 +119,7 @@ function RegisterPluginInfoCommands()
 					return MultiCommandHandler(a_Split, a_Player, CmdName, info, a_Level, a_EntireCommand)
 				end
 			end
-			
+
 			if (Handler == nil) then
 				LOGWARNING(g_PluginInfo.Name .. ": Invalid handler for command " .. CmdName .. ", command will not be registered.")
 			else
@@ -129,14 +129,14 @@ function RegisterPluginInfoCommands()
 				else
 					HelpString = ""
 				end
-				cPluginManager.BindCommand(CmdName, info.Permission or "", Handler, HelpString)
+				cPluginManager:BindCommand(CmdName, info.Permission or "", Handler, HelpString)
 				-- Register all aliases for the command:
 				if (info.Alias ~= nil) then
 					if (type(info.Alias) == "string") then
 						info.Alias = {info.Alias}
 					end
 					for idx, alias in ipairs(info.Alias) do
-						cPluginManager.BindCommand(a_Prefix .. alias, info.Permission or "", Handler, HelpString)
+						cPluginManager:BindCommand(a_Prefix .. alias, info.Permission or "", Handler, HelpString)
 						-- Also copy the alias's info table as a separate subcommand,
 						-- so that MultiCommandHandler() handles it properly. Need to off-load into a separate table
 						-- than the one we're currently iterating and join after the iterating.
@@ -144,22 +144,24 @@ function RegisterPluginInfoCommands()
 					end
 				end
 			end  -- else (if Handler == nil)
-			
+
 			-- Recursively register any subcommands:
 			if (info.Subcommands ~= nil) then
 				RegisterSubcommands(a_Prefix .. cmd .. " ", info.Subcommands, a_Level + 1)
 			end
 		end  -- for cmd, info - a_Subcommands[]
-		
+
 		-- Add the subcommand aliases that were off-loaded during registration:
 		for alias, info in pairs(AliasTable) do
 			a_Subcommands[alias] = info
 		end
 		AliasTable = {}
 	end
-	
+
 	-- Loop through all commands in the plugin info, register each:
-	RegisterSubcommands("", g_PluginInfo.Commands, 1)
+	if (g_PluginInfo.Commands) then
+		RegisterSubcommands("", g_PluginInfo.Commands, 1)
+	end
 end
 
 
@@ -172,7 +174,7 @@ function RegisterPluginInfoConsoleCommands()
 	-- The a_Prefix param already contains the space after the previous command
 	local function RegisterSubcommands(a_Prefix, a_Subcommands, a_Level)
 		assert(a_Subcommands ~= nil)
-		
+
 		for cmd, info in pairs(a_Subcommands) do
 			local CmdName = a_Prefix .. cmd
 			local Handler = info.Handler
@@ -181,16 +183,18 @@ function RegisterPluginInfoConsoleCommands()
 					return MultiCommandHandler(a_Split, nil, CmdName, info, a_Level, a_EntireCommand)
 				end
 			end
-			cPluginManager.BindConsoleCommand(CmdName, Handler, info.HelpString or "")
+			cPluginManager:BindConsoleCommand(CmdName, Handler, info.HelpString or "")
 			-- Recursively register any subcommands:
 			if (info.Subcommands ~= nil) then
 				RegisterSubcommands(a_Prefix .. cmd .. " ", info.Subcommands, a_Level + 1)
 			end
 		end
 	end
-	
+
 	-- Loop through all commands in the plugin info, register each:
-	RegisterSubcommands("", g_PluginInfo.ConsoleCommands, 1)
+	if (g_PluginInfo.ConsoleCommands) then
+		RegisterSubcommands("", g_PluginInfo.ConsoleCommands, 1)
+	end
 end
 
 

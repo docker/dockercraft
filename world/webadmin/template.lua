@@ -20,12 +20,12 @@ end
 
 
 
-function GetDefaultPage()
+local function GetDefaultPage()
 	local PM = cRoot:Get():GetPluginManager()
 
 	local SubTitle = "Current Game"
 	local Content = ""
-	
+
 	Content = Content .. "<h4>Plugins:</h4><ul>"
 	PM:ForEachPlugin(
 		function (a_CBPlugin)
@@ -34,16 +34,16 @@ function GetDefaultPage()
 			end
 		end
 	)
-	
+
 	Content = Content .. "</ul>"
 	Content = Content .. "<h4>Players:</h4><ul>"
-	
+
 	cRoot:Get():ForEachPlayer(
 		function(a_CBPlayer)
 			Content = Content .. "<li>" .. a_CBPlayer:GetName() .. "</li>"
 		end
 	)
-	
+
 	Content = Content .. "</ul><br>";
 
 	return Content, SubTitle
@@ -55,33 +55,34 @@ end
 
 function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
-	local BaseURL = WebAdmin:GetBaseURL(TemplateRequest.Request.Path)
-	local Title = "MCServer WebAdmin"
+	local BaseURL = cWebAdmin:GetBaseURL(TemplateRequest.Request.Path)
+	local Title = "Cuberite WebAdmin"
 	local NumPlayers = cRoot:Get():GetServer():GetNumPlayers()
 	local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
 	local NumChunks = cRoot:Get():GetTotalChunkCount()
-	local PluginPage = WebAdmin:GetPage(TemplateRequest.Request)
+	local PluginPage = cWebAdmin:GetPage(TemplateRequest.Request)
 	local PageContent = PluginPage.Content
-	local SubTitle = PluginPage.PluginName
-	if (PluginPage.TabName ~= "") then
-		SubTitle = PluginPage.PluginName .. " - " .. PluginPage.TabName
+	local SubTitle = PluginPage.PluginFolder
+	if (PluginPage.UrlPath ~= "") then
+		SubTitle = PluginPage.PluginFolder .. " - " .. PluginPage.TabTitle
 	end
 	if (PageContent == "") then
 		PageContent, SubTitle = GetDefaultPage()
 	end
-	
+
+	--[[
+	-- 2016-01-15 Mattes: This wasn't used anywhere in the code, no idea what it was supposed to do
 	local reqParamsClass = ""
-	
-	for key,value in pairs(TemplateRequest.Request.Params) do
+	for key, value in pairs(TemplateRequest.Request.Params) do
 		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
 	end
-	
 	if (string.gsub(reqParamsClass, "%s", "") == "") then
 		reqParamsClass = " no-param"
 	end
-	
+	--]]
+
 	Output([[
-<!-- Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 -->
+<!-- Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 -->
 <html>
 <head>
 	<title>]] .. Title .. [[</title>
@@ -94,7 +95,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<div class="pagehead">
 		<div class="row1">
 			<div class="wrapper">
-				<img src="/logo_login.png" alt="MCServer Logo" class="logo">
+				<img src="/logo_login.png" alt="Cuberite Logo" class="logo">
 			</div>
 		</div>
 		<div id="panel">
@@ -133,23 +134,42 @@ function ShowPage(WebAdmin, TemplateRequest)
 									<td class="trow1 smalltext">
 	]])
 
-
-	local AllPlugins = WebAdmin:GetPlugins()
-	for key,value in pairs(AllPlugins) do
-		local PluginWebTitle = value:GetWebTitle()
-		local TabNames = value:GetTabNames()
-		if (GetTableSize(TabNames) > 0) then
-			Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>"..PluginWebTitle.."</b></a></div>\n");
-			
-			for webname,prettyname in pairs(TabNames) do
-				Output("<div><a href='" .. BaseURL .. PluginWebTitle .. "/" .. webname .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. prettyname .. "</a></div>\n")
+	-- Get all tabs:
+	local perPluginTabs = {}
+	for _, tab in ipairs(cWebAdmin:GetAllWebTabs()) do
+		local pluginTabs = perPluginTabs[tab.PluginName] or {};
+		perPluginTabs[tab.PluginName] = pluginTabs
+		table.insert(pluginTabs, tab)
+	end
+	
+	-- Sort by plugin:
+	local pluginNames = {}
+	for pluginName, pluginTabs in pairs(perPluginTabs) do
+		table.insert(pluginNames, pluginName)
+	end
+	table.sort(pluginNames)
+	
+	-- Output by plugin, then alphabetically:
+	for _, pluginName in ipairs(pluginNames) do
+		local pluginTabs = perPluginTabs[pluginName]
+		table.sort(pluginTabs,
+			function(a_Tab1, a_Tab2)
+				return ((a_Tab1.Title or "") < (a_Tab2.Title or ""))
 			end
+		)
+		
+		-- Translate the plugin name into the folder name (-> title)
+		local pluginWebTitle = cPluginManager:Get():GetPluginFolderName(pluginName) or pluginName
+		Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>" .. pluginWebTitle .. "</b></a></div>\n");
 
-			Output("<br>\n");
+		-- Output each tab:
+		for _, tab in pairs(pluginTabs) do
+			Output("<div><a href='" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. tab.Title .. "</a></div>\n")
 		end
+		Output("<br>\n");
 	end
 
-	
+
 	Output([[
 								</td>
 							</tr>
@@ -177,17 +197,17 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<div class="upper">
 		<div class="wrapper">
 			<ul class="menu bottom_links">
-				<li><a href="http://www.mc-server.org" target="_blank">MCServer</a></li>
-				<li><a href="http://forum.mc-server.org" target="_blank">Forums</a></li>
-				<li><a href="http://builds.cuberite.org" target="_blank">Buildserver</a></li>
-				<li><a href="http://mc-server.xoft.cz/LuaAPI" target="_blank">API Documentation</a></li>
-				<li><a href="http://book.mc-server.org/" target="_blank">User's Manual</a></li>
+				<li><a href="http://cuberite.org/" target="_blank">Cuberite</a></li>
+				<li><a href="https://forum.cuberite.org/" target="_blank">Forums</a></li>
+				<li><a href="https://builds.cuberite.org/" target="_blank">Buildserver</a></li>
+				<li><a href="http://api-docs.cuberite.org/" target="_blank">API Documentation</a></li>
+				<li><a href="https://book.cuberite.org/" target="_blank">User's Manual</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="lower">
 		<div class="wrapper">
-			<span id="copyright">Copyright © <a href="http://www.mc-server.org" target="_blank">MCServer Team</a> 2014.</span>
+			<span id="copyright">Copyright © <a href="http://cuberite.org/" target="_blank">Cuberite Team</a>.</span>
 		</div>
 	</div>
 </div>
@@ -195,6 +215,6 @@ function ShowPage(WebAdmin, TemplateRequest)
 </body>
 </html>
 ]])
-	
+
 	return table.concat(SiteContent)
 end

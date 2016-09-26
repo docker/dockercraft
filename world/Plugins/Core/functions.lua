@@ -84,14 +84,9 @@ function ReturnColorFromChar(char)
 
 end
 
-function CheckHardcore(Victim)
-	if cRoot:Get():GetServer():IsHardcore() then
-		if Victim:IsPlayer() == true then
-			BannedPlayersIni:SetValueB( "Banned", tolua.cast(Victim, "cPlayer"):GetName(), true )
-			BannedPlayersIni:WriteFile( "banned.ini" )
-		end
-	end
-end
+
+
+
 
 -- Teleports a_SrcPlayer to a player named a_DstPlayerName; if a_TellDst is true, will send a notice to the destination player
 function TeleportToPlayer( a_SrcPlayer, a_DstPlayerName, a_TellDst )
@@ -100,20 +95,24 @@ function TeleportToPlayer( a_SrcPlayer, a_DstPlayerName, a_TellDst )
 
 		if a_DstPlayerName == a_SrcPlayer then
 			-- Asked to teleport to self?
-			SendMessageFailure( a_SrcPlayer, "Y' can't teleport to yerself!" )
+			SendMessageFailure( a_SrcPlayer, "Y' can't teleport to yerself" )
 		else
+			-- If destination player is not in the same world, move to the correct world                                                                    
+			if a_SrcPlayer:GetWorld():GetName() ~= a_DstPlayerName:GetWorld():GetName() then                                                                
+				a_SrcPlayer:MoveToWorld( a_DstPlayerName:GetWorld():GetName() )                                                                         
+			end
+
 			a_SrcPlayer:TeleportToEntity( a_DstPlayerName )
-			SendMessageSuccess( a_SrcPlayer, "You teleported to " .. a_DstPlayerName:GetName() .. "!" )
+			SendMessageSuccess( a_SrcPlayer, "You teleported to " .. a_DstPlayerName:GetName() )
 			if (a_TellDst) then
-				SendMessage( a_DstPlayerName, a_SrcPlayer:GetName().." teleported to you!" )
+				SendMessage( a_DstPlayerName, a_SrcPlayer:GetName().." teleported to you" )
 			end
 		end
 
 	end
 
-	local World = a_SrcPlayer:GetWorld()
-	if not World:DoWithPlayer(a_DstPlayerName, teleport) then
-		SendMessageFailure( a_SrcPlayer, "Can't find player " .. a_DstPlayerName)
+	if not cRoot:Get():FindAndDoWithPlayer( a_DstPlayerName, teleport ) then
+		SendMessageFailure( a_SrcPlayer, "Player " .. a_DstPlayerName .. " not found" )
 	end
 
 end

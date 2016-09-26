@@ -1,7 +1,3 @@
---When someone uses tpa or tpahere request is saved in this array under targeted player uuid
---Type - Request type(used command - "/tpahere" or "/tpa"), Requester - uuid of requesting player, Time - request time
-local TeleportRequests = {}
-
 function HandleTPCommand(a_Split, a_Player)
 
 	if #a_Split == 2 or #a_Split == 3 then

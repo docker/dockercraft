@@ -3,7 +3,7 @@ function Initialize(a_Plugin)
 	a_Plugin:SetVersion(1)
 	
 	-- Check if the infodump file exists.
-	if (not cFile:Exists("Plugins/InfoDump.lua")) then
+	if (not cFile:IsFile("Plugins/InfoDump.lua")) then
 		LOGWARN("[DumpInfo] InfoDump.lua was not found.")
 		return false
 	end
@@ -36,7 +36,7 @@ function HandleDumpPluginRequest(a_Request)
 	cPluginManager:Get():ForEachPlugin(
 		function(a_Plugin)
 			-- Check if there is a file called 'Info.lua'
-			if (cFile:Exists("Plugins/" .. a_Plugin:GetName() .. "/Info.lua")) then
+			if (cFile:IsFile("Plugins/" .. a_Plugin:GetName() .. "/Info.lua")) then
 				Content = Content .. "\n<tr>\n"
 				Content = Content .. "\t<td>" .. a_Plugin:GetName() .. "</td>\n"
 				Content = Content .. "\t<td><form method='POST'> <input type='hidden' value='" .. a_Plugin:GetName() .. "' name='DumpInfo'> <input type='submit' value='DumpInfo'></form></td>\n"

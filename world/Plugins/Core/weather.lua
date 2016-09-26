@@ -32,7 +32,7 @@ local WeatherConsoleUsage = "Usage: weather <clear|rain|thunder> [duration in se
 
 
 --- Handle the weather console command, wrapper for HandleWeatherCommand
---  Necessary due to MCServer now supplying additional parameters
+--  Necessary due to Cuberite now supplying additional parameters
 --  
 function HandleConsoleWeather( Split, FullCmd )
 	return HandleWeatherCommand( Split )
@@ -91,7 +91,7 @@ end
 
 
 --- Handle the downfall console command, wrapper for HandleGiveCommand
---  Necessary due to MCServer now supplying additional parameters
+--  Necessary due to Cuberite now supplying additional parameters
 --  
 function HandleConsoleDownfall( Split, FullCmd )
 	return HandleDownfallCommand( Split )

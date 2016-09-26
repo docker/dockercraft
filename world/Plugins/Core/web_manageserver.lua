@@ -13,17 +13,18 @@ function HandleRequest_ManageServer( Request )
 	<form method="POST">
 	<table>
 	<th colspan="2">Manage Server</th>
-	<tr><td><input type="submit" value="Restart Server" name="RestartServer">  restart the server</td></tr> <br />
-	<tr><td><input type="submit" value="Reload Server" name="ReloadServer"> reload the server</td></tr> <br />
-	<tr><td><input type="submit" value="Stop Server" name="StopServer"> stop the server</td></tr> <br />
+	<tr><td><input type="submit" value="Restart Server" name="RestartServer">  restart the server</td></tr>
+	<tr><td><input type="submit" value="Reload Server" name="ReloadServer"> reload the server</td></tr>
+	<tr><td><input type="submit" value="Stop Server" name="StopServer"> stop the server</td></tr>
 	</th>
 	</table>
+	<br />
 	<table>
 	<th colspan="2">Manage Worlds</th>
 	]]
 	local LoopWorlds = function( World )
 		Content = Content .. [[
-		<tr><td><input type="submit" value="]] .. World:GetName() .. [[" name="WorldSaveAllChunks"> Save all the chunks of world ]] .. World:GetName() .. [[</td></tr> <br />
+		<tr><td><input type="submit" value="]] .. World:GetName() .. [[" name="WorldSaveAllChunks"> Save all the chunks of world ]] .. World:GetName() .. [[</td></tr>
 		
 		]]
 	end
