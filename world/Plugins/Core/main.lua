@@ -25,7 +25,7 @@ lastsender = {}
 
 
 
--- Called by MCServer on plugin start to initialize the plugin
+-- Called by Cuberite on plugin start to initialize the plugin
 function Initialize(Plugin)
 	Plugin:SetName( "Core" )
 	Plugin:SetVersion( 15 )

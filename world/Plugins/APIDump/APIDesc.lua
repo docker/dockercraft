@@ -1,11 +1,4 @@
--- APIDesc.lua
-
--- Contains the API objects' descriptions
-
-
-
-
-g_APIDesc =
+return
 {
 	Classes =
 	{
@@ -17,12 +10,28 @@ g_APIDesc =
 
 			Functions =
 			{
-				FunctionName = { Params = "Parameter list", Return = "Return values list", Notes = "Notes" ),
-				OverloadedFunctionName =  -- When a function supports multiple parameter variants
+				FunctionName =
 				{
-					{ Params = "Parameter list 1", Return = "Return values list 1", Notes = "Notes 1" },
-					{ Params = "Parameter list 2", Return = "Return values list 2", Notes = "Notes 2" },
-				}
+					{
+						Params =
+						{
+							{ Name = "BuiltInType", Type = "number"},
+							{ Name = "ClassEnum", Type = "cClass#eEnum"},
+							{ Name = "GlobalEnum", Type = "eEnum"},
+						},
+						Returns =
+						{
+							{ Type = "number" },
+							{ Type = "self" },  -- Returns the same object on which it was called
+						},
+						Notes = "Notes 1"
+					},
+					{
+						Params = {...},
+						Returns = {...},
+						Notes = "Notes 2",
+					},
+				},
 			} ,
 
 			Constants =
@@ -32,7 +41,7 @@ g_APIDesc =
 
 			ConstantGroups =
 			{
-				GroupName1 =  -- GroupName1 is used as the HTML anchor name
+				eEnum =  -- also used as the HTML anchor name
 				{
 					Include = {"constant1", "constant2", "const_.*"},  -- Constants to include in this group, array of identifiers, accepts wildcards
 					TextBefore = "This text will be written in front of the constant list",
@@ -60,7 +69,7 @@ g_APIDesc =
 
 			Inherits = "ParentClassName",  -- Only present if the class inherits from another API class
 		},
-		]]--
+		--]]
 
 		cBlockArea =
 		{
@@ -95,123 +104,1722 @@ g_APIDesc =
 			]],
 			Functions =
 			{
-				constructor = { Params = "", Return = "cBlockArea", Notes = "Creates a new empty cBlockArea object" },
-				Clear = { Params = "", Return = "", Notes = "Clears the object, resets it to zero size" },
-				CopyFrom = { Params = "BlockAreaSrc", Return = "", Notes = "Copies contents from BlockAreaSrc into self" },
-				CopyTo = { Params = "BlockAreaDst", Return = "", Notes = "Copies contents from self into BlockAreaDst." },
-				CountNonAirBlocks = { Params = "", Return = "number", Notes = "Returns the count of blocks that are not air. Returns 0 if blocktypes not available. Block metas are ignored (if present, air with any meta is still considered air)." },
+				Clear =
+				{
+					Notes = "Clears the object, resets it to zero size",
+				},
+				constructor =
+				{
+					Returns =
+					{
+						{
+							Type = "cBlockArea",
+						},
+					},
+					Notes = "Creates a new empty cBlockArea object",
+				},
+				CopyFrom =
+				{
+					Params =
+					{
+						{
+							Name = "BlockAreaSrc",
+							Type = "cBlockArea",
+						},
+					},
+					Notes = "Copies contents from BlockAreaSrc into self",
+				},
+				CopyTo =
+				{
+					Params =
+					{
+						{
+							Name = "BlockAreaDst",
+							Type = "cBlockArea",
+						},
+					},
+					Notes = "Copies contents from self into BlockAreaDst.",
+				},
+				CountNonAirBlocks =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the count of blocks that are not air. Returns 0 if blocktypes not available. Block metas are ignored (if present, air with any meta is still considered air).",
+				},
 				CountSpecificBlocks =
 				{
-					{ Params = "BlockType", Return = "number", Notes = "Counts the number of occurences of the specified blocktype contained in the area." },
-					{ Params = "BlockType, BlockMeta", Return = "number", Notes = "Counts the number of occurrences of the specified blocktype + blockmeta combination contained in the area." },
+					{
+						Params =
+						{
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Counts the number of occurences of the specified blocktype contained in the area.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Counts the number of occurrences of the specified blocktype + blockmeta combination contained in the area.",
+					},
 				},
-				Create = { Params = "SizeX, SizeY, SizeZ, [DataTypes]", Return = "", Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Any previous contents are lost." },
-				Crop = { Params = "AddMinX, SubMaxX, AddMinY, SubMaxY, AddMinZ, SubMaxZ", Return = "", Notes = "Crops the specified number of blocks from each border. Modifies the size of this blockarea object." },
-				DumpToRawFile = { Params = "FileName", Return = "", Notes = "Dumps the raw data into a file. For debugging purposes only." },
-				Expand = { Params = "SubMinX, AddMaxX, SubMinY, AddMaxY, SubMinZ, AddMaxZ", Return = "", Notes = "Expands the specified number of blocks from each border. Modifies the size of this blockarea object. New blocks created with this operation are filled with zeroes." },
-				Fill = { Params = "DataTypes, BlockType, [BlockMeta], [BlockLight], [BlockSkyLight]", Return = "", Notes = "Fills the entire block area with the same values, specified. Uses the DataTypes param to determine which content types are modified." },
+				Create =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "SizeX",
+								Type = "number",
+							},
+							{
+								Name = "SizeY",
+								Type = "number",
+							},
+							{
+								Name = "SizeZ",
+								Type = "number",
+							},
+						},
+						Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Datatypes are set to baTypes + baMetas. Any previous contents are lost.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "SizeX",
+								Type = "number",
+							},
+							{
+								Name = "SizeY",
+								Type = "number",
+							},
+							{
+								Name = "SizeZ",
+								Type = "number",
+							},
+							{
+								Name = "DataTypes",
+								Type = "string",
+							},
+						},
+						Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Any previous contents are lost.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Size",
+								Type = "Vector3i",
+							},
+						},
+						Notes = "Creates a new area of the specified size. Datatypes are set to baTypes + baMetas. Origin is set to all zeroes. BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Size",
+								Type = "Vector3i",
+							},
+							{
+								Name = "DataTypes",
+								Type = "string",
+							},
+						},
+						Notes = "Creates a new area of the specified size and contents. Origin is set to all zeroes. BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.",
+					},
+				},
+				Crop =
+				{
+					Params =
+					{
+						{
+							Name = "AddMinX",
+							Type = "number",
+						},
+						{
+							Name = "SubMaxX",
+							Type = "number",
+						},
+						{
+							Name = "AddMinY",
+							Type = "number",
+						},
+						{
+							Name = "SubMaxY",
+							Type = "number",
+						},
+						{
+							Name = "AddMinZ",
+							Type = "number",
+						},
+						{
+							Name = "SubMaxZ",
+							Type = "number",
+						},
+					},
+					Notes = "Crops the specified number of blocks from each border. Modifies the size of this blockarea object.",
+				},
+				DumpToRawFile =
+				{
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+					},
+					Notes = "Dumps the raw data into a file. For debugging purposes only.",
+				},
+				Expand =
+				{
+					Params =
+					{
+						{
+							Name = "SubMinX",
+							Type = "number",
+						},
+						{
+							Name = "AddMaxX",
+							Type = "number",
+						},
+						{
+							Name = "SubMinY",
+							Type = "number",
+						},
+						{
+							Name = "AddMaxY",
+							Type = "number",
+						},
+						{
+							Name = "SubMinZ",
+							Type = "number",
+						},
+						{
+							Name = "AddMaxZ",
+							Type = "number",
+						},
+					},
+					Notes = "Expands the specified number of blocks from each border. Modifies the size of this blockarea object. New blocks created with this operation are filled with zeroes.",
+				},
+				Fill =
+				{
+					Params =
+					{
+						{
+							Name = "DataTypes",
+							Type = "string",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+							IsOptional = true,
+						},
+						{
+							Name = "BlockLight",
+							Type = "number",
+							IsOptional = true,
+						},
+						{
+							Name = "BlockSkyLight",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Notes = "Fills the entire block area with the same values, specified. Uses the DataTypes param to determine which content types are modified.",
+				},
 				FillRelCuboid =
 				{
-					{ Params = "{{cCuboid|RelCuboid}}, DataTypes, BlockType, [BlockMeta], [BlockLight], [BlockSkyLight]", Return = "", Notes = "Fills the specified cuboid (in relative coords) with the same values (like Fill() )." },
-					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, DataTypes, BlockType, [BlockMeta], [BlockLight], [BlockSkyLight]", Return = "", Notes = "Fills the specified cuboid with the same values (like Fill() )." },
+					{
+						Params =
+						{
+							{
+								Name = "RelCuboid",
+								Type = "cCuboid",
+							},
+							{
+								Name = "DataTypes",
+								Type = "string",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockSkyLight",
+								Type = "number",
+								IsOptional = true,
+							},
+						},
+						Notes = "Fills the specified cuboid (in relative coords) with the same values (like Fill() ).",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "MinRelX",
+								Type = "number",
+							},
+							{
+								Name = "BlockLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockSkyLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "MaxRelX",
+								Type = "number",
+							},
+							{
+								Name = "MinRelY",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelY",
+								Type = "number",
+							},
+							{
+								Name = "MinRelZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelZ",
+								Type = "number",
+							},
+							{
+								Name = "DataTypes",
+								Type = "string",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+								IsOptional = true,
+							},
+						},
+						Notes = "Fills the specified cuboid with the same values (like Fill() ).",
+					},
 				},
-				GetBlockLight = { Params = "BlockX, BlockY, BlockZ", Return = "NIBBLETYPE", Notes = "Returns the blocklight at the specified absolute coords" },
-				GetBlockMeta = { Params = "BlockX, BlockY, BlockZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified absolute coords" },
-				GetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ", Return = "NIBBLETYPE", Notes = "Returns the skylight at the specified absolute coords" },
-				GetBlockType = { Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified absolute coords" },
-				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified absolute coords" },
-				GetCoordRange = {Params = "", Return = "MaxX, MaxY, MaxZ", Notes = "Returns the maximum relative coords in all 3 axes. See also GetSize()." },
-				GetDataTypes = { Params = "", Return = "number", Notes = "Returns the mask of datatypes that the object is currently holding" },
-				GetOrigin = { Params = "", Return = "OriginX, OriginY, OriginZ", Notes = "Returns the origin coords of where the area was read from." },
-				GetOriginX = { Params = "", Return = "number", Notes = "Returns the origin x-coord" },
-				GetOriginY = { Params = "", Return = "number", Notes = "Returns the origin y-coord" },
-				GetOriginZ = { Params = "", Return = "number", Notes = "Returns the origin z-coord" },
-				GetNonAirCropRelCoords = { Params = "[IgnoreBlockType]", Return = "MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ", Notes = "Returns the minimum and maximum coords in each direction for the first non-ignored block in each direction. If there are no non-ignored blocks within the area, or blocktypes are not present, the returned values are reverse-ranges (MinX <- m_RangeX, MaxX <- 0 etc.). IgnoreBlockType defaults to air." },
-				GetRelBlockLight = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the blocklight at the specified relative coords" },
-				GetRelBlockMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
-				GetRelBlockSkyLight = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the skylight at the specified relative coords" },
-				GetRelBlockType = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified relative coords" },
-				GetRelBlockTypeMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified relative coords" },
-				GetSize = { Params = "", Return = "SizeX, SizeY, SizeZ", Notes = "Returns the size of the area in all 3 axes. See also GetCoordRange()." },
-				GetSizeX = { Params = "", Return = "number", Notes = "Returns the size of the held data in the x-axis" },
-				GetSizeY = { Params = "", Return = "number", Notes = "Returns the size of the held data in the y-axis" },
-				GetSizeZ = { Params = "", Return = "number", Notes = "Returns the size of the held data in the z-axis" },
-				GetVolume = { Params = "", Return = "number", Notes = "Returns the volume of the area - the total number of blocks stored within." },
-				GetWEOffset = { Params = "", Return = "{{Vector3i}}", Notes = "Returns the WE offset, a data value sometimes stored in the schematic files. Cuberite doesn't use this value, but provides access to it using this method. The default is {0, 0, 0}."},
-				HasBlockLights = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include blocklight" },
-				HasBlockMetas = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include block metas" },
-				HasBlockSkyLights = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include skylight" },
-				HasBlockTypes = { Params = "", Return = "bool", Notes = "Returns true if current datatypes include block types" },
-				LoadFromSchematicFile = { Params = "FileName", Return = "", Notes = "Clears current content and loads new content from the specified schematic file. Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case." },
-				LoadFromSchematicString = { Params = "SchematicData", Return = "", Notes = "Clears current content and loads new content from the specified string (assumed to contain .schematic data). Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case." },
+				GetBlockLight =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the blocklight at the specified absolute coords",
+				},
+				GetBlockMeta =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block meta at the specified absolute coords",
+				},
+				GetBlockSkyLight =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the skylight at the specified absolute coords",
+				},
+				GetBlockType =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BLOCKTYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type at the specified absolute coords",
+				},
+				GetBlockTypeMeta =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BLOCKTYPE",
+							Type = "number",
+						},
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type and meta at the specified absolute coords",
+				},
+				GetCoordRange =
+				{
+					Returns =
+					{
+						{
+							Name = "MaxX",
+							Type = "number",
+						},
+						{
+							Name = "MaxY",
+							Type = "number",
+						},
+						{
+							Name = "MaxZ",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum relative coords in all 3 axes. See also GetSize().",
+				},
+				GetDataTypes =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the mask of datatypes that the object is currently holding",
+				},
+				GetNonAirCropRelCoords =
+				{
+					Params =
+					{
+						{
+							Name = "IgnoredBlockType",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "MinRelX",
+							Type = "number",
+						},
+						{
+							Name = "MinRelY",
+							Type = "number",
+						},
+						{
+							Name = "MinRelZ",
+							Type = "number",
+						},
+						{
+							Name = "MaxRelX",
+							Type = "number",
+						},
+						{
+							Name = "MaxRelY",
+							Type = "number",
+						},
+						{
+							Name = "MaxRelZ",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the minimum and maximum coords in each direction for the first block in each direction of type different to IgnoredBlockType (E_BLOCK_AIR by default). If there are no non-ignored blocks within the area, or blocktypes are not present, the returned values are reverse-ranges (MinX <- m_RangeX, MaxX <- 0 etc.). IgnoreBlockType defaults to air.",
+				},
+				GetOrigin =
+				{
+					Returns =
+					{
+						{
+							Name = "OriginX",
+							Type = "number",
+						},
+						{
+							Name = "OriginY",
+							Type = "number",
+						},
+						{
+							Name = "OriginZ",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the origin coords of where the area was read from.",
+				},
+				GetOriginX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the origin x-coord",
+				},
+				GetOriginY =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the origin y-coord",
+				},
+				GetOriginZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the origin z-coord",
+				},
+				GetRelBlockLight =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the blocklight at the specified relative coords",
+				},
+				GetRelBlockMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block meta at the specified relative coords",
+				},
+				GetRelBlockSkyLight =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the skylight at the specified relative coords",
+				},
+				GetRelBlockType =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BLOCKTYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type at the specified relative coords",
+				},
+				GetRelBlockTypeMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BLOCKTYPE",
+							Type = "number",
+						},
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type and meta at the specified relative coords",
+				},
+				GetSize =
+				{
+					Returns =
+					{
+						{
+							Name = "SizeX",
+							Type = "number",
+						},
+						{
+							Name = "SizeY",
+							Type = "number",
+						},
+						{
+							Name = "SizeZ",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the size of the area in all 3 axes. See also GetCoordRange().",
+				},
+				GetSizeX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the size of the held data in the x-axis",
+				},
+				GetSizeY =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the size of the held data in the y-axis",
+				},
+				GetSizeZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the size of the held data in the z-axis",
+				},
+				GetVolume =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the volume of the area - the total number of blocks stored within.",
+				},
+				GetWEOffset =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3i",
+						},
+					},
+					Notes = "Returns the WE offset, a data value sometimes stored in the schematic files. Cuberite doesn't use this value, but provides access to it using this method. The default is {0, 0, 0}.",
+				},
+				HasBlockLights =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if current datatypes include blocklight",
+				},
+				HasBlockMetas =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if current datatypes include block metas",
+				},
+				HasBlockSkyLights =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if current datatypes include skylight",
+				},
+				HasBlockTypes =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if current datatypes include block types",
+				},
+				LoadFromSchematicFile =
+				{
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+					},
+					Notes = "Clears current content and loads new content from the specified schematic file. Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case.",
+				},
+				LoadFromSchematicString =
+				{
+					Params =
+					{
+						{
+							Name = "SchematicData",
+							Type = "string",
+						},
+					},
+					Notes = "Clears current content and loads new content from the specified string (assumed to contain .schematic data). Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case.",
+				},
 				Merge =
 				{
-					{ Params = "BlockAreaSrc, {{Vector3i|RelMinCoords}}, Strategy", Return = "", Notes = "Merges BlockAreaSrc into this object at the specified relative coords, using the specified strategy" },
-					{ Params = "BlockAreaSrc, RelX, RelY, RelZ, Strategy", Return = "", Notes = "Merges BlockAreaSrc into this object at the specified relative coords, using the specified strategy" },
+					{
+						Params =
+						{
+							{
+								Name = "BlockAreaSrc",
+								Type = "cBlockArea",
+							},
+							{
+								Name = "RelMinCoords",
+								Type = "number",
+							},
+							{
+								Name = "Strategy",
+								Type = "string",
+							},
+						},
+						Notes = "Merges BlockAreaSrc into this object at the specified relative coords, using the specified strategy",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "BlockAreaSrc",
+								Type = "cBlockArea",
+							},
+							{
+								Name = "RelX",
+								Type = "number",
+							},
+							{
+								Name = "RelY",
+								Type = "number",
+							},
+							{
+								Name = "RelZ",
+								Type = "number",
+							},
+							{
+								Name = "Strategy",
+								Type = "string",
+							},
+						},
+						Notes = "Merges BlockAreaSrc into this object at the specified relative coords, using the specified strategy",
+					},
 				},
-				MirrorXY = { Params = "", Return = "", Notes = "Mirrors this block area around the XY plane. Modifies blocks' metas (if present) to match (i. e. furnaces facing the opposite direction)." },
-				MirrorXYNoMeta = { Params = "", Return = "", Notes = "Mirrors this block area around the XY plane. Doesn't modify blocks' metas." },
-				MirrorXZ = { Params = "", Return = "", Notes = "Mirrors this block area around the XZ plane. Modifies blocks' metas (if present)" },
-				MirrorXZNoMeta = { Params = "", Return = "", Notes = "Mirrors this block area around the XZ plane. Doesn't modify blocks' metas." },
-				MirrorYZ = { Params = "", Return = "", Notes = "Mirrors this block area around the YZ plane. Modifies blocks' metas (if present)" },
-				MirrorYZNoMeta = { Params = "", Return = "", Notes = "Mirrors this block area around the YZ plane. Doesn't modify blocks' metas." },
+				MirrorXY =
+				{
+					Notes = "Mirrors this block area around the XY plane. Modifies blocks' metas (if present) to match (i. e. furnaces facing the opposite direction).",
+				},
+				MirrorXYNoMeta =
+				{
+					Notes = "Mirrors this block area around the XY plane. Doesn't modify blocks' metas.",
+				},
+				MirrorXZ =
+				{
+					Notes = "Mirrors this block area around the XZ plane. Modifies blocks' metas (if present)",
+				},
+				MirrorXZNoMeta =
+				{
+					Notes = "Mirrors this block area around the XZ plane. Doesn't modify blocks' metas.",
+				},
+				MirrorYZ =
+				{
+					Notes = "Mirrors this block area around the YZ plane. Modifies blocks' metas (if present)",
+				},
+				MirrorYZNoMeta =
+				{
+					Notes = "Mirrors this block area around the YZ plane. Doesn't modify blocks' metas.",
+				},
 				Read =
 				{
-					{ Params = "World, {{cCuboid|Cuboid}}, DataTypes", Return = "bool", Notes = "Reads the area from World, returns true if successful" },
-					{ Params = "World, {{Vector3i|Point1}}, {{Vector3i|Point2}}, DataTypes", Return = "bool", Notes = "Reads the area from World, returns true if successful" },
-					{ Params = "World, X1, X2, Y1, Y2, Z1, Z2, DataTypes", Return = "bool", Notes = "Reads the area from World, returns true if successful" },
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "Cuboid",
+								Type = "cCuboid",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "Cuboid",
+								Type = "cCuboid",
+							},
+							{
+								Name = "DataTypes",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Reads the area from World, returns true if successful. DataTypes is the sum of baXXX datatypes to be read",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "Point1",
+								Type = "Vector3i",
+							},
+							{
+								Name = "Point2",
+								Type = "Vector3i",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "Point1",
+								Type = "Vector3i",
+							},
+							{
+								Name = "Point2",
+								Type = "Vector3i",
+							},
+							{
+								Name = "DataTypes",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Reads the area from World, returns true if successful. DataTypes is a sum of baXXX datatypes to be read.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "MinX",
+								Type = "number",
+							},
+							{
+								Name = "MaxX",
+								Type = "number",
+							},
+							{
+								Name = "MinY",
+								Type = "number",
+							},
+							{
+								Name = "MaxY",
+								Type = "number",
+							},
+							{
+								Name = "MinZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxZ",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "MinX",
+								Type = "number",
+							},
+							{
+								Name = "MaxX",
+								Type = "number",
+							},
+							{
+								Name = "MinY",
+								Type = "number",
+							},
+							{
+								Name = "MaxY",
+								Type = "number",
+							},
+							{
+								Name = "MinZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxZ",
+								Type = "number",
+							},
+							{
+								Name = "DataTypes",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Reads the area from World, returns true if successful. DataTypes is a sum of baXXX datatypes to read.",
+					},
 				},
 				RelLine =
 				{
-					{ Params = "{{Vector3i|RelPoint1}}, {{Vector3i|RelPoint2}}, DataTypes, BlockType, [BlockMeta], [BlockLight], [BlockSkyLight]", Return = "", Notes = "Draws a line between the two specified points. Sets only datatypes specified by DataTypes (baXXX constants)." },
-					{ Params = "RelX1, RelY1, RelZ1, RelX2, RelY2, RelZ2, DataTypes, BlockType, [BlockMeta], [BlockLight], [BlockSkyLight]", Return = "", Notes = "Draws a line between the two specified points. Sets only datatypes specified by DataTypes (baXXX constants)." },
+					{
+						Params =
+						{
+							{
+								Name = "RelPoint1",
+								Type = "Vector3i",
+							},
+							{
+								Name = "RelPoint2",
+								Type = "Vector3i",
+							},
+							{
+								Name = "DataTypes",
+								Type = "number",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockSkyLight",
+								Type = "number",
+								IsOptional = true,
+							},
+						},
+						Notes = "Draws a line between the two specified points. Sets only datatypes specified by DataTypes (baXXX constants).",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "RelX1",
+								Type = "number",
+							},
+							{
+								Name = "BlockLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockSkyLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "RelY1",
+								Type = "number",
+							},
+							{
+								Name = "RelZ1",
+								Type = "number",
+							},
+							{
+								Name = "RelX2",
+								Type = "number",
+							},
+							{
+								Name = "RelY2",
+								Type = "number",
+							},
+							{
+								Name = "RelZ2",
+								Type = "number",
+							},
+							{
+								Name = "DataTypes",
+								Type = "string",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+								IsOptional = true,
+							},
+						},
+						Notes = "Draws a line between the two specified points. Sets only datatypes specified by DataTypes (baXXX constants).",
+					},
 				},
-				RotateCCW = { Params = "", Return = "", Notes = "Rotates the block area around the Y axis, counter-clockwise (east -> north). Modifies blocks' metas (if present) to match." },
-				RotateCCWNoMeta = { Params = "", Return = "", Notes = "Rotates the block area around the Y axis, counter-clockwise (east -> north). Doesn't modify blocks' metas." },
-				RotateCW = { Params = "", Return = "", Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Modifies blocks' metas (if present) to match." },
-				RotateCWNoMeta = { Params = "", Return = "", Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Doesn't modify blocks' metas." },
-				SaveToSchematicFile = { Params = "FileName", Return = "", Notes = "Saves the current contents to a schematic file. Returns true if successful." },
-				SaveToSchematicString = { Params = "", Return = "string", Notes = "Saves the current contents to a string (in a .schematic file format). Returns the data if successful, nil if failed." },
-				SetBlockLight = { Params = "BlockX, BlockY, BlockZ, BlockLight", Return = "", Notes = "Sets the blocklight at the specified absolute coords" },
-				SetBlockMeta = { Params = "BlockX, BlockY, BlockZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified absolute coords" },
-				SetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified absolute coords" },
-				SetBlockType = { Params = "BlockX, BlockY, BlockZ, BlockType", Return = "", Notes = "Sets the block type at the specified absolute coords" },
-				SetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified absolute coords" },
+				RotateCCW =
+				{
+					Notes = "Rotates the block area around the Y axis, counter-clockwise (east -> north). Modifies blocks' metas (if present) to match.",
+				},
+				RotateCCWNoMeta =
+				{
+					Notes = "Rotates the block area around the Y axis, counter-clockwise (east -> north). Doesn't modify blocks' metas.",
+				},
+				RotateCW =
+				{
+					Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Modifies blocks' metas (if present) to match.",
+				},
+				RotateCWNoMeta =
+				{
+					Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Doesn't modify blocks' metas.",
+				},
+				SaveToSchematicFile =
+				{
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Saves the current contents to a schematic file. Returns true if successful.",
+				},
+				SaveToSchematicString =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Saves the current contents to a string (in a .schematic file format). Returns the data if successful, nil if failed.",
+				},
+				SetBlockLight =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockLight",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the blocklight at the specified absolute coords",
+				},
+				SetBlockMeta =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block meta at the specified absolute coords",
+				},
+				SetBlockSkyLight =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockSkyLight",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the skylight at the specified absolute coords",
+				},
+				SetBlockType =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block type at the specified absolute coords",
+				},
+				SetBlockTypeMeta =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block type and meta at the specified absolute coords",
+				},
 				SetOrigin =
 				{
-					{ Params = "{{Vector3i|Origin}}", Return = "", Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords." },
-					{ Params = "OriginX, OriginY, OriginZ", Return = "", Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords." },
+					{
+						Params =
+						{
+							{
+								Name = "Origin",
+								Type = "Vector3i",
+							},
+						},
+						Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "OriginX",
+								Type = "number",
+							},
+							{
+								Name = "OriginY",
+								Type = "number",
+							},
+							{
+								Name = "OriginZ",
+								Type = "number",
+							},
+						},
+						Notes = "Resets the origin for the absolute coords. Only affects how absolute coords are translated into relative coords.",
+					},
 				},
-				SetRelBlockLight = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockLight", Return = "", Notes = "Sets the blocklight at the specified relative coords" },
-				SetRelBlockMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified relative coords" },
-				SetRelBlockSkyLight = { Params = "RelBlockX, RelBlockY, RelBlockZ, SkyLight", Return = "", Notes = "Sets the skylight at the specified relative coords" },
-				SetRelBlockType = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockType", Return = "", Notes = "Sets the block type at the specified relative coords" },
-				SetRelBlockTypeMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified relative coords" },
+				SetRelBlockLight =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockLight",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the blocklight at the specified relative coords",
+				},
+				SetRelBlockMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block meta at the specified relative coords",
+				},
+				SetRelBlockSkyLight =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockSkyLight",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the skylight at the specified relative coords",
+				},
+				SetRelBlockType =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block type at the specified relative coords",
+				},
+				SetRelBlockTypeMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelBlockX",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockY",
+							Type = "number",
+						},
+						{
+							Name = "RelBlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block type and meta at the specified relative coords",
+				},
 				SetWEOffset =
 				{
-					{ Params = "{{Vector3i|Offset}}", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. Cuberite doesn't use this value, but provides access to it using this method." },
-					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. Cuberite doesn't use this value, but provides access to it using this method." },
+					{
+						Params =
+						{
+							{
+								Name = "Offset",
+								Type = "Vector3i",
+							},
+						},
+						Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. Cuberite doesn't use this value, but provides access to it using this method.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "OffsetX",
+								Type = "number",
+							},
+							{
+								Name = "OffsetY",
+								Type = "number",
+							},
+							{
+								Name = "OffsetZ",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the WE offset, a data value sometimes stored in the schematic files. Mostly used for WorldEdit. Cuberite doesn't use this value, but provides access to it using this method.",
+					},
 				},
 				Write =
 				{
-					{ Params = "World, {{Vector3i|MinPoint}}, DataTypes", Return = "bool", Notes = "Writes the area into World at the specified coords, returns true if successful" },
-					{ Params = "World, MinX, MinY, MinZ, DataTypes", Return = "bool", Notes = "Writes the area into World at the specified coords, returns true if successful" },
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "MinPoint",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Writes the area into World at the specified coords, returns true if successful. baTypes and baMetas are written.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "MinPoint",
+								Type = "number",
+							},
+							{
+								Name = "DataTypes",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Writes the area into World at the specified coords, returns true if successful. DataTypes is the sum of baXXX datatypes to write.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "MinX",
+								Type = "number",
+							},
+							{
+								Name = "MinY",
+								Type = "number",
+							},
+							{
+								Name = "MinZ",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Writes the area into World at the specified coords, returns true if successful. baTypes and baMetas are written.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "MinX",
+								Type = "number",
+							},
+							{
+								Name = "MinY",
+								Type = "number",
+							},
+							{
+								Name = "MinZ",
+								Type = "number",
+							},
+							{
+								Name = "DataTypes",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Writes the area into World at the specified coords, returns true if successful. DataTypes is the sum of baXXX datatypes to write.",
+					},
 				},
 			},
 			Constants =
 			{
-				baTypes = { Notes = "Operation should work on block types" },
-				baMetas = { Notes = "Operations should work on block metas" },
-				baLight = { Notes = "Operations should work on block (emissive) light" },
-				baSkyLight = { Notes = "Operations should work on skylight" },
-				msDifference = { Notes = "Block becomes air if 'self' and src are the same. Otherwise it becomes the src block." },
-				msFillAir = { Notes = "'self' is overwritten by Src only where 'self' has air blocks" },
-				msImprint = { Notes = "Src overwrites 'self' anywhere where 'self' has non-air blocks" },
-				msLake = { Notes = "Special mode for merging lake images" },
-				msMask = { Notes = "The blocks that are exactly the same are kept in 'self', all differing blocks are replaced by air"},
-				msOverwrite = { Notes = "Src overwrites anything in 'self'" },
-				msSimpleCompare = { Notes = "The blocks that are exactly the same are replaced with air, all differing blocks are replaced by stone"},
-				msSpongePrint = { Notes = "Similar to msImprint, sponge block doesn't overwrite anything, all other blocks overwrite everything"},
+				baLight =
+				{
+					Notes = "Operations should work on block (emissive) light",
+				},
+				baMetas =
+				{
+					Notes = "Operations should work on block metas",
+				},
+				baSkyLight =
+				{
+					Notes = "Operations should work on skylight",
+				},
+				baTypes =
+				{
+					Notes = "Operation should work on block types",
+				},
+				msDifference =
+				{
+					Notes = "Block becomes air if 'self' and src are the same. Otherwise it becomes the src block.",
+				},
+				msFillAir =
+				{
+					Notes = "'self' is overwritten by Src only where 'self' has air blocks",
+				},
+				msImprint =
+				{
+					Notes = "Src overwrites 'self' anywhere where 'self' has non-air blocks",
+				},
+				msLake =
+				{
+					Notes = "Special mode for merging lake images",
+				},
+				msMask =
+				{
+					Notes = "The blocks that are exactly the same are kept in 'self', all differing blocks are replaced by air",
+				},
+				msOverwrite =
+				{
+					Notes = "Src overwrites anything in 'self'",
+				},
+				msSimpleCompare =
+				{
+					Notes = "The blocks that are exactly the same are replaced with air, all differing blocks are replaced by stone",
+				},
+				msSpongePrint =
+				{
+					Notes = "Similar to msImprint, sponge block doesn't overwrite anything, all other blocks overwrite everything",
+				},
 			},
 			ConstantGroups =
 			{
@@ -225,19 +1833,18 @@ g_APIDesc =
 				MergeStrategies =
 				{
 					Include = "ms.*",
+					TextAfter = "See below for a detailed explanation of the individual merge strategies.",
 					TextBefore = [[
 						The Merge() function can use different strategies to combine the source and destination blocks.
 						The following constants are used:
 					]],
-					TextAfter = "See below for a detailed explanation of the individual merge strategies.",
 				},
 			},
 			AdditionalInfo =
 			{
 				{
 					Header = "Merge strategies",
-					Contents =
-					[[
+					Contents = [[
 						<p>The strategy parameter specifies how individual blocks are combined together, using the table below.
 						</p>
 						<table class="inline">
@@ -385,10 +1992,9 @@ g_APIDesc =
 						</tr>
 						</tbody></table>
 ]],
-				},  -- Merge strategies
-			},  -- AdditionalInfo
-		},  -- cBlockArea
-
+				},
+			},
+		},
 		cBlockInfo =
 		{
 			Desc = [[
@@ -396,71 +2002,403 @@ g_APIDesc =
 			]],
 			Functions =
 			{
-				CanBeTerraformed = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns true if the block is suitable to be changed by a generator" },
-				FullyOccupiesVoxel = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block fully occupies its voxel." },
-				Get = { Params = "Type", Return = "{{cBlockInfo}}", Notes = "(STATIC) Returns the {{cBlockInfo}} structure for the specified type." },
-				GetLightValue = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block emits on its own." },
-				GetPlaceSound = { Params = "Type", Return = "", Notes = "(STATIC) Returns the name of the sound that is played when placing the block." },
-				GetSpreadLightFalloff = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block consumes." },
-				IsOneHitDig = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block will be destroyed after a single hit." },
-				IsPistonBreakable = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether a piston can break the specified block." },
-				IsSnowable = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block can hold snow atop." },
-				IsSolid = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block is solid." },
-				IsTransparent = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block is transparent." },
-				RequiresSpecialTool = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block requires a special tool to drop." },
+				CanBeTerraformed =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the block is suitable to be changed by a generator",
+				},
+				FullyOccupiesVoxel =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified block fully occupies its voxel.",
+				},
+				Get =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cBlockInfo",
+						},
+					},
+					Notes = "Returns the {{cBlockInfo}} structure for the specified block type.",
+				},
+				GetBlockHeight =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block's hitbox height.",
+				},
+				GetLightValue =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns how much light the specified block emits on its own.",
+				},
+				GetPlaceSound =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the name of the sound that is played when placing the block of this type.",
+				},
+				GetSpreadLightFalloff =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns how much light the specified block type consumes.",
+				},
+				IsOneHitDig =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified block type will be destroyed after a single hit.",
+				},
+				IsPistonBreakable =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether a piston can break the specified block type.",
+				},
+				IsSnowable =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified block type can hold snow atop.",
+				},
+				IsSolid =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified block type is solid.",
+				},
+				IsTransparent =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified block is transparent.",
+				},
+				RequiresSpecialTool =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified block requires a special tool to drop resources.",
+				},
 			},
 			Variables =
 			{
-				m_CanBeTerraformed = { Type = "bool", Notes = "Is this block suited to be terraformed?" },
-				m_FullyOccupiesVoxel = { Type = "bool", Notes = "Does this block fully occupy its voxel - is it a 'full' block?" },
-				m_IsSnowable = { Type = "bool", Notes = "Can this block hold snow atop?" },
-				m_IsSolid = { Type = "bool", Notes = "Is this block solid (player cannot walk through)?" },
-				m_LightValue = { Type = "number", Notes = "How much light do the blocks emit on their own?" },
-				m_OneHitDig = { Type = "bool", Notes = "Is a block destroyed after a single hit?" },
-				m_PistonBreakable = { Type = "bool", Notes = "Can a piston break this block?" },
-				m_PlaceSound = { Type = "string", Notes = "The name of the sound that is placed when a block is placed." },
-				m_RequiresSpecialTool = { Type = "bool", Notes = "Does this block require a tool to drop?" },
-				m_SpreadLightFalloff = { Type = "number", Notes = "How much light do the blocks consume?" },
-				m_Transparent = { Type = "bool", Notes = "Is a block completely transparent? (light doesn't get decreased(?))" },
+				m_CanBeTerraformed =
+				{
+					Type = "bool",
+					Notes = "Is this block suited to be terraformed?",
+				},
+				m_FullyOccupiesVoxel =
+				{
+					Type = "bool",
+					Notes = "Does this block fully occupy its voxel - is it a 'full' block?",
+				},
+				m_IsSnowable =
+				{
+					Type = "bool",
+					Notes = "Can this block hold snow atop?",
+				},
+				m_IsSolid =
+				{
+					Type = "bool",
+					Notes = "Is this block solid (player cannot walk through)?",
+				},
+				m_LightValue =
+				{
+					Type = "number",
+					Notes = "How much light do the blocks emit on their own?",
+				},
+				m_OneHitDig =
+				{
+					Type = "bool",
+					Notes = "Is a block destroyed after a single hit?",
+				},
+				m_PistonBreakable =
+				{
+					Type = "bool",
+					Notes = "Can a piston break this block?",
+				},
+				m_PlaceSound =
+				{
+					Type = "string",
+					Notes = "The name of the sound that is placed when a block is placed.",
+				},
+				m_RequiresSpecialTool =
+				{
+					Type = "bool",
+					Notes = "Does this block require a tool to drop?",
+				},
+				m_SpreadLightFalloff =
+				{
+					Type = "number",
+					Notes = "How much light do the blocks consume?",
+				},
+				m_Transparent =
+				{
+					Type = "bool",
+					Notes = "Is a block completely transparent? (light doesn't get decreased(?))",
+				},
 			},
-		}, -- cBlockInfo
-
+		},
 		cChatColor =
 		{
 			Desc = [[
 				A wrapper class for constants representing colors or effects.
 			]],
+			Functions =
+			{
 
-			Functions = {},
+			},
 			Constants =
 			{
-				Black         = { Notes = "" },
-				Blue          = { Notes = "" },
-				Bold          = { Notes = "" },
-				Color         = { Notes = "The first character of the color-code-sequence, �" },
-				DarkPurple    = { Notes = "" },
-				Delimiter     = { Notes = "The first character of the color-code-sequence, �" },
-				Gold          = { Notes = "" },
-				Gray          = { Notes = "" },
-				Green         = { Notes = "" },
-				Italic        = { Notes = "" },
-				LightBlue     = { Notes = "" },
-				LightGray     = { Notes = "" },
-				LightGreen    = { Notes = "" },
-				LightPurple   = { Notes = "" },
-				Navy          = { Notes = "" },
-				Plain         = { Notes = "Resets all formatting to normal" },
-				Purple        = { Notes = "" },
-				Random        = { Notes = "Random letters and symbols animate instead of the text" },
-				Red           = { Notes = "" },
-				Rose          = { Notes = "" },
-				Strikethrough = { Notes = "" },
-				Underlined    = { Notes = "" },
-				White         = { Notes = "" },
-				Yellow        = { Notes = "" },
+				Black =
+				{
+					Notes = "",
+				},
+				Blue =
+				{
+					Notes = "",
+				},
+				Bold =
+				{
+					Notes = "",
+				},
+				Color =
+				{
+					Notes = "The first character of the color-code-sequence, §",
+				},
+				DarkPurple =
+				{
+					Notes = "",
+				},
+				Delimiter =
+				{
+					Notes = "The first character of the color-code-sequence, §",
+				},
+				Gold =
+				{
+					Notes = "",
+				},
+				Gray =
+				{
+					Notes = "",
+				},
+				Green =
+				{
+					Notes = "",
+				},
+				Italic =
+				{
+					Notes = "",
+				},
+				LightBlue =
+				{
+					Notes = "",
+				},
+				LightGray =
+				{
+					Notes = "",
+				},
+				LightGreen =
+				{
+					Notes = "",
+				},
+				LightPurple =
+				{
+					Notes = "",
+				},
+				Navy =
+				{
+					Notes = "",
+				},
+				Plain =
+				{
+					Notes = "Resets all formatting to normal",
+				},
+				Purple =
+				{
+					Notes = "",
+				},
+				Random =
+				{
+					Notes = "Random letters and symbols animate instead of the text",
+				},
+				Red =
+				{
+					Notes = "",
+				},
+				Rose =
+				{
+					Notes = "",
+				},
+				Strikethrough =
+				{
+					Notes = "",
+				},
+				Underlined =
+				{
+					Notes = "",
+				},
+				White =
+				{
+					Notes = "",
+				},
+				Yellow =
+				{
+					Notes = "",
+				},
 			},
 		},
-
 		cChunkDesc =
 		{
 			Desc = [[
@@ -469,58 +2407,763 @@ g_APIDesc =
 				{{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this
 				class in both those hooks to manipulate generated chunks.
 			]],
-
 			Functions =
 			{
-				FillBlocks                = { Params = "BlockType, BlockMeta", Return = "", Notes = "Fills the entire chunk with the specified blocks" },
+				FillBlocks =
+				{
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Fills the entire chunk with the specified blocks",
+				},
 				FillRelCuboid =
 				{
-					{ Params = "{{cCuboid|RelCuboid}}, BlockType, BlockMeta", Return = "", Notes = "Fills the cuboid, specified in relative coords, by the specified block type and block meta. The cuboid may reach outside of the chunk, only the part intersecting with this chunk is filled." },
-					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta", Return = "", Notes = "Fills the cuboid, specified in relative coords, by the specified block type and block meta. The cuboid may reach outside of the chunk, only the part intersecting with this chunk is filled." },
+					{
+						Params =
+						{
+							{
+								Name = "RelCuboid",
+								Type = "cCuboid",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Fills the cuboid, specified in relative coords, by the specified block type and block meta. The cuboid may reach outside of the chunk, only the part intersecting with this chunk is filled.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "MinRelX",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelX",
+								Type = "number",
+							},
+							{
+								Name = "MinRelY",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelY",
+								Type = "number",
+							},
+							{
+								Name = "MinRelZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelZ",
+								Type = "number",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Fills the cuboid, specified in relative coords, by the specified block type and block meta. The cuboid may reach outside of the chunk, only the part intersecting with this chunk is filled.",
+					},
 				},
 				FloorRelCuboid =
 				{
-					{ Params = "{{cCuboid|RelCuboid}}, BlockType, BlockMeta", Return = "", Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
-					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta", Return = "", Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+					{
+						Params =
+						{
+							{
+								Name = "RelCuboid",
+								Type = "cCuboid",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "MinRelX",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelX",
+								Type = "number",
+							},
+							{
+								Name = "MinRelY",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelY",
+								Type = "number",
+							},
+							{
+								Name = "MinRelZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelZ",
+								Type = "number",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Fills those blocks of the cuboid (specified in relative coords) that are considered non-floor (air, water) with the specified block type and meta. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled.",
+					},
 				},
-				GetBiome                  = { Params = "RelX, RelZ", Return = "EMCSBiome", Notes = "Returns the biome at the specified relative coords" },
-				GetBlockEntity            = { Params = "RelX, RelY, RelZ", Return = "{{cBlockEntity}} descendant", Notes = "Returns the block entity for the block at the specified coords. Creates it if it doesn't exist. Returns nil if the block has no block entity capability." },
-				GetBlockMeta              = { Params = "RelX, RelY, RelZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
-				GetBlockType              = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE", Notes = "Returns the block type at the specified relative coords" },
-				GetBlockTypeMeta          = { Params = "RelX, RelY, RelZ", Return = "BLOCKTYPE, NIBBLETYPE", Notes = "Returns the block type and meta at the specified relative coords" },
-				GetChunkX                 = { Params = "", Return = "number", Notes = "Returns the X coord of the chunk contained." },
-				GetChunkZ                 = { Params = "", Return = "number", Notes = "Returns the Z coord of the chunk contained." },
-				GetHeight                 = { Params = "RelX, RelZ", Return = "number", Notes = "Returns the height at the specified relative coords" },
-				GetMaxHeight              = { Params = "", Return = "number", Notes = "Returns the maximum height contained in the heightmap." },
-				GetMinHeight              = { Params = "", Return = "number", Notes = "Returns the minimum height value in the heightmap." },
-				IsUsingDefaultBiomes      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default biome generator" },
-				IsUsingDefaultComposition = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default composition generator" },
-				IsUsingDefaultFinish      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default finishers" },
-				IsUsingDefaultHeight      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default height generator" },
-				IsUsingDefaultStructures  = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default structures" },
+				GetBiome =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "EMCSBiome",
+						},
+					},
+					Notes = "Returns the biome at the specified relative coords",
+				},
+				GetBlockEntity =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cBlockEntity",
+						},
+					},
+					Notes = "Returns the block entity for the block at the specified coords. Creates it if it doesn't exist. Returns nil if the block has no block entity capability.",
+				},
+				GetBlockMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block meta at the specified relative coords",
+				},
+				GetBlockType =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BLOCKTYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type at the specified relative coords",
+				},
+				GetBlockTypeMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BLOCKTYPE",
+							Type = "number",
+						},
+						{
+							Name = "NIBBLETYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type and meta at the specified relative coords",
+				},
+				GetChunkX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X coord of the chunk contained.",
+				},
+				GetChunkZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Z coord of the chunk contained.",
+				},
+				GetHeight =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the height at the specified relative coords",
+				},
+				GetMaxHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum height contained in the heightmap.",
+				},
+				GetMinHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the minimum height value in the heightmap.",
+				},
+				IsUsingDefaultBiomes =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the chunk is set to use default biome generator",
+				},
+				IsUsingDefaultComposition =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the chunk is set to use default composition generator",
+				},
+				IsUsingDefaultFinish =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the chunk is set to use default finishers",
+				},
+				IsUsingDefaultHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the chunk is set to use default height generator",
+				},
+				IsUsingDefaultStructures =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the chunk is set to use default structures",
+				},
 				RandomFillRelCuboid =
 				{
-					{ Params = "{{cCuboid|RelCuboid}}, BlockType, BlockMeta, RandomSeed, ChanceOutOf10k", Return = "", Notes = "Fills the specified relative cuboid with block type and meta in random locations. RandomSeed is used for the random number genertion (same seed produces same results); ChanceOutOf10k specifies the density (how many out of every 10000 blocks should be filled). Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
-					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, BlockType, BlockMeta, RandomSeed, ChanceOutOf10k", Return = "", Notes = "Fills the specified relative cuboid with block type and meta in random locations. RandomSeed is used for the random number genertion (same seed produces same results); ChanceOutOf10k specifies the density (how many out of every 10000 blocks should be filled). Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+					{
+						Params =
+						{
+							{
+								Name = "RelCuboid",
+								Type = "cCuboid",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+							{
+								Name = "RandomSeed",
+								Type = "number",
+							},
+							{
+								Name = "ChanceOutOf10k",
+								Type = "number",
+							},
+						},
+						Notes = "Fills the specified relative cuboid with block type and meta in random locations. RandomSeed is used for the random number genertion (same seed produces same results); ChanceOutOf10k specifies the density (how many out of every 10000 blocks should be filled). Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "MinRelX",
+								Type = "number",
+							},
+							{
+								Name = "ChanceOutOf10k",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelX",
+								Type = "number",
+							},
+							{
+								Name = "MinRelY",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelY",
+								Type = "number",
+							},
+							{
+								Name = "MinRelZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelZ",
+								Type = "number",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+							{
+								Name = "RandomSeed",
+								Type = "number",
+							},
+						},
+						Notes = "Fills the specified relative cuboid with block type and meta in random locations. RandomSeed is used for the random number genertion (same seed produces same results); ChanceOutOf10k specifies the density (how many out of every 10000 blocks should be filled). Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled.",
+					},
 				},
-				ReadBlockArea             = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ", Return = "", Notes = "Reads data from the chunk into the block area object. Block types and metas are processed." },
+				ReadBlockArea =
+				{
+					Params =
+					{
+						{
+							Name = "BlockArea",
+							Type = "cBlockArea",
+						},
+						{
+							Name = "MinRelX",
+							Type = "number",
+						},
+						{
+							Name = "MaxRelX",
+							Type = "number",
+						},
+						{
+							Name = "MinRelY",
+							Type = "number",
+						},
+						{
+							Name = "MaxRelY",
+							Type = "number",
+						},
+						{
+							Name = "MinRelZ",
+							Type = "number",
+						},
+						{
+							Name = "MaxRelZ",
+							Type = "number",
+						},
+					},
+					Notes = "Reads data from the chunk into the block area object. Block types and metas are processed.",
+				},
 				ReplaceRelCuboid =
 				{
-					{ Params = "{{cCuboid|RelCuboid}}, SrcType, SrcMeta, DstType, DstMeta", Return = "", Notes = "Replaces all SrcType+SrcMeta blocks in the cuboid (specified in relative coords) with DstType+DstMeta blocks. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
-					{ Params = "MinRelX, MaxRelX, MinRelY, MaxRelY, MinRelZ, MaxRelZ, SrcType, SrcMeta, DstType, DstMeta", Return = "", Notes = "Replaces all SrcType+SrcMeta blocks in the cuboid (specified in relative coords) with DstType+DstMeta blocks. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled." },
+					{
+						Params =
+						{
+							{
+								Name = "RelCuboid",
+								Type = "cCuboid",
+							},
+							{
+								Name = "SrcBlockType",
+								Type = "number",
+							},
+							{
+								Name = "SrcBlockMeta",
+								Type = "number",
+							},
+							{
+								Name = "DstBlockType",
+								Type = "number",
+							},
+							{
+								Name = "DstBlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Replaces all SrcBlockType + SrcBlockMeta blocks in the cuboid (specified in relative coords) with DstBlockType + DstBlockMeta blocks. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "MinRelX",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelX",
+								Type = "number",
+							},
+							{
+								Name = "MinRelY",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelY",
+								Type = "number",
+							},
+							{
+								Name = "MinRelZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxRelZ",
+								Type = "number",
+							},
+							{
+								Name = "SrcBlockType",
+								Type = "number",
+							},
+							{
+								Name = "SrcBlockMeta",
+								Type = "number",
+							},
+							{
+								Name = "DstBlockType",
+								Type = "number",
+							},
+							{
+								Name = "DstBlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Replaces all SrcBlockType + SrcBlockMeta blocks in the cuboid (specified in relative coords) with DstBlockType + DstBlockMeta blocks. Cuboid may reach outside the chunk, only the part intersecting with this chunk is filled.",
+					},
 				},
-				SetBiome                  = { Params = "RelX, RelZ, EMCSBiome", Return = "", Notes = "Sets the biome at the specified relative coords" },
-				SetBlockMeta              = { Params = "RelX, RelY, RelZ, BlockMeta", Return = "", Notes = "Sets the block meta at the specified relative coords" },
-				SetBlockType              = { Params = "RelX, RelY, RelZ, BlockType", Return = "", Notes = "Sets the block type at the specified relative coords" },
-				SetBlockTypeMeta          = { Params = "RelX, RelY, RelZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block type and meta at the specified relative coords" },
-				SetHeight                 = { Params = "RelX, RelZ, Height", Return = "", Notes = "Sets the height at the specified relative coords" },
-				SetUseDefaultBiomes       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default biome generator or not" },
-				SetUseDefaultComposition  = { Params = "bool", Return = "", Notes = "Sets the chunk to use default composition generator or not" },
-				SetUseDefaultFinish       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default finishers or not" },
-				SetUseDefaultHeight       = { Params = "bool", Return = "", Notes = "Sets the chunk to use default height generator or not" },
-				SetUseDefaultStructures   = { Params = "bool", Return = "", Notes = "Sets the chunk to use default structures or not" },
-				UpdateHeightmap           = { Params = "",     Return = "", Notes = "Updates the heightmap to match current contents. The plugins should do that if they modify the contents and don't modify the heightmap accordingly; Cuberite expects (and checks in Debug mode) that the heightmap matches the contents when the cChunkDesc is returned from a plugin." },
-				WriteBlockArea            = { Params = "{{cBlockArea|BlockArea}}, MinRelX, MinRelY, MinRelZ", Return = "", Notes = "Writes data from the block area into the chunk" },
+				SetBiome =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Notes = "Sets the biome at the specified relative coords",
+				},
+				SetBlockMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block meta at the specified relative coords",
+				},
+				SetBlockType =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block type at the specified relative coords",
+				},
+				SetBlockTypeMeta =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block type and meta at the specified relative coords",
+				},
+				SetHeight =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+						{
+							Name = "Height",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the height at the specified relative coords",
+				},
+				SetUseDefaultBiomes =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldUseDefaultBiomes",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the chunk to use default biome generator or not",
+				},
+				SetUseDefaultComposition =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldUseDefaultComposition",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the chunk to use default composition generator or not",
+				},
+				SetUseDefaultFinish =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldUseDefaultFinish",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the chunk to use default finishers or not",
+				},
+				SetUseDefaultHeight =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldUseDefaultHeight",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the chunk to use default height generator or not",
+				},
+				SetUseDefaultStructures =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldUseDefaultStructures",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the chunk to use default structures or not",
+				},
+				UpdateHeightmap =
+				{
+					Notes = "Updates the heightmap to match current contents. The plugins should do that if they modify the contents and don't modify the heightmap accordingly; Cuberite expects (and checks in Debug mode) that the heightmap matches the contents when the cChunkDesc is returned from a plugin.",
+				},
+				WriteBlockArea =
+				{
+					Params =
+					{
+						{
+							Name = "BlockArea",
+							Type = "cBlockArea",
+						},
+						{
+							Name = "MinRelX",
+							Type = "number",
+						},
+						{
+							Name = "MinRelY",
+							Type = "number",
+						},
+						{
+							Name = "MinRelZ",
+							Type = "number",
+						},
+						{
+							Name = "MergeStrategy",
+							Type = "cBlockArea",
+							IsOptional = true,
+						},
+					},
+					Notes = "Writes data from the block area into the chunk",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -556,9 +3199,8 @@ end
 </pre>
 					]],
 				},
-			},  -- AdditionalInfo
-		},  -- cChunkDesc
-
+			},
+		},
 		cClientHandle =
 		{
 			Desc = [[
@@ -566,41 +3208,347 @@ end
 				connection. Internally, it handles all the incoming and outgoing packets, the chunks that are to be
 				sent to the client, ping times etc.
 			]],
-
 			Functions =
 			{
-				GenerateOfflineUUID = { Params = "Username", Return = "string", Notes = "(STATIC) Generates an UUID based on the player name provided. This is used for the offline (non-auth) mode, when there's no UUID source. Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. Returns a 32-char UUID (no dashes)." },
-				GetClientBrand = { Params = "", Return = "string", Notes = "Returns the brand that the client has sent in their MC|Brand plugin message." },
-				GetIPString = { Params = "", Return = "string", Notes = "Returns the IP address of the connection, as a string. Only the address part is returned, without the port number." },
-				GetLocale = { Params = "", Return = "Locale", Notes = "Returns the locale string that the client sends as part of the protocol handshake. Can be used to provide localized strings." },
-				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
-				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned." },
-				GetProtocolVersion = { Params = "", Return = "number", Notes = "Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known." },
-				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the UniqueID of the client used to identify the client in the server" },
-				GetUUID = { Params = "", Return = "string", Notes = "Returns the authentication-based UUID of the client. This UUID should be used to identify the player when persisting any player-related data. Returns a 32-char UUID (no dashes)" },
-				GetUsername = { Params = "", Return = "string", Notes = "Returns the username that the client has provided" },
-				GetViewDistance = { Params = "", Return = "number", Notes = "Returns the viewdistance (number of chunks loaded for the player in each direction)" },
-				GetRequestedViewDistance = { Params = "", Return = "number", Notes = "Returns the view distance that the player request, not the used view distance." },
-				HasPluginChannel = { Params = "ChannelName", Return = "bool", Notes = "Returns true if the client has registered to receive messages on the specified plugin channel." },
-				IsUUIDOnline = { Params = "UUID", Return = "bool", Notes = "(STATIC) Returns true if the UUID is generated by online auth, false if it is an offline-generated UUID. We use Version-3 UUIDs for offline UUIDs, online UUIDs are Version-4, thus we can tell them apart. Accepts both 32-char and 36-char UUIDs (with and without dashes). If the string given is not a valid UUID, returns false."},
-				Kick = { Params = "Reason", Return = "", Notes = "Kicks the user with the specified reason" },
-				SendPluginMessage = { Params = "Channel, Message", Return = "", Notes = "Sends the plugin message on the specified channel." },
-				SetClientBrand = { Params = "ClientBrand", Return = "", Notes = "Sets the value of the client's brand. Normally this value is received from the client by a MC|Brand plugin message, this function lets plugins overwrite the value." },
-				SetLocale = { Params = "Locale", Return = "", Notes = "Sets the locale that Cuberite keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects)." },
-				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
-				SetViewDistance = { Params = "ViewDistance", Return = "", Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)" },
-				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player." },
-				SendEntityAnimation = { Params = "{{cEntity|Entity}}, AnimationNumber", Return = "", Notes = "Sends the specified animation of the specified entity to the client. The AnimationNumber is protocol-specific." },
-				SendSoundEffect = { Params = "SoundName, X, Y, Z, Volume, Pitch", Return = "", Notes = "Sends a sound effect request to the client. The sound is played at the specified coords, with the specified volume (a float, 1.0 is full volume, can be more) and pitch (0-255, 63 is 100%)" },
-				SendTimeUpdate = { Params = "WorldAge, TimeOfDay, DoDaylightCycle", Return = "", Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. TimeOfDay is the current day's time, in ticks (0 - 24000). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false)." },
+				GenerateOfflineUUID =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Username",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Generates an UUID based on the player name provided. This is used for the offline (non-auth) mode, when there's no UUID source. Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. Returns a 32-char UUID (no dashes).",
+				},
+				GetClientBrand =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the brand that the client has sent in their MC|Brand plugin message.",
+				},
+				GetIPString =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the IP address of the connection, as a string. Only the address part is returned, without the port number.",
+				},
+				GetLocale =
+				{
+					Returns =
+					{
+						{
+							Name = "Locale",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the locale string that the client sends as part of the protocol handshake. Can be used to provide localized strings.",
+				},
+				GetPing =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the ping time, in ms",
+				},
+				GetPlayer =
+				{
+					Returns =
+					{
+						{
+							Type = "cPlayer",
+						},
+					},
+					Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned.",
+				},
+				GetProtocolVersion =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known.",
+				},
+				GetRequestedViewDistance =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the view distance that the player request, not the used view distance.",
+				},
+				GetUniqueID =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the UniqueID of the client used to identify the client in the server",
+				},
+				GetUsername =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the username that the client has provided",
+				},
+				GetUUID =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the authentication-based UUID of the client. This UUID should be used to identify the player when persisting any player-related data. Returns a 32-char UUID (no dashes)",
+				},
+				GetViewDistance =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the viewdistance (number of chunks loaded for the player in each direction)",
+				},
+				HasPluginChannel =
+				{
+					Params =
+					{
+						{
+							Name = "ChannelName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the client has registered to receive messages on the specified plugin channel.",
+				},
+				IsUUIDOnline =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "UUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the UUID is generated by online auth, false if it is an offline-generated UUID. We use Version-3 UUIDs for offline UUIDs, online UUIDs are Version-4, thus we can tell them apart. Accepts both 32-char and 36-char UUIDs (with and without dashes). If the string given is not a valid UUID, returns false.",
+				},
+				Kick =
+				{
+					Params =
+					{
+						{
+							Name = "Reason",
+							Type = "string",
+						},
+					},
+					Notes = "Kicks the user with the specified reason",
+				},
+				SendBlockChange =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player.",
+				},
+				SendEntityAnimation =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						},
+						{
+							Name = "AnimationNumber",
+							Type = "number",
+						},
+					},
+					Notes = "Sends the specified animation of the specified entity to the client. The AnimationNumber is protocol-specific.",
+				},
+				SendPluginMessage =
+				{
+					Params =
+					{
+						{
+							Name = "Channel",
+							Type = "string",
+						},
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Sends the plugin message on the specified channel.",
+				},
+				SendSoundEffect =
+				{
+					Params =
+					{
+						{
+							Name = "SoundName",
+							Type = "string",
+						},
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "Volume",
+							Type = "number",
+						},
+						{
+							Name = "Pitch",
+							Type = "number",
+						},
+					},
+					Notes = "Sends a sound effect request to the client. The sound is played at the specified coords, with the specified volume (a float, 1.0 is full volume, can be more) and pitch (0-255, 63 is 100%)",
+				},
+				SendTimeUpdate =
+				{
+					Params =
+					{
+						{
+							Name = "WorldAge",
+							Type = "number",
+						},
+						{
+							Name = "TimeOfDay",
+							Type = "number",
+						},
+						{
+							Name = "DoDaylightCycle",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. TimeOfDay is the current day's time, in ticks (0 - 24000). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
+				},
+				SetClientBrand =
+				{
+					Params =
+					{
+						{
+							Name = "ClientBrand",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the value of the client's brand. Normally this value is received from the client by a MC|Brand plugin message, this function lets plugins overwrite the value.",
+				},
+				SetLocale =
+				{
+					Params =
+					{
+						{
+							Name = "Locale",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the locale that Cuberite keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects).",
+				},
+				SetUsername =
+				{
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the username",
+				},
+				SetViewDistance =
+				{
+					Params =
+					{
+						{
+							Name = "ViewDistance",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)",
+				},
 			},
 			Constants =
 			{
-				MAX_VIEW_DISTANCE = { Notes = "The maximum value of the view distance" },
-				MIN_VIEW_DISTANCE = { Notes = "The minimum value of the view distance" },
+				MAX_VIEW_DISTANCE =
+				{
+					Notes = "The maximum value of the view distance",
+				},
+				MIN_VIEW_DISTANCE =
+				{
+					Notes = "The minimum value of the view distance",
+				},
 			},
-		},  -- cClientHandle
-
+		},
 		cCompositeChat =
 		{
 			Desc = [[
@@ -628,26 +3576,252 @@ end
 			]],
 			Functions =
 			{
+				AddRunCommandPart =
+				{
+					Params =
+					{
+						{
+							Name = "Text",
+							Type = "string",
+						},
+						{
+							Name = "Command",
+							Type = "string",
+						},
+						{
+							Name = "Style",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
+					Notes = "Adds a text which, when clicked, runs the specified command. Chaining.",
+				},
+				AddShowAchievementPart =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+						{
+							Name = "AchievementName",
+							Type = "string",
+						},
+						{
+							Name = "Style",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Notes = "Adds a text that represents the 'Achievement get' message.",
+				},
+				AddSuggestCommandPart =
+				{
+					Params =
+					{
+						{
+							Name = "Text",
+							Type = "string",
+						},
+						{
+							Name = "Command",
+							Type = "string",
+						},
+						{
+							Name = "Style",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
+					Notes = "Adds a text which, when clicked, puts the specified command into the player's chat input area. Chaining.",
+				},
+				AddTextPart =
+				{
+					Params =
+					{
+						{
+							Name = "Text",
+							Type = "string",
+						},
+						{
+							Name = "Style",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
+					Notes = "Adds a regular text. Chaining.",
+				},
+				AddUrlPart =
+				{
+					Params =
+					{
+						{
+							Name = "Text",
+							Type = "string",
+						},
+						{
+							Name = "Url",
+							Type = "string",
+						},
+						{
+							Name = "Style",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
+					Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining.",
+				},
+				Clear =
+				{
+					Returns = "self",
+					Notes = "Removes all parts from this object",
+				},
 				constructor =
 				{
-					{ Params = "", Return = "", Notes = "Creates an empty chat message" },
-					{ Params = "Text", Return = "", Notes = "Creates a chat message containing the specified text, parsed by the ParseText() function. This allows easy migration from old chat messages." },
+					{
+						Returns = { {Type = "cCompositeChat"} },
+						Notes = "Creates an empty chat message",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Text",
+								Type = "string",
+							},
+							{
+								Name = "MessageType",
+								Type = "eMessageType",
+								IsOptional = true,
+							},
+						},
+						Returns = { {Type = "cCompositeChat"} },
+						Notes = "Creates a chat message containing the specified text, parsed by the ParseText() function. This allows easy migration from old chat messages.",
+					},
 				},
-				AddRunCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, runs the specified command. Chaining." },
-				AddShowAchievementPart = { Params = "PlayerName, AchievementName, [Style]", Return = "", Notes = "Adds a text that represents the 'Achievement get' message." },
-				AddSuggestCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, puts the specified command into the player's chat input area. Chaining." },
-				AddTextPart = { Params = "Text, [Style]", Return = "self", Notes = "Adds a regular text. Chaining." },
-				AddUrlPart = { Params = "Text, Url, [Style]", Return = "self", Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining." },
-				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
-				CreateJsonString = { Params = "[AddPrefixes]", Return = "string", Notes = "Returns the entire object serialized into JSON, as it would be sent to a client. AddPrefixes specifies whether the chat prefixes should be prepended to the message, true by default." },
-				ExtractText = { Params = "", Return = "string", Notes = "Returns the text from the parts that comprises the human-readable data. Used for older protocols that don't support composite chat and for console-logging." },
-				GetAdditionalMessageTypeData = { Params = "", Return = "string", Notes = "Returns the AdditionalData associated with the message, such as the sender's name for mtPrivateMessage" },
-				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
-				ParseText = { Params = "Text", Return = "self", Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining." },
-				SetMessageType = { Params = "MessageType, AdditionalData", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. Also sets the additional data (string) associated with the message, which is specific for the message type - such as the sender's name for mtPrivateMessage. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.). Chaining." },
-				UnderlineUrls = { Params = "", Return = "self", Notes = "Makes all URL parts contained in the message underlined. Doesn't affect parts added in the future. Chaining." },
+				CreateJsonString =
+				{
+					Params =
+					{
+						{
+							Name = "AddPrefixes",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the entire object serialized into JSON, as it would be sent to a client. AddPrefixes specifies whether the chat prefixes should be prepended to the message, true by default.",
+				},
+				ExtractText =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the text from the parts that comprises the human-readable data. Used for older protocols that don't support composite chat, and for console-logging.",
+				},
+				GetAdditionalMessageTypeData =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the AdditionalData associated with the message, such as the sender's name for mtPrivateMessage",
+				},
+				GetMessageType =
+				{
+					Returns =
+					{
+						{
+							Type = "eMessageType",
+						},
+					},
+					Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)",
+				},
+				ParseText =
+				{
+					Params =
+					{
+						{
+							Name = "Text",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
+					Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining.",
+				},
+				SetMessageType =
+				{
+					Params =
+					{
+						{
+							Name = "MessageType",
+							Type = "eMessageType",
+						},
+						{
+							Name = "AdditionalData",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
+					Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. Also sets the additional data (string) associated with the message, which is specific for the message type - such as the sender's name for mtPrivateMessage. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.). Chaining.",
+				},
+				UnderlineUrls =
+				{
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
+					Notes = "Makes all URL parts contained in the message underlined. Doesn't affect parts added in the future. Chaining.",
+				},
 			},
-
 			AdditionalInfo =
 			{
 				{
@@ -661,7 +3835,7 @@ function OnPlayerJoined(a_Player)
 	-- Send an example composite chat message to the player:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "http://www.mc-server.org", "u@2")  -- Colored underlined link
+		:AddUrlPart(a_Player:GetName(), "http://cuberite.org", "u@2")  -- Colored underlined link
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")       -- Underlined suggest-command
 		:AddRunCommandPart(" SetDay", "/time set 0")                 -- Regular text that will execute command when clicked
 		:SetMessageType(mtJoin)                                      -- It is a join-message
@@ -669,9 +3843,8 @@ function OnPlayerJoined(a_Player)
 end</pre>
 					]],
 				},
-			},  -- AdditionalInfo
-		},  -- cCompositeChat
-
+			},
+		},
 		cCraftingGrid =
 		{
 			Desc = [[
@@ -684,24 +3857,138 @@ end</pre>
 				specifying the exact number of ingredients to consume in that recipe; plugins may use this to
 				apply the crafting recipe.</p>
 			]],
-
 			Functions =
 			{
-				constructor = { Params = "Width, Height", Return = "cCraftingGrid", Notes = "Creates a new CraftingGrid object. This new crafting grid is not related to any player, but may be needed for {{cCraftingRecipe}}'s ConsumeIngredients function." },
-				Clear = { Params = "", Return = "", Notes = "Clears the entire grid" },
-				ConsumeGrid = { Params = "{{cCraftingGrid|CraftingGrid}}", Return = "", Notes = "Consumes items specified in CraftingGrid from the current contents. Used internally by {{cCraftingRecipe}}'s ConsumeIngredients() function, but available to plugins, too." },
-				Dump = { Params = "", Return = "", Notes = "DEBUG build: Dumps the contents of the grid to the log. RELEASE build: no action" },
-				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the grid" },
-				GetItem = { Params = "x, y", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified coords" },
-				GetWidth = { Params = "", Return = "number", Notes = "Returns the width of the grid" },
+				Clear =
+				{
+					Notes = "Clears the entire grid",
+				},
+				constructor =
+				{
+					Params =
+					{
+						{
+							Name = "Width",
+							Type = "number",
+						},
+						{
+							Name = "Height",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cCraftingGrid",
+						},
+					},
+					Notes = "Creates a new CraftingGrid object. This new crafting grid is not related to any player, but may be needed for {{cCraftingRecipe}}'s ConsumeIngredients function.",
+				},
+				ConsumeGrid =
+				{
+					Params =
+					{
+						{
+							Name = "CraftingGrid",
+							Type = "cCraftingGrid",
+						},
+					},
+					Notes = "Consumes items specified in CraftingGrid from the current contents. Used internally by {{cCraftingRecipe}}'s ConsumeIngredients() function, but available to plugins, too.",
+				},
+				Dump =
+				{
+					Notes = "DEBUG build: Dumps the contents of the grid to the log. RELEASE build: no action",
+				},
+				GetHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the height of the grid",
+				},
+				GetItem =
+				{
+					Params =
+					{
+						{
+							Name = "x",
+							Type = "number",
+						},
+						{
+							Name = "y",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item at the specified coords",
+				},
+				GetWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the width of the grid",
+				},
 				SetItem =
 				{
-					{ Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified coords" },
-					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified coords" },
+					{
+						Params =
+						{
+							{
+								Name = "x",
+								Type = "number",
+							},
+							{
+								Name = "y",
+								Type = "number",
+							},
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Notes = "Sets the item at the specified coords",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "x",
+								Type = "number",
+							},
+							{
+								Name = "y",
+								Type = "number",
+							},
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "ItemCount",
+								Type = "number",
+							},
+							{
+								Name = "ItemDamage",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the item at the specified coords",
+					},
 				},
 			},
-		},  -- cCraftingGrid
-
+		},
 		cCraftingRecipe =
 		{
 			Desc = [[
@@ -711,48 +3998,247 @@ end</pre>
 ]],
 			Functions =
 			{
-				Clear = { Params = "", Return = "", Notes = "Clears the entire recipe, both ingredients and results" },
-				ConsumeIngredients = { Params = "CraftingGrid", Return = "", Notes = "Consumes ingredients specified in the given {{cCraftingGrid|cCraftingGrid}} class" },
-				Dump = { Params = "", Return = "", Notes = "DEBUG build: dumps ingredients and result into server log. RELEASE build: no action" },
-				GetIngredient = { Params = "x, y", Return = "{{cItem|cItem}}", Notes = "Returns the ingredient stored in the recipe at the specified coords" },
-				GetIngredientsHeight = { Params = "", Return = "number", Notes = "Returns the height of the ingredients' grid" },
-				GetIngredientsWidth = { Params = "", Return = "number", Notes = "Returns the width of the ingredients' grid" },
-				GetResult = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the result of the recipe" },
+				Clear =
+				{
+					Notes = "Clears the entire recipe, both ingredients and results",
+				},
+				ConsumeIngredients =
+				{
+					Params =
+					{
+						{
+							Name = "CraftingGrid",
+							Type = "cCraftingGrid",
+						},
+					},
+					Notes = "Consumes ingredients specified in the given {{cCraftingGrid|cCraftingGrid}} class",
+				},
+				Dump =
+				{
+					Notes = "DEBUG build: dumps ingredients and result into server log. RELEASE build: no action",
+				},
+				GetIngredient =
+				{
+					Params =
+					{
+						{
+							Name = "x",
+							Type = "number",
+						},
+						{
+							Name = "y",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the ingredient stored in the recipe at the specified coords",
+				},
+				GetIngredientsHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the height of the ingredients' grid",
+				},
+				GetIngredientsWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the width of the ingredients' grid",
+				},
+				GetResult =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the result of the recipe",
+				},
 				SetIngredient =
 				{
-					{ Params = "x, y, {{cItem|cItem}}", Return = "", Notes = "Sets the ingredient at the specified coords" },
-					{ Params = "x, y, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the ingredient at the specified coords" },
+					{
+						Params =
+						{
+							{
+								Name = "x",
+								Type = "number",
+							},
+							{
+								Name = "y",
+								Type = "number",
+							},
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Notes = "Sets the ingredient at the specified coords",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "x",
+								Type = "number",
+							},
+							{
+								Name = "y",
+								Type = "number",
+							},
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "ItemCount",
+								Type = "number",
+							},
+							{
+								Name = "ItemDamage",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the ingredient at the specified coords",
+					},
 				},
 				SetResult =
 				{
-					{ Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the result item" },
-					{ Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the result item" },
+					{
+						Params =
+						{
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Notes = "Sets the result item",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "ItemCount",
+								Type = "number",
+							},
+							{
+								Name = "ItemDamage",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the result item",
+					},
 				},
 			},
-		},  -- cCraftingRecipe
-
+		},
 		cCryptoHash =
 		{
-			Desc =
-			[[
+			Desc = [[
 				Provides functions for generating cryptographic hashes.</p>
 				<p>
-				Note that all functions in this class are static, so they should be called in the dot convention:
+				Note that all functions in this class are super-static, so they are to be called in the dot convention:
 <pre class="prettyprint lang-lua">
 local Hash = cCryptoHash.sha1HexString("DataToHash")
 </pre></p>
 				<p>Each cryptographic hash has two variants, one returns the hash as a raw binary string, the other returns the hash as a hex-encoded string twice as long as the binary string.
 			]],
-
 			Functions =
 			{
-				md5 = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the md5 hash of the data, returns it as a raw (binary) string of 16 characters." },
-				md5HexString = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the md5 hash of the data, returns it as a hex-encoded string of 32 characters." },
-				sha1 = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the sha1 hash of the data, returns it as a raw (binary) string of 20 characters." },
-				sha1HexString = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the sha1 hash of the data, returns it as a hex-encoded string of 40 characters." },
+				md5 =
+				{
+					IsStatic = true,
+					IsGlobal = true,
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Calculates the md5 hash of the data, returns it as a raw (binary) string of 16 characters.",
+				},
+				md5HexString =
+				{
+					IsStatic = true,
+					IsGlobal = true,
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Calculates the md5 hash of the data, returns it as a hex-encoded string of 32 characters.",
+				},
+				sha1 =
+				{
+					IsStatic = true,
+					IsGlobal = true,
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Calculates the sha1 hash of the data, returns it as a raw (binary) string of 20 characters.",
+				},
+				sha1HexString =
+				{
+					IsStatic = true,
+					IsGlobal = true,
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Calculates the sha1 hash of the data, returns it as a hex-encoded string of 40 characters.",
+				},
 			},
-		},  -- cCryptoHash
-
+		},
 		cEnchantments =
 		{
 			Desc = [[
@@ -771,50 +4257,258 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 			]],
 			Functions =
 			{
+				Add =
+				{
+					Params =
+					{
+						{
+							Name = "Other",
+							Type = "cEnchantments",
+						},
+					},
+					Notes = "Adds the enchantments contained in Other into this object. Existing enchantments are preserved, unless Other specifies a different level, in which case the level is changed to the Other's one.",
+				},
+				AddFromString =
+				{
+					Params =
+					{
+						{
+							Name = "StringSpec",
+							Type = "string",
+						},
+					},
+					Notes = "Adds the enchantments in the string description into the object. If a specified enchantment already existed, it is overwritten.",
+				},
+				Clear =
+				{
+					Notes = "Removes all enchantments",
+				},
 				constructor =
 				{
-					{ Params = "", Return = "cEnchantments", Notes = "Creates a new empty cEnchantments object" },
-					{ Params = "StringSpec", Return = "cEnchantments", Notes = "Creates a new cEnchantments object filled with enchantments based on the string description" },
+					{
+						Returns =
+						{
+							{
+								Type = "cEnchantments",
+							},
+						},
+						Notes = "Creates a new empty cEnchantments object",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "StringSpec",
+								Type = "string",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "cEnchantments",
+							},
+						},
+						Notes = "Creates a new cEnchantments object filled with enchantments based on the string description",
+					},
 				},
-				operator_eq = { Params = "OtherEnchantments", Return = "bool", Notes = "Returns true if this enchantments object has the same enchantments as OtherEnchantments." },
-				AddFromString = { Params = "StringSpec", Return = "", Notes = "Adds the enchantments in the string description into the object. If a specified enchantment already existed, it is overwritten." },
-				Clear = { Params = "", Return = "", Notes = "Removes all enchantments" },
-				GetLevel = { Params = "EnchantmentNumID", Return = "number", Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored" },
-				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if the object stores no enchantments" },
-				SetLevel = { Params = "EnchantmentNumID, Level", Return = "", Notes = "Sets the level for the specified enchantment, adding it if not stored before or removing it if level < = 0" },
-				StringToEnchantmentID = { Params = "EnchantmentTextID", Return = "number", Notes = "(static) Returns the enchantment numerical ID, -1 if not understood. Case insensitive. Also understands plain numbers." },
-				ToString = { Params = "", Return = "string", Notes = "Returns the string description of all the enchantments stored in this object, in numerical-ID form" },
+				Count =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Get the count of enchantments contained within the class",
+				},
+				GetLevel =
+				{
+					Params =
+					{
+						{
+							Name = "EnchantmentNumID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored",
+				},
+				IsEmpty =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the object stores no enchantments",
+				},
+				operator_eq =
+				{
+					Params =
+					{
+						{
+							Name = "OtherEnchantments",
+							Type = "cEnchantments",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if this enchantments object has the same enchantments as OtherEnchantments.",
+				},
+				SetLevel =
+				{
+					Params =
+					{
+						{
+							Name = "EnchantmentNumID",
+							Type = "number",
+						},
+						{
+							Name = "Level",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the level for the specified enchantment, adding it if not stored before, or removing it if Level < = 0",
+				},
+				StringToEnchantmentID =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "EnchantmentName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the enchantment numerical ID, -1 if not understood. Case insensitive. Also understands plain numbers.",
+				},
+				ToString =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the string description of all the enchantments stored in this object, in numerical-ID form",
+				},
 			},
 			Constants =
 			{
-				-- Only list these enchantment IDs, as they don't really need any kind of documentation:
-				enchAquaAffinity = { Notes = "" },
-				enchBaneOfArthropods = { Notes = "" },
-				enchBlastProtection = { Notes = "" },
-				enchEfficiency = { Notes = "" },
-				enchFeatherFalling = { Notes = "" },
-				enchFireAspect = { Notes = "" },
-				enchFireProtection = { Notes = "" },
-				enchFlame = { Notes = "" },
-				enchFortune = { Notes = "" },
-				enchInfinity = { Notes = "" },
-				enchKnockback = { Notes = "" },
-				enchLooting = { Notes = "" },
-				enchLuckOfTheSea = { Notes = "" },
-				enchLure = { Notes = "" },
-				enchPower = { Notes = "" },
-				enchProjectileProtection = { Notes = "" },
-				enchProtection = { Notes = "" },
-				enchPunch = { Notes = "" },
-				enchRespiration = { Notes = "" },
-				enchSharpness = { Notes = "" },
-				enchSilkTouch = { Notes = "" },
-				enchSmite = { Notes = "" },
-				enchThorns = { Notes = "" },
-				enchUnbreaking = { Notes = "" },
+				enchAquaAffinity =
+				{
+					Notes = "",
+				},
+				enchBaneOfArthropods =
+				{
+					Notes = "",
+				},
+				enchBlastProtection =
+				{
+					Notes = "",
+				},
+				enchEfficiency =
+				{
+					Notes = "",
+				},
+				enchFeatherFalling =
+				{
+					Notes = "",
+				},
+				enchFireAspect =
+				{
+					Notes = "",
+				},
+				enchFireProtection =
+				{
+					Notes = "",
+				},
+				enchFlame =
+				{
+					Notes = "",
+				},
+				enchFortune =
+				{
+					Notes = "",
+				},
+				enchInfinity =
+				{
+					Notes = "",
+				},
+				enchKnockback =
+				{
+					Notes = "",
+				},
+				enchLooting =
+				{
+					Notes = "",
+				},
+				enchLuckOfTheSea =
+				{
+					Notes = "",
+				},
+				enchLure =
+				{
+					Notes = "",
+				},
+				enchPower =
+				{
+					Notes = "",
+				},
+				enchProjectileProtection =
+				{
+					Notes = "",
+				},
+				enchProtection =
+				{
+					Notes = "",
+				},
+				enchPunch =
+				{
+					Notes = "",
+				},
+				enchRespiration =
+				{
+					Notes = "",
+				},
+				enchSharpness =
+				{
+					Notes = "",
+				},
+				enchSilkTouch =
+				{
+					Notes = "",
+				},
+				enchSmite =
+				{
+					Notes = "",
+				},
+				enchThorns =
+				{
+					Notes = "",
+				},
+				enchUnbreaking =
+				{
+					Notes = "",
+				},
 			},
 		},
-
 		cEntity =
 		{
 			Desc = [[
@@ -841,156 +4535,1437 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 			{
 				AddPosition =
 				{
-					{ Params = "OffsetX, OffsetY, OffsetZ", Return = "", Notes = "Moves the entity by the specified amount in each axis direction" },
-					{ Params = "{{Vector3d|Offset}}", Return = "", Notes = "Moves the entity by the specified amount in each direction" },
+					{
+						Params =
+						{
+							{
+								Name = "OffsetX",
+								Type = "number",
+							},
+							{
+								Name = "OffsetY",
+								Type = "number",
+							},
+							{
+								Name = "OffsetZ",
+								Type = "number",
+							},
+						},
+						Notes = "Moves the entity by the specified amount in each axis direction",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Offset",
+								Type = "Vector3d",
+							},
+						},
+						Notes = "Moves the entity by the specified amount in each direction",
+					},
 				},
-				AddPosX = { Params = "OffsetX", Return = "", Notes = "Moves the entity by the specified amount in the X axis direction" },
-				AddPosY = { Params = "OffsetY", Return = "", Notes = "Moves the entity by the specified amount in the Y axis direction" },
-				AddPosZ = { Params = "OffsetZ", Return = "", Notes = "Moves the entity by the specified amount in the Z axis direction" },
+				AddPosX =
+				{
+					Params =
+					{
+						{
+							Name = "OffsetX",
+							Type = "number",
+						},
+					},
+					Notes = "Moves the entity by the specified amount in the X axis direction",
+				},
+				AddPosY =
+				{
+					Params =
+					{
+						{
+							Name = "OffsetY",
+							Type = "number",
+						},
+					},
+					Notes = "Moves the entity by the specified amount in the Y axis direction",
+				},
+				AddPosZ =
+				{
+					Params =
+					{
+						{
+							Name = "OffsetZ",
+							Type = "number",
+						},
+					},
+					Notes = "Moves the entity by the specified amount in the Z axis direction",
+				},
 				AddSpeed =
 				{
-					{ Params = "AddX, AddY, AddZ", Return = "", Notes = "Adds the specified amount of speed in each axis direction." },
-					{ Params = "{{Vector3d|Add}}", Return = "", Notes = "Adds the specified amount of speed in each axis direction." },
+					{
+						Params =
+						{
+							{
+								Name = "AddX",
+								Type = "number",
+							},
+							{
+								Name = "AddY",
+								Type = "number",
+							},
+							{
+								Name = "AddZ",
+								Type = "number",
+							},
+						},
+						Notes = "Adds the specified amount of speed in each axis direction.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Add",
+								Type = "Vector3d",
+							},
+						},
+						Notes = "Adds the specified amount of speed in each axis direction.",
+					},
 				},
-				AddSpeedX = { Params = "AddX", Return = "", Notes = "Adds the specified amount of speed in the X axis direction." },
-				AddSpeedY = { Params = "AddY", Return = "", Notes = "Adds the specified amount of speed in the Y axis direction." },
-				AddSpeedZ = { Params = "AddZ", Return = "", Notes = "Adds the specified amount of speed in the Z axis direction." },
-				ArmorCoversAgainst = { Params = "{{cEntity|AttackerEntity}}, DamageType, RawDamage", Return = "number", Notes = "Returns the points out of a_RawDamage that the currently equipped armor would cover." },
-				Destroy = { Params = "", Return = "", Notes = "Schedules the entity to be destroyed" },
-				GetAirLevel = { Params = "", Return = "number", Notes = "Returns the air level (number of ticks of air left). Note, this function is only updated with mobs or players." },
-				GetArmorCoverAgainst = { Params = "AttackerEntity, DamageType, RawDamage", Return = "number", Notes = "Returns the number of hitpoints out of RawDamage that the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage." },
-				GetChunkX = { Params = "", Return = "number", Notes = "Returns the X-coord of the chunk in which the entity is placed" },
-				GetChunkZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the chunk in which the entity is placed" },
-				GetClass = { Params = "", Return = "string", Notes = "Returns the classname of the entity, such as \"cSpider\" or \"cPickup\"" },
-				GetClassStatic = { Params = "", Return = "string", Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static" },
-				GetEntityType = { Params = "", Return = "{{cEntity#EntityType|EntityType}}", Notes = "Returns the type of the entity, one of the {{cEntity#EntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call." },
-				GetEquippedBoots = { Params = "", Return = "{{cItem}}", Notes = "Returns the boots that the entity has equipped. Returns an empty cItem if no boots equipped or not applicable." },
-				GetEquippedChestplate = { Params = "", Return = "{{cItem}}", Notes = "Returns the chestplate that the entity has equipped. Returns an empty cItem if no chestplate equipped or not applicable." },
-				GetEquippedHelmet = { Params = "", Return = "{{cItem}}", Notes = "Returns the helmet that the entity has equipped. Returns an empty cItem if no helmet equipped or not applicable." },
-				GetEquippedLeggings = { Params = "", Return = "{{cItem}}", Notes = "Returns the leggings that the entity has equipped. Returns an empty cItem if no leggings equipped or not applicable." },
-				GetEquippedWeapon = { Params = "", Return = "{{cItem}}", Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable." },
-				GetGravity = { Params = "", Return = "number", Notes = "Returns the number that is used as the gravity for physics simulation. 1G (9.78) by default." },
-				GetHeadYaw = { Params = "", Return = "number", Notes = "Returns the pitch of the entity's head (FIXME: Rename to GetHeadPitch() )." },
-				GetHealth = { Params = "", Return = "number", Notes = "Returns the current health of the entity." },
-				GetHeight = { Params = "", Return = "number", Notes = "Returns the height (Y size) of the entity" },
-				GetInvulnerableTicks = { Params = "", Return = "number", Notes = "Returns the number of ticks that this entity will be invulnerable for. This is used for after-hit recovery - the entities are invulnerable for half a second after being hit." },
-				GetKnockbackAmountAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the amount of knockback that the currently equipped items would cause when attacking the ReceiverEntity." },
-				GetLookVector = { Params = "", Return = "{{Vector3f}}", Notes = "Returns the vector that defines the direction in which the entity is looking" },
-				GetMass = { Params = "", Return = "number", Notes = "Returns the mass of the entity. Currently unused." },
-				GetMaxHealth = { Params = "", Return = "number", Notes = "Returns the maximum number of hitpoints this entity is allowed to have." },
-				GetParentClass = { Params = "", Return = "string", Notes = "Returns the name of the direct parent class for this entity" },
-				GetPitch = { Params = "", Return = "number", Notes = "Returns the pitch (nose-down rotation) of the entity. Measured in degrees, normal values range from -90 to +90. +90 means looking down, 0 means looking straight ahead, -90 means looking up." },
-				GetPosition = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the entity's pivot position as a 3D vector" },
-				GetPosX = { Params = "", Return = "number", Notes = "Returns the X-coord of the entity's pivot" },
-				GetPosY = { Params = "", Return = "number", Notes = "Returns the Y-coord of the entity's pivot" },
-				GetPosZ = { Params = "", Return = "number", Notes = "Returns the Z-coord of the entity's pivot" },
-				GetRawDamageAgainst = { Params = "ReceiverEntity", Return = "number", Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage." },
-				GetRoll = { Params = "", Return = "number", Notes = "Returns the roll (sideways rotation) of the entity. Currently unused." },
-				GetRot = { Params = "", Return = "{{Vector3f}}", Notes = "(OBSOLETE) Returns the entire rotation vector (Yaw, Pitch, Roll)" },
-				GetSpeed = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the complete speed vector of the entity" },
-				GetSpeedX = { Params = "", Return = "number", Notes = "Returns the X-part of the speed vector" },
-				GetSpeedY = { Params = "", Return = "number", Notes = "Returns the Y-part of the speed vector" },
-				GetSpeedZ = { Params = "", Return = "number", Notes = "Returns the Z-part of the speed vector" },
-				GetTicksAlive = { Params = "", Return = "number", Notes = "Returns the number of ticks that this entity has been alive for." },
-				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files." },
-				GetWidth = { Params = "", Return = "number", Notes = "Returns the width (X and Z size) of the entity." },
-				GetWorld = { Params = "", Return = "{{cWorld}}", Notes = "Returns the world where the entity resides" },
-				GetYaw = { Params = "", Return = "number", Notes = "Returns the yaw (direction) of the entity. Measured in degrees, values range from -180 to +180. 0 means ZP, 90 means XM, -180 means ZM, -90 means XP." },
-				HandleSpeedFromAttachee = { Params = "ForwardAmount, SidewaysAmount", Return = "", Notes = "Updates the entity's speed based on the attachee exerting the specified force forward and sideways. Used for entities being driven by other entities attached to them - usually players driving minecarts and boats." },
-				Heal = { Params = "Hitpoints", Return = "", Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number." },
-				IsA = { Params = "ClassName", Return = "bool", Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself" },
-				IsBoat = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cBoat|boat}}." },
-				IsCrouched = { Params = "", Return = "bool", Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching." },
-				IsDestroyed = { Params = "", Return = "bool", Notes = "Returns true if the entity has been destroyed and is awaiting removal from the internal structures." },
-				IsEnderCrystal = { Params = "", Return = "bool", Notes = "Returns true if the entity is an ender crystal." },
-				IsExpOrb = { Params = "", Return = "bool", Notes = "Returns true if the entity represents an experience orb" },
-				IsFallingBlock = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cFallingBlock}} entity." },
-				IsFireproof = { Params = "", Return = "bool", Notes = "Returns true if the entity takes no damage from being on fire." },
-				IsFloater = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a fishing rod floater" },
-				IsInvisible = { Params = "", Return = "bool", Notes = "Returns true if the entity is invisible" },
-				IsItemFrame = { Params = "", Return = "bool", Notes = "Returns true if the entity is an item frame." },
-				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
-				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
-				IsOnFire = { Params = "", Return = "bool", Notes = "Returns true if the entity is on fire" },
-				IsOnGround = { Params = "", Return = "bool", Notes = "Returns true if the entity is on ground (not falling, not jumping, not flying)" },
-				IsPainting = { Params = "", Return = "bool", Notes = "Returns if this entity is a painting." },
-				IsPawn = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cPawn}} descendant." },
-				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPickup|pickup}}." },
-				IsPlayer = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPlayer|player}}" },
-				IsProjectile = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cProjectileEntity}} descendant." },
-				IsRclking = { Params = "", Return = "bool", Notes = "Currently unimplemented" },
-				IsRiding = { Params = "", Return = "bool", Notes = "Returns true if the entity is attached to (riding) another entity." },
-				IsSprinting = { Params = "", Return = "bool", Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false" },
-				IsSubmerged = { Params = "", Return = "bool", Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players." },
-				IsSwimming = { Params = "", Return = "bool", Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players." },
-				IsTNT = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cTNTEntity|TNT entity}}" },
-				Killed = { Params = "{{cEntity|Victim}}", Return = "", Notes = "This entity has killed another entity (the Victim). For players, adds the scoreboard statistics about the kill." },
-				KilledBy = { Notes = "FIXME: Remove this from API" },
+				AddSpeedX =
+				{
+					Params =
+					{
+						{
+							Name = "AddX",
+							Type = "number",
+						},
+					},
+					Notes = "Adds the specified amount of speed in the X axis direction.",
+				},
+				AddSpeedY =
+				{
+					Params =
+					{
+						{
+							Name = "AddY",
+							Type = "number",
+						},
+					},
+					Notes = "Adds the specified amount of speed in the Y axis direction.",
+				},
+				AddSpeedZ =
+				{
+					Params =
+					{
+						{
+							Name = "AddZ",
+							Type = "number",
+						},
+					},
+					Notes = "Adds the specified amount of speed in the Z axis direction.",
+				},
+				ArmorCoversAgainst =
+				{
+					Params =
+					{
+						{
+							Name = "DamageType",
+							Type = "eDamageType",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether armor will protect against the specified damage type",
+				},
+				Destroy =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldBroadcast",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Notes = "Schedules the entity to be destroyed; if ShouldBroadcast is not present or set to true, broadcasts the DestroyEntity packet",
+				},
+				GetAirLevel =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the air level (number of ticks of air left). Note, this function is only updated with mobs or players.",
+				},
+				GetArmorCoverAgainst =
+				{
+					Params =
+					{
+						{
+							Name = "AttackerEntity",
+							Type = "cEntity",
+						},
+						{
+							Name = "DamageType",
+							Type = "eDamageType",
+						},
+						{
+							Name = "RawDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of hitpoints out of RawDamage that the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage.",
+				},
+				GetChunkX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X-coord of the chunk in which the entity is placed",
+				},
+				GetChunkZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Z-coord of the chunk in which the entity is placed",
+				},
+				GetClass =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the classname of the entity, such as \"cSpider\" or \"cPickup\"",
+				},
+				GetClassStatic =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static",
+				},
+				GetEntityType =
+				{
+					Returns =
+					{
+						{
+							Name = "EntityType",
+							Type = "cEntity#EntityType",
+						},
+					},
+					Notes = "Returns the type of the entity, one of the {{cEntity#EntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call.",
+				},
+				GetEquippedBoots =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the boots that the entity has equipped. Returns an empty cItem if no boots equipped or not applicable.",
+				},
+				GetEquippedChestplate =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the chestplate that the entity has equipped. Returns an empty cItem if no chestplate equipped or not applicable.",
+				},
+				GetEquippedHelmet =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the helmet that the entity has equipped. Returns an empty cItem if no helmet equipped or not applicable.",
+				},
+				GetEquippedLeggings =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the leggings that the entity has equipped. Returns an empty cItem if no leggings equipped or not applicable.",
+				},
+				GetEquippedWeapon =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable.",
+				},
+				GetGravity =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number that is used as the gravity for physics simulation. 1G (9.78) by default.",
+				},
+				GetHeadYaw =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the pitch of the entity's head (FIXME: Rename to GetHeadPitch() ).",
+				},
+				GetHealth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the current health of the entity.",
+				},
+				GetHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the height (Y size) of the entity",
+				},
+				GetInvulnerableTicks =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of ticks that this entity will be invulnerable for. This is used for after-hit recovery - the entities are invulnerable for half a second after being hit.",
+				},
+				GetKnockbackAmountAgainst =
+				{
+					Params =
+					{
+						{
+							Name = "ReceiverEntity",
+							Type = "cEntity",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the amount of knockback that the currently equipped items would cause when attacking the ReceiverEntity.",
+				},
+				GetLookVector =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3f",
+						},
+					},
+					Notes = "Returns the vector that defines the direction in which the entity is looking",
+				},
+				GetMass =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the mass of the entity. Currently unused.",
+				},
+				GetMaxHealth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum number of hitpoints this entity is allowed to have.",
+				},
+				GetParentClass =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the direct parent class for this entity",
+				},
+				GetPitch =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the pitch (nose-down rotation) of the entity. Measured in degrees, normal values range from -90 to +90. +90 means looking down, 0 means looking straight ahead, -90 means looking up.",
+				},
+				GetPosition =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the entity's pivot position as a 3D vector",
+				},
+				GetPosX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X-coord of the entity's pivot",
+				},
+				GetPosY =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Y-coord of the entity's pivot",
+				},
+				GetPosZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Z-coord of the entity's pivot",
+				},
+				GetRawDamageAgainst =
+				{
+					Params =
+					{
+						{
+							Name = "ReceiverEntity",
+							Type = "cEntity",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the raw damage that this entity's equipment would cause when attacking the ReceiverEntity. This includes this entity's weapon {{cEnchantments|enchantments}}, but excludes the receiver's armor or potion effects. See {{TakeDamageInfo}} for more information on attack damage.",
+				},
+				GetRoll =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the roll (sideways rotation) of the entity. Currently unused.",
+				},
+				GetRot =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3f",
+						},
+					},
+					Notes = "(OBSOLETE) Returns the entire rotation vector (Yaw, Pitch, Roll)",
+				},
+				GetSpeed =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the complete speed vector of the entity",
+				},
+				GetSpeedX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X-part of the speed vector",
+				},
+				GetSpeedY =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Y-part of the speed vector",
+				},
+				GetSpeedZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Z-part of the speed vector",
+				},
+				GetTicksAlive =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of ticks that this entity has been alive for.",
+				},
+				GetUniqueID =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the ID that uniquely identifies the entity within the running server. Note that this ID is not persisted to the data files.",
+				},
+				GetWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the width (X and Z size) of the entity.",
+				},
+				GetWorld =
+				{
+					Returns =
+					{
+						{
+							Type = "cWorld",
+						},
+					},
+					Notes = "Returns the world where the entity resides",
+				},
+				GetYaw =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the yaw (direction) of the entity. Measured in degrees, values range from -180 to +180. 0 means ZP, 90 means XM, -180 means ZM, -90 means XP.",
+				},
+				HandleSpeedFromAttachee =
+				{
+					Params =
+					{
+						{
+							Name = "ForwardAmount",
+							Type = "number",
+						},
+						{
+							Name = "SidewaysAmount",
+							Type = "number",
+						},
+					},
+					Notes = "Updates the entity's speed based on the attachee exerting the specified force forward and sideways. Used for entities being driven by other entities attached to them - usually players driving minecarts and boats.",
+				},
+				Heal =
+				{
+					Params =
+					{
+						{
+							Name = "Hitpoints",
+							Type = "number",
+						},
+					},
+					Notes = "Heals the specified number of hitpoints. Hitpoints is expected to be a positive number.",
+				},
+				IsA =
+				{
+					Params =
+					{
+						{
+							Name = "ClassName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself",
+				},
+				IsBoat =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is a {{cBoat|boat}}.",
+				},
+				IsCrouched =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching.",
+				},
+				IsDestroyed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "(<b>DEPRECATED</b>) Please use cEntity:IsTicking().",
+				},
+				IsEnderCrystal =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is an ender crystal.",
+				},
+				IsExpOrb =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents an experience orb",
+				},
+				IsFallingBlock =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents a {{cFallingBlock}} entity.",
+				},
+				IsFireproof =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity takes no damage from being on fire.",
+				},
+				IsFloater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents a fishing rod floater",
+				},
+				IsInvisible =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is invisible",
+				},
+				IsItemFrame =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is an item frame.",
+				},
+				IsMinecart =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents a {{cMinecart|minecart}}",
+				},
+				IsMob =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents any {{cMonster|mob}}.",
+				},
+				IsOnFire =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is on fire",
+				},
+				IsOnGround =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is on ground (not falling, not jumping, not flying)",
+				},
+				IsPainting =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns if this entity is a painting.",
+				},
+				IsPawn =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is a {{cPawn}} descendant.",
+				},
+				IsPickup =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents a {{cPickup|pickup}}.",
+				},
+				IsPlayer =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents a {{cPlayer|player}}",
+				},
+				IsProjectile =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is a {{cProjectileEntity}} descendant.",
+				},
+				IsRclking =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Currently unimplemented",
+				},
+				IsRiding =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is attached to (riding) another entity.",
+				},
+				IsSprinting =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false",
+				},
+				IsSubmerged =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players.",
+				},
+				IsSwimming =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players.",
+				},
+				IsTicking =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is valid and ticking. Returns false if the entity is not ticking and is about to leave its current world either via teleportation or destruction. If this returns false, you must stop using the cEntity pointer you have.",
+				},
+				IsTNT =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity represents a {{cTNTEntity|TNT entity}}",
+				},
+				Killed =
+				{
+					Params =
+					{
+						{
+							Name = "Victim",
+							Type = "cEntity",
+						},
+					},
+					Notes = "This entity has killed another entity (the Victim). For players, adds the scoreboard statistics about the kill.",
+				},
+				KilledBy =
+				{
+					Notes = "FIXME: Remove this from API",
+				},
 				MoveToWorld =
 				{
-					{ Params = "{{cWorld|World}}, [ShouldSendRespawn]", Return = "bool", Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Repawn packet upon leaving the world (The client handles respawns only between different dimensions)." },
-					{ Params = "WorldName, [ShouldSendRespawn]", Return = "bool", Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Repawn packet upon leaving the world (The client handles respawns only between different dimensions)." },
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "ShouldSendRespawn",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "WorldName",
+								Type = "string",
+							},
+							{
+								Name = "ShouldSendRespawn",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "ShouldSendRespawn",
+								Type = "boolean",
+							},
+							{
+								Name = "Position",
+								Type = "Vector3d",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world. <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+					},
 				},
-				SetGravity = { Params = "Gravity", Return = "", Notes = "Sets the number that is used as the gravity for physics simulation. 1G (9.78) by default." },
-				SetHeadYaw = { Params = "HeadPitch", Return = "", Notes = "Sets the head pitch (FIXME: Rename to SetHeadPitch() )." },
-				SetHealth = { Params = "Hitpoints", Return = "", Notes = "Sets the entity's health to the specified amount of hitpoints. Doesn't broadcast any hurt animation. Doesn't kill the entity if health drops below zero. Use the TakeDamage() function instead for taking damage." },
-				SetHeight = { Params = "", Return = "", Notes = "FIXME: Remove this from API" },
-				SetInvulnerableTicks = { Params = "NumTicks", Return = "", Notes = "Sets the amount of ticks for which the entity will not receive any damage from other entities." },
-				SetIsFireproof = { Params = "IsFireproof", Return = "", Notes = "Sets whether the entity receives damage from being on fire." },
-				SetMass = { Params = "Mass", Return = "", Notes = "Sets the mass of the entity. Currently unused." },
-				SetMaxHealth = { Params = "MaxHitpoints", Return = "", Notes = "Sets the maximum hitpoints of the entity. If current health is above MaxHitpoints, it is capped to MaxHitpoints." },
-				SetPitch = { Params = "number", Return = "", Notes = "Sets the pitch (nose-down rotation) of the entity" },
-				SetPitchFromSpeed = { Params = "", Return = "", Notes = "Sets the entity pitch to match its speed (entity looking forwards as it moves)" },
+				ScheduleMoveToWorld =
+				{
+					Params =
+					{
+						{
+							Name = "World",
+							Type = "cWorld",
+						},
+						{
+							Name = "NewPosition",
+							Type = "Vector3d",
+						},
+						{
+							Name = "ShouldSetPortalCooldown",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity.",
+				},
+				SetGravity =
+				{
+					Params =
+					{
+						{
+							Name = "Gravity",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the number that is used as the gravity for physics simulation. 1G (9.78) by default.",
+				},
+				SetHeadYaw =
+				{
+					Params =
+					{
+						{
+							Name = "HeadPitch",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the head pitch (FIXME: Rename to SetHeadPitch() ).",
+				},
+				SetHealth =
+				{
+					Params =
+					{
+						{
+							Name = "Hitpoints",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the entity's health to the specified amount of hitpoints. Doesn't broadcast any hurt animation. Doesn't kill the entity if health drops below zero. Use the TakeDamage() function instead for taking damage.",
+				},
+				SetHeight =
+				{
+					Notes = "FIXME: Remove this from API",
+				},
+				SetInvulnerableTicks =
+				{
+					Params =
+					{
+						{
+							Name = "NumTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the amount of ticks for which the entity will not receive any damage from other entities.",
+				},
+				SetIsFireproof =
+				{
+					Params =
+					{
+						{
+							Name = "IsFireproof",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the entity receives damage from being on fire.",
+				},
+				SetMass =
+				{
+					Params =
+					{
+						{
+							Name = "Mass",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the mass of the entity. Currently unused.",
+				},
+				SetMaxHealth =
+				{
+					Params =
+					{
+						{
+							Name = "MaxHitpoints",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the maximum hitpoints of the entity. If current health is above MaxHitpoints, it is capped to MaxHitpoints.",
+				},
+				SetPitch =
+				{
+					Params =
+					{
+						{
+							Name = "Pitch",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the pitch (nose-down rotation) of the entity",
+				},
+				SetPitchFromSpeed =
+				{
+					Notes = "Sets the entity pitch to match its speed (entity looking forwards as it moves)",
+				},
 				SetPosition =
 				{
-					{ Params = "PosX, PosY, PosZ", Return = "", Notes = "Sets all three coords of the entity's pivot" },
-					{ Params = "{{Vector3d|Vector3d}}", Return = "", Notes = "Sets all three coords of the entity's pivot" },
+					{
+						Params =
+						{
+							{
+								Name = "PosX",
+								Type = "number",
+							},
+							{
+								Name = "PosY",
+								Type = "number",
+							},
+							{
+								Name = "PosZ",
+								Type = "number",
+							},
+						},
+						Notes = "Sets all three coords of the entity's pivot",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Vector3d",
+								Type = "Vector3d",
+							},
+						},
+						Notes = "Sets all three coords of the entity's pivot",
+					},
 				},
-				SetPosX = { Params = "number", Return = "", Notes = "Sets the X-coord of the entity's pivot" },
-				SetPosY = { Params = "number", Return = "", Notes = "Sets the Y-coord of the entity's pivot" },
-				SetPosZ = { Params = "number", Return = "", Notes = "Sets the Z-coord of the entity's pivot" },
-				SetRoll = { Params = "number", Return = "", Notes = "Sets the roll (sideways rotation) of the entity. Currently unused." },
-				SetRot = { Params = "{{Vector3f|Rotation}}", Return = "", Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)" },
-				SetYawFromSpeed = { Params = "", Return = "", Notes = "Sets the entity's yaw to match its current speed (entity looking forwards as it moves)." },
+				SetPosX =
+				{
+					Params =
+					{
+						{
+							Name = "PosX",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the X-coord of the entity's pivot",
+				},
+				SetPosY =
+				{
+					Params =
+					{
+						{
+							Name = "PosY",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the Y-coord of the entity's pivot",
+				},
+				SetPosZ =
+				{
+					Params =
+					{
+						{
+							Name = "PosZ",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the Z-coord of the entity's pivot",
+				},
+				SetRoll =
+				{
+					Params =
+					{
+						{
+							Name = "Roll",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the roll (sideways rotation) of the entity. Currently unused.",
+				},
+				SetRot =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3f",
+						},
+					},
+					Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)",
+				},
 				SetSpeed =
 				{
-					{ Params = "SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Sets the current speed of the entity" },
-					{ Params = "{{Vector3d|Speed}}", Return = "", Notes = "Sets the current speed of the entity" },
+					{
+						Params =
+						{
+							{
+								Name = "SpeedX",
+								Type = "number",
+							},
+							{
+								Name = "SpeedY",
+								Type = "number",
+							},
+							{
+								Name = "SpeedZ",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the current speed of the entity",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Speed",
+								Type = "Vector3d",
+							},
+						},
+						Notes = "Sets the current speed of the entity",
+					},
 				},
-				SetSpeedX = { Params = "SpeedX", Return = "", Notes = "Sets the X component of the entity speed" },
-				SetSpeedY = { Params = "SpeedY", Return = "", Notes = "Sets the Y component of the entity speed" },
-				SetSpeedZ = { Params = "SpeedZ", Return = "", Notes = "Sets the Z component of the entity speed" },
-				SetWidth = { Params = "", Return = "", Notes = "FIXME: Remove this from API" },
-				SetYaw = { Params = "number", Return = "", Notes = "Sets the yaw (direction) of the entity." },
-				StartBurning = { Params = "NumTicks", Return = "", Notes = "Sets the entity on fire for the specified number of ticks. If entity is on fire already, makes it burn for either NumTicks or the number of ticks left from the previous fire, whichever is larger." },
-				SteerVehicle = { Params = "ForwardAmount, SidewaysAmount", Return = "", Notes = "Applies the specified steering to the vehicle this entity is attached to. Ignored if not attached to any entity." },
-				StopBurning = { Params = "", Return = "", Notes = "Extinguishes the entity fire, cancels all fire timers." },
+				SetSpeedX =
+				{
+					Params =
+					{
+						{
+							Name = "SpeedX",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the X component of the entity speed",
+				},
+				SetSpeedY =
+				{
+					Params =
+					{
+						{
+							Name = "SpeedY",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the Y component of the entity speed",
+				},
+				SetSpeedZ =
+				{
+					Params =
+					{
+						{
+							Name = "SpeedZ",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the Z component of the entity speed",
+				},
+				SetWidth =
+				{
+					Notes = "FIXME: Remove this from API",
+				},
+				SetYaw =
+				{
+					Params =
+					{
+						{
+							Name = "Yaw",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the yaw (direction) of the entity.",
+				},
+				SetYawFromSpeed =
+				{
+					Notes = "Sets the entity's yaw to match its current speed (entity looking forwards as it moves).",
+				},
+				StartBurning =
+				{
+					Params =
+					{
+						{
+							Name = "NumTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the entity on fire for the specified number of ticks. If entity is on fire already, makes it burn for either NumTicks or the number of ticks left from the previous fire, whichever is larger.",
+				},
+				SteerVehicle =
+				{
+					Params =
+					{
+						{
+							Name = "ForwardAmount",
+							Type = "number",
+						},
+						{
+							Name = "SidewaysAmount",
+							Type = "number",
+						},
+					},
+					Notes = "Applies the specified steering to the vehicle this entity is attached to. Ignored if not attached to any entity.",
+				},
+				StopBurning =
+				{
+					Notes = "Extinguishes the entity fire, cancels all fire timers.",
+				},
 				TakeDamage =
 				{
-					{ Params = "AttackerEntity", Return = "", Notes = "Causes this entity to take damage that AttackerEntity would inflict. Includes their weapon and this entity's armor." },
-					{ Params = "DamageType, AttackerEntity, RawDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The final damage is calculated from RawDamage using the currently equipped armor." },
-					{ Params = "DamageType, ArrackerEntity, RawDamage, FinalDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The values are wrapped into a {{TakeDamageInfo}} structure and applied directly." },
+					{
+						Params =
+						{
+							{
+								Name = "AttackerEntity",
+								Type = "cEntity",
+							},
+						},
+						Notes = "Causes this entity to take damage that AttackerEntity would inflict. Includes their weapon and this entity's armor.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "DamageType",
+								Type = "eDamageType",
+							},
+							{
+								Name = "AttackerEntity",
+								Type = "cEntity",
+							},
+							{
+								Name = "RawDamage",
+								Type = "number",
+							},
+							{
+								Name = "KnockbackAmount",
+								Type = "number",
+							},
+						},
+						Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The final damage is calculated from RawDamage using the currently equipped armor.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "DamageType",
+								Type = "eDamageType",
+							},
+							{
+								Name = "AttackerEntity",
+								Type = "cEntity",
+							},
+							{
+								Name = "RawDamage",
+								Type = "number",
+							},
+							{
+								Name = "FinalDamage",
+								Type = "number",
+							},
+							{
+								Name = "KnockbackAmount",
+								Type = "number",
+							},
+						},
+						Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The values are wrapped into a {{TakeDamageInfo}} structure and applied directly.",
+					},
 				},
-				TeleportToCoords = { Params = "PosX, PosY, PosZ", Return = "", Notes = "Teleports the entity to the specified coords. Asks plugins if the teleport is allowed." },
-				TeleportToEntity = { Params = "DestEntity", Return = "", Notes = "Teleports this entity to the specified destination entity. Asks plugins if the teleport is allowed." },
+				TeleportToCoords =
+				{
+					Params =
+					{
+						{
+							Name = "PosX",
+							Type = "number",
+						},
+						{
+							Name = "PosY",
+							Type = "number",
+						},
+						{
+							Name = "PosZ",
+							Type = "number",
+						},
+					},
+					Notes = "Teleports the entity to the specified coords. Asks plugins if the teleport is allowed.",
+				},
+				TeleportToEntity =
+				{
+					Params =
+					{
+						{
+							Name = "DestEntity",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Teleports this entity to the specified destination entity. Asks plugins if the teleport is allowed.",
+				},
 			},
 			Constants =
 			{
-				etBoat = { Notes = "The entity is a {{cBoat}}" },
-				etEnderCrystal = { Notes = "" },
-				etEntity = { Notes = "No further specialization available" },
-				etExpOrb = { Notes = "The entity is a {{cExpOrb}}" },
-				etFallingBlock = { Notes = "The entity is a {{cFallingBlock}}" },
-				etFloater = { Notes = "The entity is a fishing rod floater" },
-				etItemFrame = { Notes = "" },
-				etMinecart = { Notes = "The entity is a {{cMinecart}} descendant" },
-				etMob = { Notes = "The entity is a {{cMonster}} descendant" },
-				etMonster = { Notes = "The entity is a {{cMonster}} descendant" },
-				etPainting = { Notes = "The entity is a {{cPainting}}" },
-				etPickup = { Notes = "The entity is a {{cPickup}}" },
-				etPlayer = { Notes = "The entity is a {{cPlayer}}" },
-				etProjectile = { Notes = "The entity is a {{cProjectileEntity}} descendant" },
-				etTNT = { Notes = "The entity is a {{cTNTEntity}}" },
+				etBoat =
+				{
+					Notes = "The entity is a {{cBoat}}",
+				},
+				etEnderCrystal =
+				{
+					Notes = "",
+				},
+				etEntity =
+				{
+					Notes = "No further specialization available",
+				},
+				etExpOrb =
+				{
+					Notes = "The entity is a {{cExpOrb}}",
+				},
+				etFallingBlock =
+				{
+					Notes = "The entity is a {{cFallingBlock}}",
+				},
+				etFloater =
+				{
+					Notes = "The entity is a fishing rod floater",
+				},
+				etItemFrame =
+				{
+					Notes = "",
+				},
+				etMinecart =
+				{
+					Notes = "The entity is a {{cMinecart}} descendant",
+				},
+				etMob =
+				{
+					Notes = "The entity is a {{cMonster}} descendant",
+				},
+				etMonster =
+				{
+					Notes = "The entity is a {{cMonster}} descendant",
+				},
+				etPainting =
+				{
+					Notes = "The entity is a {{cPainting}}",
+				},
+				etPickup =
+				{
+					Notes = "The entity is a {{cPickup}}",
+				},
+				etPlayer =
+				{
+					Notes = "The entity is a {{cPlayer}}",
+				},
+				etProjectile =
+				{
+					Notes = "The entity is a {{cProjectileEntity}} descendant",
+				},
+				etTNT =
+				{
+					Notes = "The entity is a {{cTNTEntity}}",
+				},
 			},
 			ConstantGroups =
 			{
@@ -1001,7 +5976,104 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 			},
 		},
-
+		cEntityEffect =
+		{
+			Functions =
+			{
+				GetPotionColor =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the potion color (used by the client for visuals), based on the potion's damage value",
+				},
+				GetPotionEffectDuration =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the effect duration, in ticks, based on the potion's damage value",
+				},
+				GetPotionEffectIntensity =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "short",
+							Type = "number",
+						},
+					},
+					Notes = "Retrieves the intensity level from the potion's damage value. Returns 0 for level I potions, 1 for level II potions.",
+				},
+				GetPotionEffectType =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "eType",
+							Type = "cEntityEffect#eType",
+						},
+					},
+					Notes = "Translates the potion's damage value into the entity effect that the potion gives",
+				},
+				IsPotionDrinkable =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the potion with the given damage is drinkable",
+				},
+			},
+		},
 		cFile =
 		{
 			Desc = [[
@@ -1013,41 +6085,410 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 			]],
 			Functions =
 			{
-				ChangeFileExt = { Params = "FileName, NewExt", Return = "string", Notes = "(STATIC) Returns FileName with its extension changed to NewExt. NewExt may begin with a dot, but needn't, the result is the same in both cases (the first dot, if present, is ignored). FileName may contain path elements, extension is recognized as the last dot after the last path separator in the string." },
-				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "(STATIC) Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
-				CreateFolder = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Creates a new folder. Returns true if successful. Only a single level can be created at a time, use CreateFolderRecursive() to create multiple levels of folders at once." },
-				CreateFolderRecursive = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Creates a new folder, creating its parents if needed. Returns true if successful." },
-				Delete = { Params = "Path", Return = "bool", Notes = "(STATIC) Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty.<br/><b>NOTE</b>: If you already know if the object is a file or folder, use DeleteFile() or DeleteFolder() explicitly." },
-				DeleteFile = { Params = "FilePath", Return = "bool", Notes = "(STATIC) Deletes the specified file. Returns true if successful." },
-				DeleteFolder = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty." },
-				DeleteFolderContents = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Deletes everything from the specified folder, recursively. The specified folder stays intact. Returns true if successful." },
-				Exists = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified file or folder exists.<br/><b>OBSOLETE</b>, use IsFile() or IsFolder() instead" },
-				GetExecutableExt = { Params = "", Return = "string", Notes = "(STATIC) Returns the customary executable extension (including the dot) used by the current platform (\".exe\" on Windows, empty string on Linux). " },
-				GetFolderContents = { Params = "FolderName", Return = "array table of strings", Notes = "(STATIC) Returns the contents of the specified folder, as an array table of strings. Each filesystem object is listed. Use the IsFile() and IsFolder() functions to determine the object type." },
-				GetLastModificationTime = { Params = "Path", Return = "number", Notes = "(STATIC) Returns the last modification time (in current timezone) of the specified file or folder. Returns zero if file not found / not accessible. The returned value is in the same units as values returned by os.time()." },
-				GetPathSeparator = { Params = "", Return = "string", Notes = "(STATIC) Returns the primary path separator used by the current platform. Returns \"\\\" on Windows and \"/\" on Linux. Note that the platform or CRT may support additional path separators, those are not reported." },
-				GetSize = { Params = "FileName", Return = "number", Notes = "(STATIC) Returns the size of the file, or -1 on failure." },
-				IsFile = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing file." },
-				IsFolder = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified path points to an existing folder." },
-				ReadWholeFile = { Params = "FileName", Return = "string", Notes = "(STATIC) Returns the entire contents of the specified file. Returns an empty string if the file cannot be opened." },
-				Rename = { Params = "OrigPath, NewPath", Return = "bool", Notes = "(STATIC) Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists." },
+				ChangeFileExt =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+						{
+							Name = "NewExt",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns FileName with its extension changed to NewExt. NewExt may begin with a dot, but needn't, the result is the same in both cases (the first dot, if present, is ignored). FileName may contain path elements, extension is recognized as the last dot after the last path separator in the string.",
+				},
+				Copy =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "SrcFileName",
+							Type = "string",
+						},
+						{
+							Name = "DstFileName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists.",
+				},
+				CreateFolder =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FolderPath",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Creates a new folder. Returns true if successful. Only a single level can be created at a time, use CreateFolderRecursive() to create multiple levels of folders at once.",
+				},
+				CreateFolderRecursive =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FolderPath",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Creates a new folder, creating its parents if needed. Returns true if successful.",
+				},
+				Delete =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Path",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty.<br/><b>NOTE</b>: If you already know if the object is a file or folder, use DeleteFile() or DeleteFolder() explicitly.",
+				},
+				DeleteFile =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FilePath",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes the specified file. Returns true if successful.",
+				},
+				DeleteFolder =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FolderPath",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty.",
+				},
+				DeleteFolderContents =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FolderPath",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes everything from the specified folder, recursively. The specified folder stays intact. Returns true if successful.",
+				},
+				Exists =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Path",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Exists",
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified file or folder exists.<br/><b>OBSOLETE</b>, use IsFile() or IsFolder() instead",
+				},
+				GetExecutableExt =
+				{
+					IsStatic = true,
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the customary executable extension (including the dot) used by the current platform (\".exe\" on Windows, empty string on Linux). ",
+				},
+				GetFolderContents =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FolderName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns the contents of the specified folder, as an array table of strings. Each filesystem object is listed. Use the IsFile() and IsFolder() functions to determine the object type. Note that \".\" and \"..\" are NOT returned. The order of the names is arbitrary (as returned by OS, no sorting).",
+				},
+				GetLastModificationTime =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Path",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the last modification time (in current timezone) of the specified file or folder. Returns zero if file not found / not accessible. The returned value is in the same units as values returned by os.time().",
+				},
+				GetPathSeparator =
+				{
+					IsStatic = true,
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the primary path separator used by the current platform. Returns \"\\\" on Windows and \"/\" on Linux. Note that the platform or CRT may support additional path separators, those are not reported.",
+				},
+				GetSize =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the size of the file, or -1 on failure.",
+				},
+				IsFile =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Path",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified path points to an existing file.",
+				},
+				IsFolder =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Path",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified path points to an existing folder.",
+				},
+				ReadWholeFile =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the entire contents of the specified file. Returns an empty string if the file cannot be opened.",
+				},
+				Rename =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "OrigPath",
+							Type = "string",
+						},
+						{
+							Name = "NewPath",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Renames a file or a folder. Returns true if successful. Undefined result if NewPath already exists.",
+				},
 			},
-		},  -- cFile
-
+		},
 		cFloater =
 		{
 			Desc = [[
-				When a player uses his/her fishing rod it creates a floater entity. This class manages it.
+				Manages the floater created when a player uses their fishing rod.
 			]],
 			Functions =
 			{
-				CanPickup = { Params = "", Return = "bool", Notes = "Returns true if the floater gives an item when the player right clicks." },
-				GetAttachedMobID = { Params = "", Return = "EntityID", Notes = "A floater can get attached to an mob. When it is and this functions gets called it returns the mob ID. If it isn't attached to a mob it returns -1" },
-				GetOwnerID = { Params = "", Return = "EntityID", Notes = "Returns the EntityID of the player who owns the floater." },
+				CanPickup =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the floater gives an item when the player right clicks.",
+				},
+				GetAttachedMobID =
+				{
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the EntityID of a mob that this floater is attached to. Returns -1 if not attached to any mob.",
+				},
+				GetOwnerID =
+				{
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the EntityID of the player who owns the floater.",
+				},
 			},
 			Inherits = "cEntity",
 		},
-
+		cHangingEntity =
+		{
+			Functions =
+			{
+				GetFacing =
+				{
+					Returns =
+					{
+						{
+							Name = "BlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the direction in which the entity is facing.",
+				},
+				SetFacing =
+				{
+					Params =
+					{
+						{
+							Name = "BlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Set the direction in which the entity is facing.",
+				},
+			},
+			Inherits = "cEntity",
+		},
 		cIniFile =
 		{
 			Desc = [[
@@ -1080,89 +6521,1043 @@ ValueName0=SomeOtherValue
 			]],
 			Functions =
 			{
-				constructor = { Params = "", Return = "cIniFile", Notes = "Creates a new empty cIniFile object." },
-				AddHeaderComment = { Params = "Comment", Return = "", Notes = "Adds a comment to be stored in the file header." },
+				AddHeaderComment =
+				{
+					Params =
+					{
+						{
+							Name = "Comment",
+							Type = "string",
+						},
+					},
+					Notes = "Adds a comment to be stored in the file header.",
+				},
 				AddKeyComment =
 				{
-					{ Params = "KeyID, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
-					{ Params = "KeyName, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+							{
+								Name = "Comment",
+								Type = "string",
+							},
+						},
+						Notes = "Adds a comment to be stored in the file under the specified key",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+							{
+								Name = "Comment",
+								Type = "string",
+							},
+						},
+						Notes = "Adds a comment to be stored in the file under the specified key",
+					},
 				},
-				AddKeyName = { Params = "KeyName", Returns = "number", Notes = "Adds a new key of the specified name. Returns the KeyID of the new key." },
-				AddValue = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
-				AddValueB = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new bool value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
-				AddValueF = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new float value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
-				AddValueI = { Params = "KeyName, ValueName, Value", Return = "", Notes = "Adds a new integer value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)" },
-				CaseInsensitive = { Params = "", Return = "", Notes = "Sets key names' and value names' comparisons to case insensitive (default)." },
-				CaseSensitive = { Params = "", Return = "", Notes = "Sets key names and value names comparisons to case sensitive." },
-				Clear = { Params = "", Return = "", Notes = "Removes all the in-memory data. Note that , like all the other operations, this doesn't affect any file data." },
-				DeleteHeaderComment = { Params = "CommentID", Return = "bool" , Notes = "Deletes the specified header comment. Returns true if successful."},
-				DeleteHeaderComments = { Params = "", Return = "", Notes = "Deletes all headers comments." },
-				DeleteKey = { Params = "KeyName", Return = "bool", Notes = "Deletes the specified key, and all values in that key. Returns true if successful." },
+				AddKeyName =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Adds a new key of the specified name. Returns the KeyID of the new key.",
+				},
+				AddValue =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "Value",
+							Type = "string",
+						},
+					},
+					Notes = "Adds a new value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)",
+				},
+				AddValueB =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "Value",
+							Type = "boolean",
+						},
+					},
+					Notes = "Adds a new bool value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)",
+				},
+				AddValueF =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "Value",
+							Type = "number",
+						},
+					},
+					Notes = "Adds a new float value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)",
+				},
+				AddValueI =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "Value",
+							Type = "number",
+						},
+					},
+					Notes = "Adds a new integer value of the specified name to the specified key. If another value of the same name exists in the key, both are kept (nonstandard INI file)",
+				},
+				CaseInsensitive =
+				{
+					Notes = "Sets key names' and value names' comparisons to case insensitive (default).",
+				},
+				CaseSensitive =
+				{
+					Notes = "Sets key names and value names comparisons to case sensitive.",
+				},
+				Clear =
+				{
+					Notes = "Removes all the in-memory data. Note that , like all the other operations, this doesn't affect any file data.",
+				},
+				constructor =
+				{
+					Returns =
+					{
+						{
+							Type = "cIniFile",
+						},
+					},
+					Notes = "Creates a new empty cIniFile object.",
+				},
+				DeleteHeaderComment =
+				{
+					Params =
+					{
+						{
+							Name = "CommentID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes the specified header comment. Returns true if successful.",
+				},
+				DeleteHeaderComments =
+				{
+					Notes = "Deletes all headers comments.",
+				},
+				DeleteKey =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes the specified key, and all values in that key. Returns true if successful.",
+				},
 				DeleteKeyComment =
 				{
-					{ Params = "KeyID, CommentID", Return = "bool", Notes = "Deletes the specified key comment. Returns true if successful." },
-					{ Params = "KeyName, CommentID", Return = "bool", Notes = "Deletes the specified key comment. Returns true if successful." },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+							{
+								Name = "CommentID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Deletes the specified key comment. Returns true if successful.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+							{
+								Name = "CommentID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Deletes the specified key comment. Returns true if successful.",
+					},
 				},
 				DeleteKeyComments =
 				{
-					{ Params = "KeyID", Return = "bool", Notes = "Deletes all comments for the specified key. Returns true if successful." },
-					{ Params = "KeyName", Return = "bool", Notes = "Deletes all comments for the specified key. Returns true if successful." },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Deletes all comments for the specified key. Returns true if successful.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Deletes all comments for the specified key. Returns true if successful.",
+					},
 				},
-				DeleteValue = { Params = "KeyName, ValueName", Return = "bool", Notes = "Deletes the specified value. Returns true if successful." },
-				DeleteValueByID = { Params = "KeyID, ValueID", Return = "bool", Notes = "Deletes the specified value. Returns true if successful." },
-				FindKey = { Params = "KeyName", Return = "number", Notes = "Returns the KeyID for the specified key name, or the noID constant if the key doesn't exist." },
-				FindValue = { Params = "KeyID, ValueName", Return = "numebr", Notes = "Returns the ValueID for the specified value name, or the noID constant if the specified key doesn't contain a value of that name." },
-				GetHeaderComment = { Params = "CommentID", Return = "string", Notes = "Returns the specified header comment, or an empty string if such comment doesn't exist" },
+				DeleteValue =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes the specified value. Returns true if successful.",
+				},
+				DeleteValueByID =
+				{
+					Params =
+					{
+						{
+							Name = "KeyID",
+							Type = "number",
+						},
+						{
+							Name = "ValueID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Deletes the specified value. Returns true if successful.",
+				},
+				FindKey =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the KeyID for the specified key name, or the noID constant if the key doesn't exist.",
+				},
+				FindValue =
+				{
+					Params =
+					{
+						{
+							Name = "KeyID",
+							Type = "number",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "ValueID",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the ValueID for the specified value name, or the noID constant if the specified key doesn't contain a value of that name.",
+				},
+				Flush =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Writes the data stored in the object to the file that was last associated with the object (ReadFile() or WriteFile()). Returns true on success, false on failure.",
+				},
+				GetHeaderComment =
+				{
+					Params =
+					{
+						{
+							Name = "CommentID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the specified header comment, or an empty string if such comment doesn't exist",
+				},
 				GetKeyComment =
 				{
-					{ Params = "KeyID, CommentID", Return = "string", Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist" },
-					{ Params = "KeyName, CommentID", Return = "string", Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist" },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+							{
+								Name = "CommentID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "string",
+							},
+						},
+						Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+							{
+								Name = "CommentID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "string",
+							},
+						},
+						Notes = "Returns the specified key comment, or an empty string if such a comment doesn't exist",
+					},
 				},
-				GetKeyName = { Params = "KeyID", Return = "string", Notes = "Returns the key name for the specified key ID. Inverse for FindKey()." },
-				GetNumHeaderComments = { Params = "", Return = "number", Notes = "Retuns the number of header comments." },
+				GetKeyName =
+				{
+					Params =
+					{
+						{
+							Name = "KeyID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the key name for the specified key ID. Inverse for FindKey().",
+				},
+				GetNumHeaderComments =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Retuns the number of header comments.",
+				},
 				GetNumKeyComments =
 				{
-					{ Params = "KeyID", Return = "number", Notes = "Returns the number of comments under the specified key" },
-					{ Params = "KeyName", Return = "number", Notes = "Returns the number of comments under the specified key" },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the number of comments under the specified key",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the number of comments under the specified key",
+					},
 				},
-				GetNumKeys = { Params = "", Return = "number", Notes = "Returns the total number of keys. This is the range for the KeyID (0 .. GetNumKeys() - 1)" },
+				GetNumKeys =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the total number of keys. This is the range for the KeyID (0 .. GetNumKeys() - 1)",
+				},
 				GetNumValues =
 				{
-					{ Params = "KeyID", Return = "number", Notes = "Returns the number of values stored under the specified key." },
-					{ Params = "KeyName", Return = "number", Notes = "Returns the number of values stored under the specified key." },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the number of values stored under the specified key.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the number of values stored under the specified key.",
+					},
 				},
 				GetValue =
 				{
-					{ Params = "KeyName, ValueName", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
-					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+							{
+								Name = "ValueName",
+								Type = "string",
+							},
+							{
+								Name = "DefaultValue",
+								Type = "string",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "string",
+							},
+						},
+						Notes = "Returns the value of the specified name under the specified key. Returns DefaultValue (empty string if not given) if the value doesn't exist.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+							{
+								Name = "ValueID",
+								Type = "number",
+							},
+							{
+								Name = "DefaultValue",
+								Type = "string",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "string",
+							},
+						},
+						Notes = "Returns the value of the specified name under the specified key. Returns DefaultValue (empty string if not given) if the value doesn't exist.",
+					},
 				},
-				GetValueB = { Params = "KeyName, ValueName", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. Returns false if the value doesn't exist." },
-				GetValueF = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. Returns zero if the value doesn't exist." },
-				GetValueI = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. Returns zero if the value doesn't exist." },
+				GetValueB =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns the value of the specified name under the specified key, as a bool. Returns DefaultValue (false if not given) if the value doesn't exist.",
+				},
+				GetValueF =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the value of the specified name under the specified key, as a floating-point number. Returns DefaultValue (zero if not given) if the value doesn't exist.",
+				},
+				GetValueI =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the value of the specified name under the specified key, as an integer. Returns DefaultValue (zero if not given) if the value doesn't exist.",
+				},
 				GetValueName =
 				{
-					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
-					{ Params = "KeyName, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+							{
+								Name = "ValueID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "string",
+							},
+						},
+						Notes = "Returns the name of the value specified by its ID. Inverse for FindValue().",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+							{
+								Name = "ValueID",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "string",
+							},
+						},
+						Notes = "Returns the name of the value specified by its ID. Inverse for FindValue().",
+					},
 				},
-				GetValueSet = { Params = "KeyName, ValueName, Default", Return = "string", Notes = "Returns the value of the specified name under the specified key. If the value doesn't exist, creates it with the specified default." },
-				GetValueSetB = { Params = "KeyName, ValueName, Default", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. If the value doesn't exist, creates it with the specified default." },
-				GetValueSetF = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. If the value doesn't exist, creates it with the specified default." },
-				GetValueSetI = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. If the value doesn't exist, creates it with the specified default." },
-				HasValue = { Params = "KeyName, ValueName", Return = "bool", Notes = "Returns true if the specified value is present." },
-				ReadFile = { Params = "FileName, [AllowExampleFallback]", Return = "bool", Notes = "Reads the values from the specified file. Previous in-memory contents are lost. If the file cannot be opened, and AllowExample is true, another file, \"filename.example.ini\", is loaded and then saved as \"filename.ini\". Returns true if successful, false if not." },
+				GetValueSet =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the value of the specified name under the specified key. If the value doesn't exist, creates it with the specified default (empty string if not given).",
+				},
+				GetValueSetB =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns the value of the specified name under the specified key, as a bool. If the value doesn't exist, creates it with the specified default (false if not given).",
+				},
+				GetValueSetF =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the value of the specified name under the specified key, as a floating-point number. If the value doesn't exist, creates it with the specified default (zero if not given).",
+				},
+				GetValueSetI =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the value of the specified name under the specified key, as an integer. If the value doesn't exist, creates it with the specified default (zero if not given).",
+				},
+				HasValue =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified value is present.",
+				},
+				ReadFile =
+				{
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+						{
+							Name = "AllowExampleFallback",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Reads the values from the specified file. Previous in-memory contents are lost. If the file cannot be opened, and AllowExample is true, another file, \"filename.example.ini\", is loaded and then saved as \"filename.ini\". Returns true if successful, false if not.",
+				},
 				SetValue =
 				{
-					{ Params = "KeyID, ValueID, NewValue", Return = "bool", Notes = "Overwrites the specified value with a new value. If the specified value doesn't exist, returns false (doesn't add)." },
-					{ Params = "KeyName, ValueName, NewValue, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
+					{
+						Params =
+						{
+							{
+								Name = "KeyID",
+								Type = "number",
+							},
+							{
+								Name = "ValueID",
+								Type = "number",
+							},
+							{
+								Name = "NewValue",
+								Type = "string",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Overwrites the specified value with a new value. If the specified value doesn't exist, returns false (doesn't add).",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "KeyName",
+								Type = "string",
+							},
+							{
+								Name = "ValueName",
+								Type = "string",
+							},
+							{
+								Name = "NewValue",
+								Type = "string",
+							},
+							{
+								Name = "CreateIfNotExists",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "IsSuccess",
+								Type = "boolean",
+							},
+						},
+						Notes = "Overwrites the specified value with a new value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false).",
+					},
 				},
-				SetValueB = { Params = "KeyName, ValueName, NewValueBool, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new bool value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
-				SetValueF = { Params = "KeyName, ValueName, NewValueFloat, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new floating-point number value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
-				SetValueI = { Params = "KeyName, ValueName, NewValueInt, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new integer value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
-				WriteFile = { Params = "FileName", Return = "bool", Notes = "Writes the current in-memory data into the specified file. Returns true if successful, false if not." },
+				SetValueB =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "NewValue",
+							Type = "boolean",
+						},
+						{
+							Name = "CreateIfNotExists",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Overwrites the specified value with a new bool value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false).",
+				},
+				SetValueF =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "NewValue",
+							Type = "number",
+						},
+						{
+							Name = "CreateIfNotExists",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Overwrites the specified value with a new floating-point number value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false).",
+				},
+				SetValueI =
+				{
+					Params =
+					{
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "ValueName",
+							Type = "string",
+						},
+						{
+							Name = "NewValue",
+							Type = "number",
+						},
+						{
+							Name = "CreateIfNotExists",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Overwrites the specified value with a new integer value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false).",
+				},
+				WriteFile =
+				{
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Writes the current in-memory data into the specified file. Returns true if successful, false if not.",
+				},
 			},
 			Constants =
 			{
-				noID = { Notes = "" },
+				noID =
+				{
+					Notes = "",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -1192,22 +7587,22 @@ end
 local IniFile = cIniFile();
 IniFile:ReadFile("somefile.ini")
 local NumKeys = IniFile:GetNumKeys();
-for k = 0, NumKeys do
+for k = 0, (NumKeys - 1) do
 	local NumValues = IniFile:GetNumValues(k);
 	LOG("key \"" .. IniFile:GetKeyName(k) .. "\" has " .. NumValues .. " values:");
-	for v = 0, NumValues do
+	for v = 0, (NumValues - 1) do
 		LOG("  value \"" .. IniFile:GetValueName(k, v) .. "\".");
 	end
 end
 </pre>
 					]],
 				},
-			},  -- AdditionalInfo
-		},  -- cIniFile
-
+			},
+		},
 		cInventory =
 		{
-			Desc = [[This object is used to store the items that a {{cPlayer|cPlayer}} has. It also keeps track of what item the player has currently selected in their hotbar.
+			Desc = [[
+This object is used to store the items that a {{cPlayer|cPlayer}} has. It also keeps track of what item the player has currently selected in their hotbar.
 Internally, the class uses three {{cItemGrid|cItemGrid}} objects to store the contents:
 <li>Armor</li>
 <li>Inventory</li>
@@ -1220,47 +7615,510 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			]],
 			Functions =
 			{
-				AddItem = { Params = "{{cItem|cItem}}, [AllowNewStacks]", Return = "number", Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added" },
-				AddItems = { Params = "{{cItems|cItems}}, [AllowNewStacks]", Return = "number", Notes = "Same as AddItem, but for several items at once" },
-				ChangeSlotCount = { Params = "SlotNum, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum" },
-				Clear = { Params = "", Return = "", Notes = "Empties all slots" },
-				CopyToItems = { Params = "{{cItems|cItems}}", Return = "", Notes = "Copies all non-empty slots into the cItems object provided; original cItems contents are preserved" },
-				DamageEquippedItem = { Params = "[DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the currently equipped it" },
-				DamageItem = { Params = "SlotNum, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
-				GetArmorGrid = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the ItemGrid representing the armor grid (1 x 4 slots)" },
-				GetArmorSlot = { Params = "ArmorSlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the specified armor slot contents. Note that the returned item is read-only" },
-				GetEquippedBoots = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the \"boots\" slot of the armor grid. Note that the returned item is read-only" },
-				GetEquippedChestplate = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the \"chestplate\" slot of the armor grid. Note that the returned item is read-only" },
-				GetEquippedHelmet = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the \"helmet\" slot of the armor grid. Note that the returned item is read-only" },
-				GetEquippedItem = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the currently selected item from the hotbar. Note that the returned item is read-only" },
-				GetEquippedLeggings = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the \"leggings\" slot of the armor grid. Note that the returned item is read-only" },
-				GetEquippedSlotNum = { Params = "", Return = "number", Notes = "Returns the hotbar slot number for the currently selected item" },
-				GetHotbarGrid = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the ItemGrid representing the hotbar grid (9 x 1 slots)" },
-				GetHotbarSlot = { Params = "HotBarSlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the specified hotbar slot contents. Note that the returned item is read-only" },
-				GetInventoryGrid = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the ItemGrid representing the main inventory (9 x 3 slots)" },
-				GetInventorySlot = { Params = "InventorySlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the specified main inventory slot contents. Note that the returned item is read-only" },
-				GetOwner = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player whose inventory this object represents" },
-				GetSlot = { Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the contents of the specified slot. Note that the returned item is read-only" },
-				HasItems = { Params = "{{cItem|cItem}}", Return = "bool", Notes = "Returns true if there are at least as many items of the specified type as in the parameter" },
-				HowManyCanFit = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that can fit in the storage, including empty slots" },
-				HowManyItems = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that are currently stored" },
-				RemoveItem = { Params = "{{cItem}}", Return = "number", Notes = "Removes the specified item from the inventory, as many as possible, up to the item's m_ItemCount. Returns the number of items that were removed." },
-				RemoveOneEquippedItem = { Params = "", Return = "", Notes = "Removes one item from the hotbar's currently selected slot" },
-				SetArmorSlot = { Params = "ArmorSlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified armor slot contents" },
-				SetEquippedSlotNum = { Params = "EquippedSlotNum", Return = "", Notes = "Sets the currently selected hotbar slot number" },
-				SetHotbarSlot = { Params = "HotbarSlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified hotbar slot contents" },
-				SetInventorySlot = { Params = "InventorySlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified main inventory slot contents" },
-				SetSlot = { Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot contents" },
+				AddItem =
+				{
+					Params =
+					{
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+						{
+							Name = "AllowNewStacks",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added",
+				},
+				AddItems =
+				{
+					Params =
+					{
+						{
+							Name = "cItems",
+							Type = "cItems",
+						},
+						{
+							Name = "AllowNewStacks",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Same as AddItem, but for several items at once",
+				},
+				ChangeSlotCount =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+						{
+							Name = "AddToCount",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum",
+				},
+				Clear =
+				{
+					Notes = "Empties all slots",
+				},
+				CopyToItems =
+				{
+					Params =
+					{
+						{
+							Name = "cItems",
+							Type = "cItems",
+						},
+					},
+					Notes = "Copies all non-empty slots into the cItems object provided; original cItems contents are preserved",
+				},
+				DamageEquippedItem =
+				{
+					Params =
+					{
+						{
+							Name = "DamageAmount",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "HasDestroyed",
+							Type = "boolean",
+						},
+					},
+					Notes = "Adds the specified damage (1 by default) to the currently equipped item. Removes the item and returns true if the item reached its max damage and was destroyed.",
+				},
+				DamageItem =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+						{
+							Name = "DamageAmount",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "HasDestroyed",
+							Type = "boolean",
+						},
+					},
+					Notes = "Adds the specified damage (1 by default) to the specified item. Removes the item and returns true if the item reached its max damage and was destroyed.",
+				},
+				GetArmorGrid =
+				{
+					Returns =
+					{
+						{
+							Type = "cItemGrid",
+						},
+					},
+					Notes = "Returns the ItemGrid representing the armor grid (1 x 4 slots)",
+				},
+				GetArmorSlot =
+				{
+					Params =
+					{
+						{
+							Name = "ArmorSlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the specified armor slot contents. Note that the returned item is read-only",
+				},
+				GetEquippedBoots =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item in the \"boots\" slot of the armor grid. Note that the returned item is read-only",
+				},
+				GetEquippedChestplate =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item in the \"chestplate\" slot of the armor grid. Note that the returned item is read-only",
+				},
+				GetEquippedHelmet =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item in the \"helmet\" slot of the armor grid. Note that the returned item is read-only",
+				},
+				GetEquippedItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the currently selected item from the hotbar. Note that the returned item is read-only",
+				},
+				GetEquippedLeggings =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item in the \"leggings\" slot of the armor grid. Note that the returned item is read-only",
+				},
+				GetEquippedSlotNum =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the hotbar slot number for the currently selected item",
+				},
+				GetHotbarGrid =
+				{
+					Returns =
+					{
+						{
+							Type = "cItemGrid",
+						},
+					},
+					Notes = "Returns the ItemGrid representing the hotbar grid (9 x 1 slots)",
+				},
+				GetHotbarSlot =
+				{
+					Params =
+					{
+						{
+							Name = "HotBarSlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the specified hotbar slot contents. Note that the returned item is read-only",
+				},
+				GetInventoryGrid =
+				{
+					Returns =
+					{
+						{
+							Type = "cItemGrid",
+						},
+					},
+					Notes = "Returns the ItemGrid representing the main inventory (9 x 3 slots)",
+				},
+				GetInventorySlot =
+				{
+					Params =
+					{
+						{
+							Name = "InventorySlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the specified main inventory slot contents. Note that the returned item is read-only",
+				},
+				GetOwner =
+				{
+					Returns =
+					{
+						{
+							Type = "cPlayer",
+						},
+					},
+					Notes = "Returns the player whose inventory this object represents",
+				},
+				GetSlot =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the contents of the specified slot. Note that the returned item is read-only",
+				},
+				HasItems =
+				{
+					Params =
+					{
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if there are at least as many items of the specified type as in the parameter",
+				},
+				HowManyCanFit =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "ItemStack",
+								Type = "cItem",
+							},
+							{
+								Name = "AllowNewStacks",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns number of items out of a_ItemStack that can fit in the storage. If AllowNewStacks is false, only considers slots already containing the specified item. AllowNewStacks defaults to true if not given.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "ItemStack",
+								Type = "cItem",
+							},
+							{
+								Name = "BeginSlotNum",
+								Type = "number",
+							},
+							{
+								Name = "EndSlotNum",
+								Type = "number",
+							},
+							{
+								Name = "AllowNewStacks",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns how many items of the specified type would fit into the slot range specified. If AllowNewStacks is false, only considers slots already containing the specified item. AllowNewStacks defaults to true if not given.",
+					},
+				},
+				HowManyItems =
+				{
+					Params =
+					{
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of the specified items that are currently stored",
+				},
+				RemoveItem =
+				{
+					Params =
+					{
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Removes the specified item from the inventory, as many as possible, up to the item's m_ItemCount. Returns the number of items that were removed.",
+				},
+				RemoveOneEquippedItem =
+				{
+					Notes = "Removes one item from the hotbar's currently selected slot",
+				},
+				SendEquippedSlot =
+				{
+					Notes = "Sends the equipped item slot to the client",
+				},
+				SetArmorSlot =
+				{
+					Params =
+					{
+						{
+							Name = "ArmorSlotNum",
+							Type = "number",
+						},
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the specified armor slot contents",
+				},
+				SetEquippedSlotNum =
+				{
+					Params =
+					{
+						{
+							Name = "EquippedSlotNum",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the currently selected hotbar slot number",
+				},
+				SetHotbarSlot =
+				{
+					Params =
+					{
+						{
+							Name = "HotbarSlotNum",
+							Type = "number",
+						},
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the specified hotbar slot contents",
+				},
+				SetInventorySlot =
+				{
+					Params =
+					{
+						{
+							Name = "InventorySlotNum",
+							Type = "number",
+						},
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the specified main inventory slot contents",
+				},
+				SetSlot =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the specified slot contents",
+				},
 			},
 			Constants =
 			{
-				invArmorCount      = { Notes = "Number of slots in the Armor part" },
-				invArmorOffset     = { Notes = "Starting slot number of the Armor part" },
-				invInventoryCount  = { Notes = "Number of slots in the main inventory part" },
-				invInventoryOffset = { Notes = "Starting slot number of the main inventory part" },
-				invHotbarCount     = { Notes = "Number of slots in the Hotbar part" },
-				invHotbarOffset    = { Notes = "Starting slot number of the Hotbar part" },
-				invNumSlots        = { Notes = "Total number of slots in a cInventory" },
+				invArmorCount =
+				{
+					Notes = "Number of slots in the Armor part",
+				},
+				invArmorOffset =
+				{
+					Notes = "Starting slot number of the Armor part",
+				},
+				invHotbarCount =
+				{
+					Notes = "Number of slots in the Hotbar part",
+				},
+				invHotbarOffset =
+				{
+					Notes = "Starting slot number of the Hotbar part",
+				},
+				invInventoryCount =
+				{
+					Notes = "Number of slots in the main inventory part",
+				},
+				invInventoryOffset =
+				{
+					Notes = "Starting slot number of the main inventory part",
+				},
+				invNumSlots =
+				{
+					Notes = "Total number of slots in a cInventory",
+				},
 			},
 			ConstantGroups =
 			{
@@ -1272,8 +8130,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					]],
 				},
 			},
-		},  -- cInventory
-
+		},
 		cItem =
 		{
 			Desc = [[
@@ -1289,44 +8146,327 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				ItemToString(), ItemTypeToString() or ItemToFullString(). To translate from a string to a cItem,
 				use the StringToItem() global function.
 			]],
-
 			Functions =
 			{
+				AddCount =
+				{
+					Params =
+					{
+						{
+							Name = "AmountToAdd",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Adds the specified amount to the item count. Returns self (useful for chaining).",
+				},
+				Clear =
+				{
+					Notes = "Resets the instance to an empty item",
+				},
 				constructor =
 				{
-					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem object" },
-					{ Params = "ItemType, Count, Damage, EnchantmentString, CustomName, Lore", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default), enchantments (non-enchanted by default), CustomName (empty by default) and Lore (string, empty by default)" },
-					{ Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
-				} ,
-				AddCount = { Params = "AmountToAdd", Return = "cItem", Notes = "Adds the specified amount to the item count. Returns self (useful for chaining)." },
-				Clear = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
-				CopyOne = { Params = "", Return = "cItem", Notes = "Creates a copy of this object, with its count set to 1" },
-				DamageItem = { Params = "[Amount]", Return = "bool", Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)" },
-				Empty = { Params = "", Return = "", Notes = "Resets the instance to an empty item" },
-				GetMaxDamage = { Params = "", Return = "number", Notes = "Returns the maximum value for damage that this item can get before breaking; zero if damage is not accounted for for this item type" },
-				GetMaxStackSize = { Params = "", Return = "number", Notes = "Returns the maximum stack size for this item." },
-				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
-				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
-				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage, lore, name and enchantments)" },
-				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
-				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments" },
-				IsBothNameAndLoreEmpty = { Params = "", Return = "bool", Notes = "Returns if both the custom name and lore are not set." },
-				IsCustomNameEmpty = { Params = "", Return = "bool", Notes = "Returns if the custom name of the cItem is empty." },
-				IsLoreEmpty = { Params = "", Return = "", Notes = "Returns if the lore of the cItem is empty." },
-				GetEnchantability = { Params = "", Return = "number", Notes = "Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0" },
-				EnchantByXPLevels = { Params = "NumXPLevels", Return = "bool", Notes = "Enchants the item using the specified number of XP levels. Returns true if item enchanted, false if not." },
-				IsEnchantable = { Params = "ItemType, WithBook", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is enchantable. If WithBook is true, the function is used in the anvil inventory with book enchantments. So it checks the \"only book enchantments\" too. Example: You can only enchant a hoe with a book." },
+					{
+						Returns =
+						{
+							{
+								Type = "cItem",
+							},
+						},
+						Notes = "Creates a new empty cItem object",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "Count",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "Damage",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "EnchantmentString",
+								Type = "string",
+								IsOptional = true,
+							},
+							{
+								Name = "CustomName",
+								Type = "string",
+								IsOptional = true,
+							},
+							{
+								Name = "Lore",
+								Type = "string",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "cItem",
+							},
+						},
+						Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default), enchantments (non-enchanted by default), CustomName (empty by default) and Lore (string, empty by default)",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "cItem",
+							},
+						},
+						Notes = "Creates an exact copy of the cItem object in the parameter",
+					},
+				},
+				CopyOne =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Creates a copy of this object, with its count set to 1",
+				},
+				DamageItem =
+				{
+					Params =
+					{
+						{
+							Name = "Amount",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "HasReachedMaxDamage",
+							Type = "boolean",
+						},
+					},
+					Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)",
+				},
+				Empty =
+				{
+					Notes = "Resets the instance to an empty item",
+				},
+				EnchantByXPLevels =
+				{
+					Params =
+					{
+						{
+							Name = "NumXPLevels",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "HasEnchanted",
+							Type = "boolean",
+						},
+					},
+					Notes = "Randomly enchants the item using the specified number of XP levels. Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already).",
+				},
+				GetEnchantability =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the enchantability of the item. Returns zero if the item doesn't have enchantability.",
+				},
+				GetMaxDamage =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum value for damage that this item can get before breaking; zero if damage is not accounted for for this item type",
+				},
+				GetMaxStackSize =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum stack size for this item.",
+				},
+				IsBothNameAndLoreEmpty =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns if both the custom name and lore are not set.",
+				},
+				IsCustomNameEmpty =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns if the custom name is empty.",
+				},
+				IsDamageable =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if this item does account for its damage",
+				},
+				IsEmpty =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if this object represents an empty item (zero count or invalid ItemType)",
+				},
+				IsEnchantable =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+						{
+							Name = "WithBook",
+							Type = "boolean",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is enchantable. If WithBook is true, the function is used in the anvil inventory with book enchantments. So it checks the \"only book enchantments\" too. Example: You can only enchant a hoe with a book.",
+				},
+				IsEqual =
+				{
+					Params =
+					{
+						{
+							Name = "OtherItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage, lore, name and enchantments)",
+				},
+				IsFullStack =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the item is stacked up to its maximum stacking",
+				},
+				IsLoreEmpty =
+				{
+					Notes = "Returns if the lore of the cItem is empty.",
+				},
+				IsSameType =
+				{
+					Params =
+					{
+						{
+							Name = "OtherItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments",
+				},
 			},
 			Variables =
 			{
-				m_Enchantments = { Type = "{{cEnchantments}}", Notes = "The enchantments that this item has" },
-				m_ItemCount    = { Type = "number", Notes = "Number of items in this stack" },
-				m_ItemDamage   = { Type = "number", Notes = "The damage of the item. Zero means no damage. Maximum damage can be queried with GetMaxDamage()" },
-				m_ItemType     = { Type = "number", Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants" },
-				m_CustomName   = { Type = "string", Notes = "The custom name for an item." },
-				m_Lore         = { Type = "string", Notes = "The lore for an item. Line breaks are represented by the ` character." },
-				m_RepairCost   = { Type = "number", Notes = "The repair cost of the item. The anvil need this value" },
-				m_Enchantments = { Type = "{{cEnchantments|cEnchantments}}}", Notes = "The enchantments of the item." },
+				m_CustomName =
+				{
+					Type = "string",
+					Notes = "The custom name for an item.",
+				},
+				m_Enchantments =
+				{
+					Type = "{{cEnchantments|cEnchantments}}}",
+					Notes = "The enchantments of the item.",
+				},
+				m_ItemCount =
+				{
+					Type = "number",
+					Notes = "Number of items in this stack",
+				},
+				m_ItemDamage =
+				{
+					Type = "number",
+					Notes = "The damage of the item. Zero means no damage. Maximum damage can be queried with GetMaxDamage()",
+				},
+				m_ItemType =
+				{
+					Type = "number",
+					Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants",
+				},
+				m_Lore =
+				{
+					Type = "string",
+					Notes = "The lore for an item. Line breaks are represented by the ` character.",
+				},
+				m_RepairCost =
+				{
+					Type = "number",
+					Notes = "The repair cost of the item. The anvil need this value",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -1369,58 +8509,60 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 ]],
 				},
 			},
-		},  -- cItem
-
-		cObjective =
+		},
+		cItemFrame =
 		{
-			Desc = [[
-				This class represents a single scoreboard objective.
-			]],
 			Functions =
 			{
-				AddScore = { Params = "string, number", Return = "Score", Notes = "Adds a value to the score of the specified player and returns the new value." },
-				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the objective. This name will be shown to the connected players." },
-				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the objective." },
-				GetScore = { Params = "string", Return = "Score", Notes = "Returns the score of the specified player." },
-				GetType = { Params = "", Return = "eType", Notes = "Returns the type of the objective. (i.e what is being tracked)" },
-				Reset = { Params = "", Return = "", Notes = "Resets the scores of the tracked players." },
-				ResetScore = { Params = "string", Return = "", Notes = "Reset the score of the specified player." },
-				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of the objective." },
-				SetScore = { Params = "string, Score", Return = "", Notes = "Sets the score of the specified player." },
-				SubScore = { Params = "string, number", Return = "Score", Notes = "Subtracts a value from the score of the specified player and returns the new value." },
+				GetItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+							IsConst = true,
+						},
+					},
+					Notes = "Returns the item in the frame (readonly object, do not modify)",
+				},
+				GetItemRotation =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the rotation from the item in the frame",
+				},
+				SetItem =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Set the item in the frame",
+				},
+				SetItemRotation =
+				{
+					Params =
+					{
+						{
+							Name = "ItemRotation",
+							Type = "number",
+						},
+					},
+					Notes = "Set the rotation from the item in the frame",
+				},
 			},
-			Constants =
-			{
-				otAchievement = { Notes = "" },
-				otDeathCount = { Notes = "" },
-				otDummy = { Notes = "" },
-				otHealth = { Notes = "" },
-				otPlayerKillCount = { Notes = "" },
-				otStat = { Notes = "" },
-				otStatBlockMine = { Notes = "" },
-				otStatEntityKill = { Notes = "" },
-				otStatEntityKilledBy = { Notes = "" },
-				otStatItemBreak = { Notes = "" },
-				otStatItemCraft = { Notes = "" },
-				otStatItemUse = { Notes = "" },
-				otTotalKillCount = { Notes = "" },
-			},
-		}, -- cObjective
-
-		cPainting =
-		{
-			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
-			Functions =
-			{
-				GetDirection = { Params = "", Return = "number", Notes = "Returns the direction the painting faces. Directions: ZP - 0, ZM - 2, XM - 1, XP - 3. Note that these are not the BLOCK_FACE constants." },
-				GetName = { Params = "", Return = "string", Notes = "Returns the name of the painting" },
-			},
-
-		}, -- cPainting
-
+		},
 		cItemGrid =
 		{
-			Desc = [[This class represents a 2D array of items. It is used as the underlying storage and API for all cases that use a grid of items:
+			Desc = [[
+This class represents a 2D array of items. It is used as the underlying storage and API for all cases that use a grid of items:
 <li>{{cChestEntity|Chest}} contents</li>
 <li>(TODO) Chest minecart contents</li>
 <li>{{cDispenserEntity|Dispenser}} contents</li>
@@ -1435,59 +8577,617 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 ]],
 			Functions =
 			{
-				AddItem = { Params = "{{cItem|cItem}}, [AllowNewStacks]", Return = "number", Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added" },
-				AddItems = { Params = "{{cItems|cItems}}, [AllowNewStacks]", Return = "number", Notes = "Same as AddItem, but for several items at once" },
+				AddItem =
+				{
+					Params =
+					{
+						{
+							Name = "ItemStack",
+							Type = "cItem",
+						},
+						{
+							Name = "AllowNewStacks",
+							Type = "boolean",
+							IsOptional = true,
+						},
+						{
+							Name = "PrioritarySlot",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Adds as many items out of ItemStack as can fit. If AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true (default), empty slots can be used for the rest. If PrioritarySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritarySlot is set to -1 (default), regular order applies. Returns the number of items that fit.",
+				},
+				AddItems =
+				{
+					Params =
+					{
+						{
+							Name = "ItemStackList",
+							Type = "cItems",
+						},
+						{
+							Name = "AllowNewStacks",
+							Type = "boolean",
+							IsOptional = true,
+						},
+						{
+							Name = "PrioritarySlot",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Same as AddItem, but works on an entire list of item stacks. The a_ItemStackList is modified to reflect the leftover items. If a_AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true, empty slots can be used for the rest. If PrioritarySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritarySlot is set to -1 (default), regular order applies. Returns the total number of items that fit.",
+				},
 				ChangeSlotCount =
 				{
-					{ Params = "SlotNum, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum" },
-					{ Params = "X, Y, AddToCount", Return = "number", Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid slot coords" },
+					{
+						Params =
+						{
+							{
+								Name = "SlotNum",
+								Type = "number",
+							},
+							{
+								Name = "AddToCount",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid SlotNum",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+							{
+								Name = "AddToCount",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Adds AddToCount to the count of items in the specified slot. If the slot was empty, ignores the call. Returns the new count in the slot, or -1 if invalid slot coords",
+					},
 				},
-				Clear = { Params = "", Return = "", Notes = "Empties all slots" },
-				CopyToItems = { Params = "{{cItems|cItems}}", Return = "", Notes = "Copies all non-empty slots into the cItems object provided; original cItems contents are preserved" },
+				Clear =
+				{
+					Notes = "Empties all slots",
+				},
+				CopyToItems =
+				{
+					Params =
+					{
+						{
+							Name = "cItems",
+							Type = "cItems",
+						},
+					},
+					Notes = "Copies all non-empty slots into the {{cItems}} object provided; original cItems contents are preserved as well.",
+				},
 				DamageItem =
 				{
-					{ Params = "SlotNum, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
-					{ Params = "X, Y, [DamageAmount]", Return = "bool", Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed" },
+					{
+						Params =
+						{
+							{
+								Name = "SlotNum",
+								Type = "number",
+							},
+							{
+								Name = "DamageAmount",
+								Type = "number",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "HasReachedMaxDamage",
+								Type = "boolean",
+							},
+						},
+						Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed (but doesn't destroy the item).",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+							{
+								Name = "DamageAmount",
+								Type = "number",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "HasReachedMaxDamage",
+								Type = "boolean",
+							},
+						},
+						Notes = "Adds the specified damage (1 by default) to the specified item, returns true if the item reached its max damage and should be destroyed (but doesn't destroy the item).",
+					},
 				},
 				EmptySlot =
 				{
-					{ Params = "SlotNum", Return = "", Notes = "Destroys the item in the specified slot" },
-					{ Params = "X, Y", Return = "", Notes = "Destroys the item in the specified slot" },
+					{
+						Params =
+						{
+							{
+								Name = "SlotNum",
+								Type = "number",
+							},
+						},
+						Notes = "Destroys the item in the specified slot",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+						},
+						Notes = "Destroys the item in the specified slot",
+					},
 				},
-				GetFirstEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the first empty slot, -1 if all slots are full" },
-				GetFirstUsedSlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the first non-empty slot, -1 if all slots are empty" },
-				GetHeight = { Params = "", Return = "number", Notes = "Returns the Y dimension of the grid" },
-				GetLastEmptySlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the last empty slot, -1 if all slots are full" },
-				GetLastUsedSlot = { Params = "", Return = "number", Notes = "Returns the SlotNumber of the last non-empty slot, -1 if all slots are empty" },
-				GetNextEmptySlot = { Params = "StartFrom", Return = "number", Notes = "Returns the SlotNumber of the first empty slot following StartFrom, -1 if all the following slots are full" },
-				GetNextUsedSlot = { Params = "StartFrom", Return = "number", Notes = "Returns the SlotNumber of the first non-empty slot following StartFrom, -1 if all the following slots are full" },
-				GetNumSlots = { Params = "", Return = "number", Notes = "Returns the total number of slots in the grid (Width * Height)" },
+				GetFirstEmptySlot =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the SlotNumber of the first empty slot, -1 if all slots are full",
+				},
+				GetFirstUsedSlot =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the SlotNumber of the first non-empty slot, -1 if all slots are empty",
+				},
+				GetHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Y dimension of the grid",
+				},
+				GetLastEmptySlot =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the SlotNumber of the last empty slot, -1 if all slots are full",
+				},
+				GetLastUsedSlot =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the SlotNumber of the last non-empty slot, -1 if all slots are empty",
+				},
+				GetNextEmptySlot =
+				{
+					Params =
+					{
+						{
+							Name = "StartFrom",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the SlotNumber of the first empty slot following StartFrom, -1 if all the following slots are full",
+				},
+				GetNextUsedSlot =
+				{
+					Params =
+					{
+						{
+							Name = "StartFrom",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the SlotNumber of the first non-empty slot following StartFrom, -1 if all the following slots are full",
+				},
+				GetNumSlots =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the total number of slots in the grid (Width * Height)",
+				},
 				GetSlot =
 				{
-					{ Params = "SlotNumber", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
-					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the item in the specified slot. Note that the item is read-only" },
+					{
+						Params =
+						{
+							{
+								Name = "SlotNumber",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "cItem",
+							},
+						},
+						Notes = "Returns the item in the specified slot. Note that the item is read-only",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "cItem",
+							},
+						},
+						Notes = "Returns the item in the specified slot. Note that the item is read-only",
+					},
 				},
-				GetSlotCoords = { Params = "SlotNum", Return = "number, number", Notes = "Returns the X and Y coords for the specified SlotNumber. Returns \"-1, -1\" on invalid SlotNumber" },
-				GetSlotNum = { Params = "X, Y", Return = "number", Notes = "Returns the SlotNumber for the specified slot coords. Returns -1 on invalid coords" },
-				GetWidth = { Params = "", Return = "number", Notes = "Returns the X dimension of the grid" },
-				HasItems = { Params = "{{cItem|cItem}}", Return = "bool", Notes = "Returns true if there are at least as many items of the specified type as in the parameter" },
-				HowManyCanFit = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that can fit in the storage, including empty slots" },
-				HowManyItems = { Params = "{{cItem|cItem}}", Return = "number", Notes = "Returns the number of the specified items that are currently stored" },
+				GetSlotCoords =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X and Y coords for the specified SlotNumber. Returns \"-1, -1\" on invalid SlotNumber",
+				},
+				GetSlotNum =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the SlotNumber for the specified slot coords. Returns -1 on invalid coords",
+				},
+				GetWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X dimension of the grid",
+				},
+				HasItems =
+				{
+					Params =
+					{
+						{
+							Name = "ItemStack",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if there are at least as many items of the specified type as in the parameter",
+				},
+				HowManyCanFit =
+				{
+					Params =
+					{
+						{
+							Name = "ItemStack",
+							Type = "cItem",
+						},
+						{
+							Name = "AllowNewStacks",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of the specified items that can fit in the storage. If AllowNewStacks is true (default), includes empty slots in the returned count.",
+				},
+				HowManyItems =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of the specified item that are currently stored",
+				},
 				IsSlotEmpty =
 				{
-					{ Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
-					{ Params = "X, Y", Return = "bool", Notes = "Returns true if the specified slot is empty, or an invalid slot is specified" },
+					{
+						Params =
+						{
+							{
+								Name = "SlotNum",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Returns true if the specified slot is empty, or an invalid slot is specified",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Returns true if the specified slot is empty, or an invalid slot is specified",
+					},
 				},
-				RemoveItem = { Params = "{{cItem}}", Return = "number", Notes = "Removes the specified item from the grid, as many as possible, up to the item's m_ItemCount. Returns the number of items that were removed." },
+				RemoveItem =
+				{
+					Params =
+					{
+						{
+							Name = "ItemStack",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Removes the specified item from the grid, as many as possible, up to ItemStack's m_ItemCount. Returns the number of items that were removed.",
+				},
 				RemoveOneItem =
 				{
-					{ Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
-					{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned" },
+					{
+						Params =
+						{
+							{
+								Name = "SlotNum",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "cItem",
+							},
+						},
+						Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "cItem",
+							},
+						},
+						Notes = "Removes one item from the stack in the specified slot and returns it as a single cItem. Empty slots are skipped and an empty item is returned",
+					},
 				},
 				SetSlot =
 				{
-					{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
-					{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the specified slot to the specified item" },
+					{
+						Params =
+						{
+							{
+								Name = "SlotNum",
+								Type = "number",
+							},
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Notes = "Sets the specified slot to the specified item",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "SlotNum",
+								Type = "number",
+							},
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "ItemCount",
+								Type = "number",
+							},
+							{
+								Name = "ItemDamage",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the specified slot to the specified item",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Notes = "Sets the specified slot to the specified item",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "ItemCount",
+								Type = "number",
+							},
+							{
+								Name = "ItemDamage",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the specified slot to the specified item",
+					},
 				},
 			},
 			AdditionalInfo =
@@ -1523,9 +9223,8 @@ end
 </pre>
 					]],
 				},
-			},  -- AdditionalInfo
-		},  -- cItemGrid
-
+			},
+		},
 		cItems =
 		{
 			Desc = [[
@@ -1535,27 +9234,263 @@ end
 				]],
 			Functions =
 			{
-				constructor = { Params = "", Return = "cItems", Notes = "Creates a new cItems object" },
 				Add =
 				{
-					{ Params = "{{cItem|cItem}}", Return = "", Notes = "Adds a new item to the end of the collection" },
-					{ Params = "ItemType, ItemCount, ItemDamage", Return = "", Notes = "Adds a new item to the end of the collection" },
+					{
+						Params =
+						{
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Notes = "Adds a new item to the end of the collection",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "ItemCount",
+								Type = "number",
+							},
+							{
+								Name = "ItemDamage",
+								Type = "number",
+							},
+						},
+						Notes = "Adds a new item to the end of the collection",
+					},
 				},
-				Clear = { Params = "", Return = "", Notes = "Removes all items from the collection" },
-				Delete = { Params = "Index", Return = "", Notes = "Deletes item at the specified index" },
-				Get = { Params = "Index", Return = "{{cItem|cItem}}", Notes = "Returns the item at the specified index" },
+				Clear =
+				{
+					Notes = "Removes all items from the collection",
+				},
+				constructor =
+				{
+					Returns =
+					{
+						{
+							Type = "cItems",
+						},
+					},
+					Notes = "Creates a new cItems object",
+				},
+				Contains =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the collection contains an item that is fully equivalent to the parameter",
+				},
+				ContainsType =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the collection contains an item that is the same type as the parameter",
+				},
+				Delete =
+				{
+					Params =
+					{
+						{
+							Name = "Index",
+							Type = "number",
+						},
+					},
+					Notes = "Deletes item at the specified index",
+				},
+				Get =
+				{
+					Params =
+					{
+						{
+							Name = "Index",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item at the specified index",
+				},
 				Set =
 				{
-					{ Params = "Index, {{cItem|cItem}}", Return = "", Notes = "Sets the item at the specified index to the specified item" },
-					{ Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified index to the specified item" },
+					{
+						Params =
+						{
+							{
+								Name = "Index",
+								Type = "number",
+							},
+							{
+								Name = "cItem",
+								Type = "cItem",
+							},
+						},
+						Notes = "Sets the item at the specified index to the specified item",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Index",
+								Type = "number",
+							},
+							{
+								Name = "ItemType",
+								Type = "number",
+							},
+							{
+								Name = "ItemCount",
+								Type = "number",
+							},
+							{
+								Name = "ItemDamage",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the item at the specified index to the specified item",
+					},
 				},
-				Size = { Params = "", Return = "number", Notes = "Returns the number of items in the collection" },
+				Size =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of items in the collection",
+				},
 			},
-		},  -- cItems
-
+		},
+		cJson =
+		{
+			Desc = [[
+				Exposes the Json parser and serializer available in the server. Plugins can parse Json strings into
+				Lua tables, and serialize Lua tables into Json strings easily.
+			]],
+			Functions =
+			{
+				Parse =
+				{
+					Params =
+					{
+						{
+							Name = "InputString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Parses the Json in the input string into a Lua table. Returns nil and detailed error message if parsing fails.",
+				},
+				Serialize =
+				{
+					Params =
+					{
+						{
+							Name = "table",
+							Type = "table",
+						},
+						{
+							Name = "options",
+							Type = "table",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Serializes the input table into a Json string. The options table, if present, is used to adjust the formatting of the serialized string, see below for details.",
+				},
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Serializer options",
+					Contents = [[
+						The "options" parameter given to the cJson:Serialize() function is a dictionary-table of "option
+						name" -> "option value". The serializer warns if any unknown options are used; the following
+						options are recognized:</p>
+						<ul>
+						<li><b>commentStyle</b> - either "All" or "None", specifies whether comments are written to the
+						output. Currently unused since comments cannot be represented in a Lua table</li>
+						<li><b>indentation</b> - the string that is repeated for each level of indentation of the output.
+						If empty, the Json is compressed (without linebreaks).</li>
+						<li><b>enableYAMLCompatibility</b> - bool manipulating the whitespace around the colons.</li>
+						<li><b>dropNullPlaceholders</b> - bool specifying whether null placeholders should be dropped
+						from the output</li>
+						</ul>
+					]],
+				},
+				{
+					Header = "Code example: Parsing a Json string",
+					Contents = [==[
+						The following code, adapted from the Debuggers plugin, parses a simple Json string and verifies
+						the results:
+<pre class="prettyprint lang-lua">
+local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5]}]])
+assert(t1.a == 1)
+assert(t1.b == "2")
+assert(t1.c[1] == 3)
+assert(t1.c[2] == "4")
+assert(t1.c[3] == 5)
+</pre>
+					]==],
+				},
+				{
+					Header = "Code example: Serializing into a Json string",
+					Contents = [[
+						The following code, adapted from the Debuggers plugin, serializes a simple Lua table into a
+						string, using custom indentation:
+<pre class="prettyprint lang-lua">
+local s1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}}, {indentation = "  "})
+LOG("Serialization result: " .. (s1 or "<nil>"))
+</pre>
+					]],
+				},
+			},
+		},
 		cLuaWindow =
 		{
-			Desc = [[This class is used by plugins wishing to display a custom window to the player, unrelated to block entities or entities near the player. The window can be of any type and have any contents that the plugin defines. Callbacks for when the player modifies the window contents and when the player closes the window can be set.
+			Desc = [[
+This class is used by plugins wishing to display a custom window to the player, unrelated to block entities or entities near the player. The window can be of any type and have any contents that the plugin defines. Callbacks for when the player modifies the window contents and when the player closes the window can be set.
 </p>
 		<p>This class inherits from the {{cWindow|cWindow}} class, so all cWindow's functions and constants can be used, in addition to the cLuaWindow-specific functions listed below.
 </p>
@@ -1567,10 +9502,61 @@ end
 ]],
 			Functions =
 			{
-				constructor = { Params = "WindowType, ContentsWidth, ContentsHeight, Title", Return = "", Notes = "Creates a new object of this class" },
-				GetContents = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the cItemGrid object representing the internal storage in this window" },
-				SetOnClosing = { Params = "OnClosingCallback", Return = "", Notes = "Sets the function that the window will call when it is about to be closed by a player" },
-				SetOnSlotChanged = { Params = "OnSlotChangedCallback", Return = "", Notes = "Sets the function that the window will call when a slot is changed by a player" },
+				constructor =
+				{
+					Params =
+					{
+						{
+							Name = "WindowType",
+							Type = "cWindow#WindowType",
+						},
+						{
+							Name = "ContentsWidth",
+							Type = "number",
+						},
+						{
+							Name = "ContentsHeight",
+							Type = "number",
+						},
+						{
+							Name = "Title",
+							Type = "string",
+						},
+					},
+					Notes = "Creates a new object of this class. The window is not shown to any player yet.",
+				},
+				GetContents =
+				{
+					Returns =
+					{
+						{
+							Type = "cItemGrid",
+						},
+					},
+					Notes = "Returns the cItemGrid object representing the internal storage in this window",
+				},
+				SetOnClosing =
+				{
+					Params =
+					{
+						{
+							Name = "OnClosingCallback",
+							Type = "function",
+						},
+					},
+					Notes = "Sets the function that the window will call when it is about to be closed by a player",
+				},
+				SetOnSlotChanged =
+				{
+					Params =
+					{
+						{
+							Name = "OnSlotChangedCallback",
+							Type = "function",
+						},
+					},
+					Notes = "Sets the function that the window will call when a slot is changed by a player",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -1623,7 +9609,7 @@ end
 
 -- Set window contents:
 -- a_Player is a cPlayer object received from the outside of this code fragment
-local Window = cLuaWindow(cWindow.Hopper, 3, 3, "TestWnd");
+local Window = cLuaWindow(cWindow.wtHopper, 3, 3, "TestWnd");
 Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
 Window:SetOnClosing(OnClosing);
 Window:SetOnSlotChanged(OnSlotChanged);
@@ -1633,10 +9619,9 @@ a_Player:OpenWindow(Window);
 </pre>
 					]],
 				},
-			},  -- AdditionalInfo
+			},
 			Inherits = "cWindow",
-		},  -- cLuaWindow
-
+		},
 		cMap =
 		{
 			Desc = [[
@@ -1649,43 +9634,270 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				EraseData = { Params = "", Return = "", Notes = "Erases all pixel data." },
-				GetCenterX = { Params = "", Return = "number", Notes = "Returns the X coord of the map's center." },
-				GetCenterZ = { Params = "", Return = "number", Notes = "Returns the Y coord of the map's center." },
-				GetDimension = { Params = "", Return = "eDimension", Notes = "Returns the dimension of the associated world." },
-				GetHeight = { Params = "", Return = "number", Notes = "Returns the height of the map." },
-				GetID = { Params = "", Return = "number", Notes = "Returns the numerical ID of the map. (The item damage value)" },
-				GetName = { Params = "", Return = "string", Notes = "Returns the name of the map." },
-				GetNumPixels = { Params = "", Return = "number", Notes = "Returns the number of pixels in this map." },
-				GetPixel = { Params = "PixelX, PixelZ", Return = "ColorID", Notes = "Returns the color of the specified pixel." },
-				GetPixelWidth = { Params = "", Return = "number", Notes = "Returns the width of a single pixel in blocks." },
-				GetScale = { Params = "", Return = "number", Notes = "Returns the scale of the map. Range: [0,4]" },
-				GetWidth = { Params = "", Return = "number", Notes = "Returns the width of the map." },
-				GetWorld = { Params = "", Return = "cWorld", Notes = "Returns the associated world." },
-				Resize = { Params = "Width, Height", Return = "", Notes = "Resizes the map. WARNING: This will erase the pixel data." },
-				SetPixel = { Params = "PixelX, PixelZ, ColorID", Return = "bool", Notes = "Sets the color of the specified pixel. Returns false on error (Out of range)." },
-				SetPosition = { Params = "CenterX, CenterZ", Return = "", Notes = "Relocates the map. The pixel data will not be modified." },
-				SetScale = { Params = "number", Return = "", Notes = "Rescales the map. The pixel data will not be modified." },
+				EraseData =
+				{
+					Notes = "Erases all pixel data.",
+				},
+				GetCenterX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X coord of the map's center.",
+				},
+				GetCenterZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Y coord of the map's center.",
+				},
+				GetDimension =
+				{
+					Returns =
+					{
+						{
+							Type = "eDimension",
+						},
+					},
+					Notes = "Returns the dimension of the associated world.",
+				},
+				GetHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the height of the map.",
+				},
+				GetID =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the numerical ID of the map. (The item damage value)",
+				},
+				GetName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the map.",
+				},
+				GetNumPixels =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of pixels in this map.",
+				},
+				GetPixel =
+				{
+					Params =
+					{
+						{
+							Name = "PixelX",
+							Type = "number",
+						},
+						{
+							Name = "PixelZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "ColorID",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color of the specified pixel.",
+				},
+				GetPixelWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the width of a single pixel in blocks.",
+				},
+				GetScale =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the scale of the map. Range: [0,4]",
+				},
+				GetWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the width of the map.",
+				},
+				GetWorld =
+				{
+					Returns =
+					{
+						{
+							Type = "cWorld",
+						},
+					},
+					Notes = "Returns the associated world.",
+				},
+				Resize =
+				{
+					Params =
+					{
+						{
+							Name = "Width",
+							Type = "number",
+						},
+						{
+							Name = "Height",
+							Type = "number",
+						},
+					},
+					Notes = "Resizes the map. WARNING: This will erase the pixel data.",
+				},
+				SetPixel =
+				{
+					Params =
+					{
+						{
+							Name = "PixelX",
+							Type = "number",
+						},
+						{
+							Name = "PixelZ",
+							Type = "number",
+						},
+						{
+							Name = "ColorID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the color of the specified pixel. Returns false on error (Out of range).",
+				},
+				SetPosition =
+				{
+					Params =
+					{
+						{
+							Name = "CenterX",
+							Type = "number",
+						},
+						{
+							Name = "CenterZ",
+							Type = "number",
+						},
+					},
+					Notes = "Relocates the map. The pixel data will not be modified.",
+				},
+				SetScale =
+				{
+					Params =
+					{
+						{
+							Name = "Scale",
+							Type = "number",
+						},
+					},
+					Notes = "Rescales the map. The pixel data will not be modified.",
+				},
 			},
 			Constants =
 			{
-				E_BASE_COLOR_BLUE = { Notes = "" },
-				E_BASE_COLOR_BROWN = { Notes = "" },
-				E_BASE_COLOR_DARK_BROWN = { Notes = "" },
-				E_BASE_COLOR_DARK_GRAY = { Notes = "" },
-				E_BASE_COLOR_DARK_GREEN = { Notes = "" },
-				E_BASE_COLOR_GRAY_1 = { Notes = "" },
-				E_BASE_COLOR_GRAY_2 = { Notes = "" },
-				E_BASE_COLOR_LIGHT_BROWN = { Notes = "" },
-				E_BASE_COLOR_LIGHT_GRAY = { Notes = "" },
-				E_BASE_COLOR_LIGHT_GREEN = { Notes = "" },
-				E_BASE_COLOR_PALE_BLUE = { Notes = "" },
-				E_BASE_COLOR_RED = { Notes = "" },
-				E_BASE_COLOR_TRANSPARENT = { Notes = "" },
-				E_BASE_COLOR_WHITE = { Notes = "" },
+				E_BASE_COLOR_BLUE =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_BROWN =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_DARK_BROWN =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_DARK_GRAY =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_DARK_GREEN =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_GRAY_1 =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_GRAY_2 =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_LIGHT_BROWN =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_LIGHT_GRAY =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_LIGHT_GREEN =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_PALE_BLUE =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_RED =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_TRANSPARENT =
+				{
+					Notes = "",
+				},
+				E_BASE_COLOR_WHITE =
+				{
+					Notes = "",
+				},
 			},
-		}, -- cMap
-
+		},
 		cMapManager =
 		{
 			Desc = [[
@@ -1693,12 +9905,39 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				DoWithMap = { Params = "ID, CallbackFunction", Return = "bool", Notes = "If a map with the specified ID exists, calls the CallbackFunction for that map. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMap|Map}})</pre> Returns true if the map was found and the callback called, false if map not found." },
-				GetNumMaps = { Params = "", Return = "number", Notes = "Returns the number of registered maps." },
+				DoWithMap =
+				{
+					Params =
+					{
+						{
+							Name = "MapID",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If a map with the specified ID exists, calls the CallbackFunction for that map. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMap|Map}})</pre> Returns true if the map was found and the callback called, false if map not found.",
+				},
+				GetNumMaps =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of registered maps.",
+				},
 			},
-
-		}, -- cMapManager
-
+		},
 		cMojangAPI =
 		{
 			Desc = [[
@@ -1721,16 +9960,133 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				AddPlayerNameToUUIDMapping = { Params = "PlayerName, UUID", Return = "", Notes = "(STATIC) Adds the specified PlayerName-to-UUID mapping into the cache, with current timestamp. Accepts both short or dashed UUIDs. " },
-				GetPlayerNameFromUUID = { Params = "UUID, [UseOnlyCached]", Return = "PlayerName", Notes = "(STATIC) Returns the playername that corresponds to the given UUID, or an empty string on error. If UseOnlyCached is false (the default), queries the Mojang servers if the UUID is not in the cache. The UUID can be either short or dashed. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
-				GetUUIDFromPlayerName = { Params = "PlayerName, [UseOnlyCached]", Return = "UUID", Notes = "(STATIC) Returns the (short) UUID that corresponds to the given playername, or an empty string on error. If UseOnlyCached is false (the default), queries the Mojang servers if the playername is not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
-				GetUUIDsFromPlayerNames = { Params = "PlayerNames, [UseOnlyCached]", Return = "table", Notes = "(STATIC) Returns a table that contains the map, 'PlayerName' -> '(short) UUID', for all valid playernames in the input array-table. PlayerNames not recognized will not be set in the returned map. If UseOnlyCached is false (the default), queries the Mojang servers for the results that are not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
-				MakeUUIDDashed = { Params = "UUID", Return = "DashedUUID", Notes = "(STATIC) Converts the UUID to a dashed format (\"01234567-8901-2345-6789-012345678901\"). Accepts both dashed or short UUIDs. Logs a warning and returns an empty string if UUID format not recognized." },
-				MakeUUIDShort = { Params = "UUID", Return = "ShortUUID", Notes = "(STATIC) Converts the UUID to a short format (without dashes, \"01234567890123456789012345678901\"). Accepts both dashed or short UUIDs. Logs a warning and returns an empty string if UUID format not recognized." },
+				AddPlayerNameToUUIDMapping =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+						{
+							Name = "UUID",
+							Type = "string",
+						},
+					},
+					Notes = "Adds the specified PlayerName-to-UUID mapping into the cache, with current timestamp. Accepts both short or dashed UUIDs. ",
+				},
+				GetPlayerNameFromUUID =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "UUID",
+							Type = "string",
+						},
+						{
+							Name = "UseOnlyCached",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the playername that corresponds to the given UUID, or an empty string on error. If UseOnlyCached is false (the default), queries the Mojang servers if the UUID is not in the cache. The UUID can be either short or dashed. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely.",
+				},
+				GetUUIDFromPlayerName =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+						{
+							Name = "UseOnlyCached",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "UUID",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the (short) UUID that corresponds to the given playername, or an empty string on error. If UseOnlyCached is false (the default), queries the Mojang servers if the playername is not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely.",
+				},
+				GetUUIDsFromPlayerNames =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "PlayerNames",
+							Type = "string",
+						},
+						{
+							Name = "UseOnlyCached",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns a table that contains the map, 'PlayerName' -> '(short) UUID', for all valid playernames in the input array-table. PlayerNames not recognized will not be set in the returned map. If UseOnlyCached is false (the default), queries the Mojang servers for the results that are not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely.",
+				},
+				MakeUUIDDashed =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "UUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "DashedUUID",
+							Type = "string",
+						},
+					},
+					Notes = "Converts the UUID to a dashed format (\"01234567-8901-2345-6789-012345678901\"). Accepts both dashed or short UUIDs. Logs a warning and returns an empty string if UUID format not recognized.",
+				},
+				MakeUUIDShort =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "UUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "ShortUUID",
+							Type = "string",
+						},
+					},
+					Notes = "Converts the UUID to a short format (without dashes, \"01234567890123456789012345678901\"). Accepts both dashed or short UUIDs. Logs a warning and returns an empty string if UUID format not recognized.",
+				},
 			},
-
 		},
-
 		cMonster =
 		{
 			Desc = [[
@@ -1740,66 +10096,382 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				HasCustomName = { Params = "", Return = "bool", Notes = "Returns true if the monster has a custom name." },
-				GetCustomName = { Params = "", Return = "string", Notes = "Gets the custom name of the monster. If no custom name is set, the function returns an empty string." },
-				SetCustomName = { Params = "string", Return = "", Notes = "Sets the custom name of the monster. You see the name over the monster. If you want to disable the custom name, simply set an empty string." },
-				IsCustomNameAlwaysVisible = { Params = "", Return = "bool", Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob." },
-				SetCustomNameAlwaysVisible = { Params = "bool", Return = "", Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name." },
-				FamilyFromType = { Params = "{{Globals#MobType|MobType}}", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "(STATIC) Returns the mob family ({{cMonster#MobFamily|mfXXX}} constants) based on the mob type ({{Globals#MobType|mtXXX}} constants)" },
-				GetMobFamily = { Params = "", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "Returns this mob's family ({{cMonster#MobFamily|mfXXX}} constant)" },
-				GetMobType = { Params = "", Return = "{{Globals#MobType|MobType}}", Notes = "Returns the type of this mob ({{Globals#MobType|mtXXX}} constant)" },
-				GetSpawnDelay = { Params = "{{cMonster#MobFamily|MobFamily}}", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
-				MobTypeToString = { Params = "{{Globals#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{Globals#MobType|mtXXX}} constant), or empty string if unknown type." },
-				MobTypeToVanillaName = { Params = "{{Globals#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the vanilla name of the given mob type, or empty string if unknown type." },
-				MoveToPosition = { Params = "Position", Return = "", Notes = "Moves mob to the specified position" },
-				StringToMobType = { Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{Globals#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
-				GetRelativeWalkSpeed = { Params = "", Return = "number", Notes = "Returns the relative walk speed of this mob. Standard is 1.0" },
-				SetRelativeWalkSpeed = { Params = "number", Return = "", Notes = "Sets the relative walk speed of this mob. Standard is 1.0" },
-				SetAge = { Params = "number", Return = "", Notes = "Sets the age of the monster" },
-				GetAge = { Params = "", Return = "number", Notes = "Returns the age of the monster" },
-				IsBaby = { Params = "", Return = "bool", Notes = "Returns true if the monster is a baby" },
+				FamilyFromType =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "MobType",
+							Type = "Globals#eMonsterType",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "MobFamily",
+							Type = "cMonster#eFamily",
+						},
+					},
+					Notes = "Returns the mob family ({{cMonster#eFamily|mfXXX}} constants) based on the mob type ({{Globals#eMonsterType|mtXXX}} constants)",
+				},
+				GetAge =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the age of the monster",
+				},
+				GetCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Gets the custom name of the monster. If no custom name is set, the function returns an empty string.",
+				},
+				GetMobFamily =
+				{
+					Returns =
+					{
+						{
+							Name = "MobFamily",
+							Type = "cMonster#eFamily",
+						},
+					},
+					Notes = "Returns this mob's family ({{cMonster#eFamily|mfXXX}} constant)",
+				},
+				GetMobType =
+				{
+					Returns =
+					{
+						{
+							Name = "MobType",
+							Type = "Globals#eMonsterType",
+						},
+					},
+					Notes = "Returns the type of this mob ({{Globals#eMonsterType|mtXXX}} constant)",
+				},
+				GetRelativeWalkSpeed =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the relative walk speed of this mob. Standard is 1.0",
+				},
+				GetSpawnDelay =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "MobFamily",
+							Type = "cMonster#eFamily",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family.",
+				},
+				HasCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the monster has a custom name.",
+				},
+				IsBaby =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the monster is a baby",
+				},
+				IsCustomNameAlwaysVisible =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
+				},
+				MobTypeToString =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "MobType",
+							Type = "Globals#eMonsterType",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the string representing the given mob type ({{Globals#eMonsterType|mtXXX}} constant), or empty string if unknown type.",
+				},
+				MobTypeToVanillaName =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "MobType",
+							Type = "Globals#MobType",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the vanilla name of the given mob type, or empty string if unknown type.",
+				},
+				MoveToPosition =
+				{
+					Params =
+					{
+						{
+							Name = "Position",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Start moving (using a pathfinder) towards the specified position",
+				},
+				SetAge =
+				{
+					Params =
+					{
+						{
+							Name = "Age",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the age of the monster",
+				},
+				SetCustomName =
+				{
+					Params =
+					{
+						{
+							Name = "CustomName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the custom name of the monster. You see the name over the monster. If you want to disable the custom name, simply set an empty string.",
+				},
+				SetCustomNameAlwaysVisible =
+				{
+					Params =
+					{
+						{
+							Name = "IsCustomNameAlwaysVisible",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name.",
+				},
+				SetRelativeWalkSpeed =
+				{
+					Params =
+					{
+						{
+							Name = "RelativeWalkSpeed",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the relative walk speed of this mob. The default relative speed is 1.0.",
+				},
+				StringToMobType =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "MobTypeString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "MobType",
+							Type = "Globals#eMonsterType",
+						},
+					},
+					Notes = "Returns the mob type ({{Globals#eMonsterType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
+				},
 			},
 			Constants =
 			{
-				mfAmbient = { Notes = "Family: ambient (bat)" },
-				mfHostile = { Notes = "Family: hostile (blaze, cavespider, creeper, enderdragon, enderman, ghast, giant, magmacube, silverfish, skeleton, slime, spider, witch, wither, zombie, zombiepigman)" },
-				mfMaxplusone = { Notes = "The maximum family value, plus one. Returned when monster family not recognized." },
-				mfPassive = { Notes = "Family: passive (chicken, cow, horse, irongolem, mooshroom, ocelot, pig, sheep, snowgolem, villager, wolf)" },
-				mfWater = { Notes = "Family: water (squid)" },
-				mtBat = { Notes = "" },
-				mtBlaze = { Notes = "" },
-				mtCaveSpider = { Notes = "" },
-				mtChicken = { Notes = "" },
-				mtCow = { Notes = "" },
-				mtCreeper = { Notes = "" },
-				mtEnderDragon = { Notes = "" },
-				mtEnderman = { Notes = "" },
-				mtGhast = { Notes = "" },
-				mtGiant = { Notes = "" },
-				mtHorse = { Notes = "" },
-				mtInvalidType = { Notes = "Invalid monster type. Returned when monster type not recognized" },
-				mtIronGolem = { Notes = "" },
-				mtMagmaCube = { Notes = "" },
-				mtMooshroom = { Notes = "" },
-				mtOcelot = { Notes = "" },
-				mtPig = { Notes = "" },
-				mtSheep = { Notes = "" },
-				mtSilverfish = { Notes = "" },
-				mtSkeleton = { Notes = "" },
-				mtSlime = { Notes = "" },
-				mtSnowGolem = { Notes = "" },
-				mtSpider = { Notes = "" },
-				mtSquid = { Notes = "" },
-				mtVillager = { Notes = "" },
-				mtWitch = { Notes = "" },
-				mtWither = { Notes = "" },
-				mtWolf = { Notes = "" },
-				mtZombie = { Notes = "" },
-				mtZombiePigman = { Notes = "" },
+				mfAmbient =
+				{
+					Notes = "Family: ambient (bat)",
+				},
+				mfHostile =
+				{
+					Notes = "Family: hostile (blaze, cavespider, creeper, enderdragon, enderman, ghast, giant, magmacube, silverfish, skeleton, slime, spider, witch, wither, zombie, zombiepigman)",
+				},
+				mfMaxplusone =
+				{
+					Notes = "The maximum family value, plus one. Returned when monster family not recognized.",
+				},
+				mfPassive =
+				{
+					Notes = "Family: passive (chicken, cow, horse, irongolem, mooshroom, ocelot, pig, sheep, snowgolem, villager, wolf)",
+				},
+				mfWater =
+				{
+					Notes = "Family: water (squid)",
+				},
+				mtBat =
+				{
+					Notes = "",
+				},
+				mtBlaze =
+				{
+					Notes = "",
+				},
+				mtCaveSpider =
+				{
+					Notes = "",
+				},
+				mtChicken =
+				{
+					Notes = "",
+				},
+				mtCow =
+				{
+					Notes = "",
+				},
+				mtCreeper =
+				{
+					Notes = "",
+				},
+				mtEnderDragon =
+				{
+					Notes = "",
+				},
+				mtEnderman =
+				{
+					Notes = "",
+				},
+				mtGhast =
+				{
+					Notes = "",
+				},
+				mtGiant =
+				{
+					Notes = "",
+				},
+				mtHorse =
+				{
+					Notes = "",
+				},
+				mtInvalidType =
+				{
+					Notes = "Invalid monster type. Returned when monster type not recognized",
+				},
+				mtIronGolem =
+				{
+					Notes = "",
+				},
+				mtMagmaCube =
+				{
+					Notes = "",
+				},
+				mtMooshroom =
+				{
+					Notes = "",
+				},
+				mtOcelot =
+				{
+					Notes = "",
+				},
+				mtPig =
+				{
+					Notes = "",
+				},
+				mtSheep =
+				{
+					Notes = "",
+				},
+				mtSilverfish =
+				{
+					Notes = "",
+				},
+				mtSkeleton =
+				{
+					Notes = "",
+				},
+				mtSlime =
+				{
+					Notes = "",
+				},
+				mtSnowGolem =
+				{
+					Notes = "",
+				},
+				mtSpider =
+				{
+					Notes = "",
+				},
+				mtSquid =
+				{
+					Notes = "",
+				},
+				mtVillager =
+				{
+					Notes = "",
+				},
+				mtWitch =
+				{
+					Notes = "",
+				},
+				mtWither =
+				{
+					Notes = "",
+				},
+				mtWolf =
+				{
+					Notes = "",
+				},
+				mtZombie =
+				{
+					Notes = "",
+				},
+				mtZombiePigman =
+				{
+					Notes = "",
+				},
 			},
 			ConstantGroups =
 			{
-				MobFamily =
+				eFamily =
 				{
 					Include = "mf.*",
 					TextBefore = [[
@@ -1808,28 +10480,325 @@ a_Player:OpenWindow(Window);
 				},
 			},
 			Inherits = "cPawn",
-		},  -- cMonster
-
-		cPawn =
+		},
+		cObjective =
 		{
-			Desc = [[cPawn is a controllable pawn object, controlled by either AI or a player. cPawn inherits all functions and members of {{cEntity}}
-]],
+			Desc = [[
+				This class represents a single scoreboard objective.
+			]],
 			Functions =
 			{
-				TeleportToEntity = { Return = "" },
-				TeleportTo = { Return = "" },
-				Heal = { Return = "" },
-				TakeDamage = { Return = "" },
-				KilledBy = { Return = "" },
-				GetHealth = { Return = "number" },
-				AddEntityEffect = { Params = "{{cEntityEffect|EffectType}}", Return = "", Notes = "Applies an entity effect" },
-				RemoveEntityEffect = { Params = "{{cEntityEffect|EffectType}}", Return = "", Notes = "Removes a currently applied entity effect" },
-				HasEntityEffect = { Return = "bool", Params = "{{cEntityEffect|EffectType}}", Notes = "Returns true, if the supplied entity effect type is currently applied" },
-				ClearEntityEffects = { Return = "", Notes = "Removes all currently applied entity effects" },
+				AddScore =
+				{
+					Params =
+					{
+						{
+							Name = "string",
+							Type = "string",
+						},
+						{
+							Name = "number",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Score",
+							Type = "<unknown>",
+						},
+					},
+					Notes = "Adds a value to the score of the specified player and returns the new value.",
+				},
+				GetDisplayName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the display name of the objective. This name will be shown to the connected players.",
+				},
+				GetName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the internal name of the objective.",
+				},
+				GetScore =
+				{
+					Params =
+					{
+						{
+							Name = "string",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Score",
+							Type = "<unknown>",
+						},
+					},
+					Notes = "Returns the score of the specified player.",
+				},
+				GetType =
+				{
+					Returns =
+					{
+						{
+							Name = "eType",
+							Type = "<unknown>",
+						},
+					},
+					Notes = "Returns the type of the objective. (i.e what is being tracked)",
+				},
+				Reset =
+				{
+					Notes = "Resets the scores of the tracked players.",
+				},
+				ResetScore =
+				{
+					Params =
+					{
+						{
+							Name = "string",
+							Type = "string",
+						},
+					},
+					Notes = "Reset the score of the specified player.",
+				},
+				SetDisplayName =
+				{
+					Params =
+					{
+						{
+							Name = "string",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the display name of the objective.",
+				},
+				SetScore =
+				{
+					Params =
+					{
+						{
+							Name = "string",
+							Type = "string",
+						},
+						{
+							Name = "Score",
+							Type = "<unknown>",
+						},
+					},
+					Notes = "Sets the score of the specified player.",
+				},
+				SubScore =
+				{
+					Params =
+					{
+						{
+							Name = "string",
+							Type = "string",
+						},
+						{
+							Name = "number",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Score",
+							Type = "<unknown>",
+						},
+					},
+					Notes = "Subtracts a value from the score of the specified player and returns the new value.",
+				},
+			},
+			Constants =
+			{
+				otAchievement =
+				{
+					Notes = "",
+				},
+				otDeathCount =
+				{
+					Notes = "",
+				},
+				otDummy =
+				{
+					Notes = "",
+				},
+				otHealth =
+				{
+					Notes = "",
+				},
+				otPlayerKillCount =
+				{
+					Notes = "",
+				},
+				otStat =
+				{
+					Notes = "",
+				},
+				otStatBlockMine =
+				{
+					Notes = "",
+				},
+				otStatEntityKill =
+				{
+					Notes = "",
+				},
+				otStatEntityKilledBy =
+				{
+					Notes = "",
+				},
+				otStatItemBreak =
+				{
+					Notes = "",
+				},
+				otStatItemCraft =
+				{
+					Notes = "",
+				},
+				otStatItemUse =
+				{
+					Notes = "",
+				},
+				otTotalKillCount =
+				{
+					Notes = "",
+				},
+			},
+		},
+		cPainting =
+		{
+			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
+			Functions =
+			{
+				GetDirection =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the direction the painting faces. Directions: ZP - 0, ZM - 2, XM - 1, XP - 3. Note that these are not the BLOCK_FACE constants.",
+				},
+				GetName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the painting",
+				},
+			},
+		},
+		cPawn =
+		{
+			Desc = "cPawn is a controllable pawn object, controlled by either AI or a player. cPawn inherits all functions and members of {{cEntity}}\
+",
+			Functions =
+			{
+				AddEntityEffect =
+				{
+					Params =
+					{
+						{
+							Name = "EffectType",
+							Type = "cEntityEffect",
+						},
+						{
+							Name = "EffectDurationTicks",
+							Type = "number",
+						},
+						{
+							Name = "EffectIntensity",
+							Type = "number",
+						},
+						{
+							Name = "DistanceModifier",
+							Type = "number",
+						},
+					},
+					Notes = "Applies an entity effect. Checks with plugins if they allow the addition. EffectIntensity is the level of the effect (0 = Potion I, 1 = Potion II, etc). DistanceModifier is the scalar multiplied to the potion duration (only applies to splash potions).",
+				},
+				ClearEntityEffects =
+				{
+					Notes = "Removes all currently applied entity effects",
+				},
+				GetHealth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+				},
+				HasEntityEffect =
+				{
+					Params =
+					{
+						{
+							Name = "EffectType",
+							Type = "cEntityEffect",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true, if the supplied entity effect type is currently applied",
+				},
+				Heal =
+				{
+
+				},
+				KilledBy =
+				{
+
+				},
+				RemoveEntityEffect =
+				{
+					Params =
+					{
+						{
+							Name = "EffectType",
+							Type = "cEntityEffect",
+						},
+					},
+					Notes = "Removes a currently applied entity effect",
+				},
+				TakeDamage =
+				{
+
+				},
+				TeleportTo =
+				{
+
+				},
+				TeleportToEntity =
+				{
+
+				},
 			},
 			Inherits = "cEntity",
-		},  -- cPawn
-
+		},
 		cPickup =
 		{
 			Desc = [[
@@ -1839,16 +10808,78 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				CollectedBy = { Params = "{{cPlayer}}", Return = "bool", Notes = "Tries to make the player collect the pickup. Returns true if the pickup was collected, at least partially." },
-				GetAge = { Params = "", Return = "number", Notes = "Returns the number of ticks that the pickup has existed." },
-				GetItem = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item represented by this pickup" },
-				IsCollected = { Params = "", Return = "bool", Notes = "Returns true if this pickup has already been collected (is waiting to be destroyed)" },
-				IsPlayerCreated = { Params = "", Return = "bool", Notes = "Returns true if the pickup was created by a player" },
-				SetAge = { Params = "AgeTicks", Return = "", Notes = "Sets the pickup's age, in ticks." },
+				CollectedBy =
+				{
+					Params =
+					{
+						{
+							Name = "Player",
+							Type = "cPlayer",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "WasCollected",
+							Type = "boolean",
+						},
+					},
+					Notes = "Tries to make the player collect the pickup. Returns true if the pickup was collected, at least partially.",
+				},
+				GetAge =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of ticks that the pickup has existed.",
+				},
+				GetItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item represented by this pickup",
+				},
+				IsCollected =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if this pickup has already been collected (is waiting to be destroyed)",
+				},
+				IsPlayerCreated =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the pickup was created by a player",
+				},
+				SetAge =
+				{
+					Params =
+					{
+						{
+							Name = "AgeTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the pickup's age, in ticks.",
+				},
 			},
 			Inherits = "cEntity",
-		},  -- cPickup
-
+		},
 		cPlayer =
 		{
 			Desc = [[
@@ -1858,115 +10889,1167 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
-				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "(STATIC) Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
-				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
-				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
-				CloseWindowIfID = { Params = "WindowID, [CanRefuse]", Return = "", Notes = "Closes the currently open UI window if its ID matches the given ID. If CanRefuse is true (default), the window may refuse the closing." },
-				DeltaExperience = { Params = "DeltaXP", Return = "", Notes = "Adds or removes XP from the current XP amount. Won't allow XP to go negative. Returns the new experience, -1 on error (XP overflow)." },
-				Feed = { Params = "AddFood, AddSaturation", Return = "bool", Notes = "Tries to add the specified amounts to food level and food saturation level (only positive amounts expected). Returns true if player was hungry and the food was consumed, false if too satiated." },
-				FoodPoison = { Params = "NumTicks", Return = "", Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two" },
-				ForceSetSpeed = { Params = "{{Vector3d|Direction}}", Notes = "Forces the player to move to the given direction." },
-				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
-				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code." },
-				GetCurrentXp = { Params = "", Return = "number", Notes = "Returns the current amount of XP" },
-				GetCustomName = { Params = "", Return = "string", Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string." },
-				GetEffectiveGameMode = { Params = "", Return = "{{Globals#GameMode|GameMode}}", Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead." },
-				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
-				GetEyeHeight = { Return = "number", Notes = "Returns the height of the player's eyes, in absolute coords" },
-				GetEyePosition = { Return = "{{Vector3d|EyePositionVector}}", Notes = "Returns the position of the player's eyes, as a {{Vector3d}}" },
-				GetFloaterID = { Params = "", Return = "number", Notes = "Returns the Entity ID of the fishing hook floater that belongs to the player. Returns -1 if no floater is associated with the player. FIXME: Undefined behavior when the player has used multiple fishing rods simultanously." },
-				GetFlyingMaxSpeed = { Params = "", Return = "number", Notes = "Returns the maximum flying speed, relative to the default game flying speed. Defaults to 1, but plugins may modify it for faster or slower flying." },
-				GetFoodExhaustionLevel = { Params = "", Return = "number", Notes = "Returns the food exhaustion level" },
-				GetFoodLevel = { Params = "", Return = "number", Notes = "Returns the food level (number of half-drumsticks on-screen)" },
-				GetFoodPoisonedTicksRemaining = { Params = "", Return = "", Notes = "Returns the number of ticks left for the food posoning effect" },
-				GetFoodSaturationLevel = { Params = "", Return = "number", Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)" },
-				GetFoodTickTimer = { Params = "", Return = "", Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
-				GetGameMode = { Return = "{{Globals#GameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
-				GetIP = { Return = "string", Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report."},
-				GetInventory = { Return = "{{cInventory|Inventory}}", Notes = "Returns the player's inventory"},
-				GetLastBedPos = { Params = "", Return = "{{Vector3i}}", Notes = "Returns the position of the last bed the player has slept in, or the world's spawn if no such position was recorded." },
-				GetMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status." },
-				GetName = { Return = "string", Notes = "Returns the player's name" },
-				GetNormalMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum walking speed, relative to the game default speed. Defaults to 1, but plugins may modify it for faster or slower walking." },
-				GetPermissions = { Params = "", Return = "array-table of strings", Notes = "Returns the list of all permissions that the player has assigned to them through their rank." },
-				GetPlayerListName = { Return = "string", Notes = "Returns the name that is used in the playerlist." },
-				GetResolvedPermissions = { Return = "array-table of string", Notes = "Returns all the player's permissions, as a table. The permissions are stored in the array part of the table, beginning with index 1." },
-				GetSprintingMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's maximum sprinting speed, relative to the game default speed. Defaults to 1.3, but plugins may modify it for faster or slower sprinting." },
-				GetStance = { Return = "number", Notes = "Returns the player's stance (Y-pos of player's eyes)" },
-				GetTeam = { Params = "", Return = "{{cTeam}}", Notes = "Returns the team that the player belongs to, or nil if none." },
-				GetThrowSpeed = { Params = "SpeedCoeff", Return = "{{Vector3d}}", Notes = "Returns the speed vector for an object thrown with the specified speed coeff. Basically returns the normalized look vector multiplied by the coeff, with a slight random variation." },
-				GetThrowStartPos = { Params = "", Return = "{{Vector3d}}", Notes = "Returns the position where the projectiles should start when thrown by this player." },
-				GetUUID = { Params = "", Return = "string", Notes = "Returns the (short) UUID that the player is using. Could be empty string for players that don't have a Mojang account assigned to them (in the future, bots for example)." },
-				GetWindow = { Params = "", Return = "{{cWindow}}", Notes = "Returns the currently open UI window. If the player doesn't have any UI window open, returns the inventory window." },
-				GetXpLevel = { Params = "", Return = "number", Notes = "Returns the current XP level (based on current XP amount)." },
-				GetXpLifetimeTotal = { Params = "", Return = "number", Notes = "Returns the amount of XP that has been accumulated throughout the player's lifetime." },
-				GetXpPercentage = { Params = "", Return = "number", Notes = "Returns the percentage of the experience bar - the amount of XP towards the next XP level. Between 0 and 1." },
-				HasCustomName = { Params = "", Return = "bool", Notes = "Returns true if the player has a custom name." },
-				HasPermission = { Params = "PermissionString", Return = "bool", Notes = "Returns true if the player has the specified permission" },
-				Heal = { Params = "HitPoints", Return = "", Notes = "Heals the player by the specified amount of HPs. Only positive amounts are expected. Sends a health update to the client." },
-				IsEating = { Params = "", Return = "bool", Notes = "Returns true if the player is currently eating the item in their hand." },
-				IsFishing = { Params = "", Return = "bool", Notes = "Returns true if the player is currently fishing" },
-				IsFlying = { Return = "bool", Notes = "Returns true if the player is flying." },
-				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world." },
-				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world." },
-				IsGameModeSpectator = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSpectator gamemode, or has their gamemode unset and the world is a gmSpectator world." },
-				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSurvival gamemode, or has their gamemode unset and the world is a gmSurvival world." },
-				IsInBed = { Params = "", Return = "bool", Notes = "Returns true if the player is currently lying in a bed." },
-				IsSatiated = { Params = "", Return = "bool", Notes = "Returns true if the player is satiated (cannot eat)." },
-				IsVisible = { Params = "", Return = "bool", Notes = "Returns true if the player is visible to other players" },
-				LoadRank = { Params = "", Return = "", Notes = "Reloads the player's rank, message visuals and permissions from the {{cRankManager}}, based on the player's current rank." },
-				MoveTo = { Params = "{{Vector3d|NewPosition}}", Return = "Tries to move the player into the specified position." },
-				MoveToWorld = { Params = "WorldName", Return = "bool", Return = "Moves the player to the specified world. Returns true if successful." },
-				OpenWindow = { Params = "{{cWindow|Window}}", Return = "", Notes = "Opens the specified UI window for the player." },
-				PermissionMatches = { Params = "Permission, Template", Return = "bool", Notes = "(STATIC) Returns true if the specified permission matches the specified template. The template may contain wildcards." },
-				PlaceBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "bool", Notes = "Places a block while impersonating the player. The {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}} hook is called before the placement, and if it succeeds, the block is placed and the {{OnPlayerPlacedBlock|HOOK_PLAYER_PLACED_BLOCK}} hook is called. Returns true iff the block is successfully placed. Assumes that the block is in a currently loaded chunk." },
-				Respawn = { Params = "", Return = "", Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet." },
-				SendBlocksAround = { Params = "BlockX, BlockY, BlockZ, [Range]", Return = "", Notes = "Sends all the world's blocks in Range from the specified coords to the player, as a BlockChange packet. Range defaults to 1 (only one block sent)." },
-				SendMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player." },
-				SendMessageFailure = { Params = "Message", Return = "", Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For a command that failed to run because of insufficient permissions, etc." },
-				SendMessageFatal = { Params = "Message", Return = "", Notes = "Prepends Red [FATAL] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For something serious, such as a plugin crash, etc." },
-				SendMessageInfo = { Params = "Message", Return = "", Notes = "Prepends Yellow [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Informational message, such as command usage, etc." },
-				SendMessagePrivateMsg = { Params = "Message, SenderName", Return = "", Notes = "Prepends Light Blue [MSG: *SenderName*] / prepends SenderName and colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For private messaging." },
-				SendMessageSuccess = { Params = "Message", Return = "", Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Success notification." },
-				SendMessageWarning = { Params = "Message, Sender", Return = "", Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Denotes that something concerning, such as plugin reload, is about to happen." },
-				SendAboveActionBarMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player (shows above action bar, doesn't show for < 1.8 clients)." },
-				SendSystemMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player (doesn't show for < 1.8 clients)." },
-				SendRotation = { Params = "YawDegrees, PitchDegrees", Return = "", Notes = "Sends the specified rotation to the player, forcing them to look that way" },
-				SetBedPos = { Params = "{{Vector3i|Position}}", Return = "", Notes = "Sets the internal representation of the last bed position the player has slept in. The player will respawn at this position if they die." },
-				SetCanFly = { Params = "CanFly", Notes = "Sets if the player can fly or not." },
-				SetCrouch = { Params = "IsCrouched", Return = "", Notes = "Sets the crouch state, broadcasts the change to other players." },
-				SetCurrentExperience = { Params = "XPAmount", Return = "", Notes = "Sets the current amount of experience (and indirectly, the XP level)." },
-				SetCustomName = { Params = "string", Return = "", Notes = "Sets the custom name of this player. If you want to disable the custom name, simply set an empty string. The custom name will be used in the tab-list, in the player nametag and in the tab-completion." },
-				SetFlying = { Params = "IsFlying", Notes = "Sets if the player is flying or not." },
-				SetFlyingMaxSpeed = { Params = "FlyingMaxSpeed", Return = "", Notes = "Sets the flying maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client." },
-				SetFoodExhaustionLevel = { Params = "ExhaustionLevel", Return = "", Notes = "Sets the food exhaustion to the specified level." },
-				SetFoodLevel = { Params = "FoodLevel", Return = "", Notes = "Sets the food level (number of half-drumsticks on-screen)" },
-				SetFoodPoisonedTicksRemaining = { Params = "FoodPoisonedTicksRemaining", Return = "", Notes = "Sets the number of ticks remaining for food poisoning. Doesn't send foodpoisoning effect to the client, use FoodPoison() for that." },
-				SetFoodSaturationLevel = { Params = "FoodSaturationLevel", Return = "", Notes = "Sets the food saturation (overcharge of the food level)." },
-				SetFoodTickTimer = { Params = "FoodTickTimer", Return = "", Notes = "Sets the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
-				SetGameMode = { Params = "{{Globals#GameMode|NewGameMode}}", Return = "", Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit." },
-				SetIsFishing = { Params = "IsFishing, [FloaterEntityID]", Return = "", Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously" },
-				SetName = { Params = "Name", Return = "", Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player." },
-				SetNormalMaxSpeed = { Params = "NormalMaxSpeed", Return = "", Notes = "Sets the normal (walking) maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client, if appropriate." },
-				SetSprint = { Params = "IsSprinting", Return = "", Notes = "Sets whether the player is sprinting or not." },
-				SetSprintingMaxSpeed = { Params = "SprintingMaxSpeed", Return = "", Notes = "Sets the sprinting maximum speed, relative to the game default speed. The default value is 1.3. Sends the updated speed to the client, if appropriate." },
-				SetTeam = { Params = "{{cTeam|Team}}", Return = "", Notes = "Moves the player to the specified team." },
-				SetVisible = { Params = "IsVisible", Return = "", Notes = "Sets the player visibility to other players" },
-				TossEquippedItem = { Params = "[Amount]", Return = "", Notes = "Tosses the item that the player has selected in their hotbar. Amount defaults to 1." },
-				TossHeldItem = { Params = "[Amount]", Return = "", Notes = "Tosses the item held by the cursor, then the player is in a UI window. Amount defaults to 1." },
-				TossPickup = { Params = "{{cItem|Item}}", Return = "", Notes = "Tosses a pickup newly created from the specified item." },
-				XpForLevel = { Params = "XPLevel", Return = "number", Notes = "(STATIC) Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp()." },
+				AddFoodExhaustion =
+				{
+					Params =
+					{
+						{
+							Name = "Exhaustion",
+							Type = "number",
+						},
+					},
+					Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected.",
+				},
+				CalcLevelFromXp =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "XPAmount",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel().",
+				},
+				CanFly =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns if the player is able to fly.",
+				},
+				CloseWindow =
+				{
+					Params =
+					{
+						{
+							Name = "CanRefuse",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing.",
+				},
+				CloseWindowIfID =
+				{
+					Params =
+					{
+						{
+							Name = "WindowID",
+							Type = "number",
+						},
+						{
+							Name = "CanRefuse",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Notes = "Closes the currently open UI window if its ID matches the given ID. If CanRefuse is true (default), the window may refuse the closing.",
+				},
+				DeltaExperience =
+				{
+					Params =
+					{
+						{
+							Name = "DeltaXP",
+							Type = "number",
+						},
+					},
+					Notes = "Adds or removes XP from the current XP amount. Won't allow XP to go negative. Returns the new experience, -1 on error (XP overflow).",
+				},
+				Feed =
+				{
+					Params =
+					{
+						{
+							Name = "AddFood",
+							Type = "number",
+						},
+						{
+							Name = "AddSaturation",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Tries to add the specified amounts to food level and food saturation level (only positive amounts expected). Returns true if player was hungry and the food was consumed, false if too satiated.",
+				},
+				FoodPoison =
+				{
+					Params =
+					{
+						{
+							Name = "NumTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two",
+				},
+				ForceSetSpeed =
+				{
+					Params =
+					{
+						{
+							Name = "Direction",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Forces the player to move to the given direction.",
+				},
+				Freeze =
+				{
+					Params =
+					{
+						{
+							Name = "Location",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Teleports the player to \"Location\" and prevents them from moving, locking them in place until unfreeze() is called",
+				},
+				GetClientHandle =
+				{
+					Returns =
+					{
+						{
+							Type = "cClientHandle",
+						},
+					},
+					Notes = "Returns the client handle representing the player's connection. May be nil (AI players).",
+				},
+				GetColor =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
+				},
+				GetCurrentXp =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the current amount of XP",
+				},
+				GetCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+				},
+				GetEffectiveGameMode =
+				{
+					Returns =
+					{
+						{
+							Name = "GameMode",
+							Type = "Globals#GameMode",
+						},
+					},
+					Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead.",
+				},
+				GetEquippedItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item that the player is currently holding; empty item if holding nothing.",
+				},
+				GetEyeHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the height of the player's eyes, in absolute coords",
+				},
+				GetEyePosition =
+				{
+					Returns =
+					{
+						{
+							Name = "EyePositionVector",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the position of the player's eyes, as a {{Vector3d}}",
+				},
+				GetFloaterID =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Entity ID of the fishing hook floater that belongs to the player. Returns -1 if no floater is associated with the player. FIXME: Undefined behavior when the player has used multiple fishing rods simultanously.",
+				},
+				GetFlyingMaxSpeed =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum flying speed, relative to the default game flying speed. Defaults to 1, but plugins may modify it for faster or slower flying.",
+				},
+				GetFoodExhaustionLevel =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the food exhaustion level",
+				},
+				GetFoodLevel =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the food level (number of half-drumsticks on-screen)",
+				},
+				GetFoodPoisonedTicksRemaining =
+				{
+					Notes = "Returns the number of ticks left for the food posoning effect",
+				},
+				GetFoodSaturationLevel =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)",
+				},
+				GetFoodTickTimer =
+				{
+					Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied.",
+				},
+				GetGameMode =
+				{
+					Returns =
+					{
+						{
+							Name = "GameMode",
+							Type = "Globals#GameMode",
+						},
+					},
+					Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically.",
+				},
+				GetInventory =
+				{
+					Returns =
+					{
+						{
+							Name = "Inventory",
+							Type = "cInventory",
+						},
+					},
+					Notes = "Returns the player's inventory",
+				},
+				GetIP =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report.",
+				},
+				GetLastBedPos =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3i",
+						},
+					},
+					Notes = "Returns the position of the last bed the player has slept in, or the world's spawn if no such position was recorded.",
+				},
+				GetMaxSpeed =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status.",
+				},
+				GetName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the player's name",
+				},
+				GetNormalMaxSpeed =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the player's maximum walking speed, relative to the game default speed. Defaults to 1, but plugins may modify it for faster or slower walking.",
+				},
+				GetPermissions =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table of all permissions (strings) that the player has assigned to them through their rank.",
+				},
+				GetPlayerListName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name that is used in the playerlist.",
+				},
+				GetResolvedPermissions =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns all the player's permissions, as an array-table of strings.",
+				},
+				GetSprintingMaxSpeed =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the player's maximum sprinting speed, relative to the game default speed. Defaults to 1.3, but plugins may modify it for faster or slower sprinting.",
+				},
+				GetStance =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the player's stance (Y-pos of player's eyes)",
+				},
+				GetTeam =
+				{
+					Returns =
+					{
+						{
+							Type = "cTeam",
+						},
+					},
+					Notes = "Returns the team that the player belongs to, or nil if none.",
+				},
+				GetThrowSpeed =
+				{
+					Params =
+					{
+						{
+							Name = "SpeedCoeff",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the speed vector for an object thrown with the specified speed coeff. Basically returns the normalized look vector multiplied by the coeff, with a slight random variation.",
+				},
+				GetThrowStartPos =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the position where the projectiles should start when thrown by this player.",
+				},
+				GetUUID =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the (short) UUID that the player is using. Could be empty string for players that don't have a Mojang account assigned to them (in the future, bots for example).",
+				},
+				GetWindow =
+				{
+					Returns =
+					{
+						{
+							Type = "cWindow",
+						},
+					},
+					Notes = "Returns the currently open UI window. If the player doesn't have any UI window open, returns the inventory window.",
+				},
+				GetXpLevel =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the current XP level (based on current XP amount).",
+				},
+				GetXpLifetimeTotal =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the amount of XP that has been accumulated throughout the player's lifetime.",
+				},
+				GetXpPercentage =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the percentage of the experience bar - the amount of XP towards the next XP level. Between 0 and 1.",
+				},
+				HasCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player has a custom name.",
+				},
+				HasPermission =
+				{
+					Params =
+					{
+						{
+							Name = "PermissionString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player has the specified permission",
+				},
+				Heal =
+				{
+					Params =
+					{
+						{
+							Name = "HitPoints",
+							Type = "number",
+						},
+					},
+					Notes = "Heals the player by the specified amount of HPs. Only positive amounts are expected. Sends a health update to the client.",
+				},
+				IsEating =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is currently eating the item in their hand.",
+				},
+				IsFishing =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is currently fishing",
+				},
+				IsFlying =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is flying.",
+				},
+				IsFrozen =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is frozen. See Freeze()",
+				},
+				IsGameModeAdventure =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world.",
+				},
+				IsGameModeCreative =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world.",
+				},
+				IsGameModeSpectator =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is in the gmSpectator gamemode, or has their gamemode unset and the world is a gmSpectator world.",
+				},
+				IsGameModeSurvival =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is in the gmSurvival gamemode, or has their gamemode unset and the world is a gmSurvival world.",
+				},
+				IsInBed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is currently lying in a bed.",
+				},
+				IsSatiated =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is satiated (cannot eat).",
+				},
+				IsVisible =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player is visible to other players",
+				},
+				LoadRank =
+				{
+					Notes = "Reloads the player's rank, message visuals and permissions from the {{cRankManager}}, based on the player's current rank.",
+				},
+				MoveTo =
+				{
+					Params =
+					{
+						{
+							Name = "NewPosition",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Tries to move the player into the specified position.",
+				},
+				OpenWindow =
+				{
+					Params =
+					{
+						{
+							Name = "Window",
+							Type = "cWindow",
+						},
+					},
+					Notes = "Opens the specified UI window for the player.",
+				},
+				PermissionMatches =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Permission",
+							Type = "string",
+						},
+						{
+							Name = "Template",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified permission matches the specified template. The template may contain asterisk as a wildcard for any word.",
+				},
+				PlaceBlock =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Places a block while impersonating the player. The {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}} hook is called before the placement, and if it succeeds, the block is placed and the {{OnPlayerPlacedBlock|HOOK_PLAYER_PLACED_BLOCK}} hook is called. Returns true iff the block is successfully placed. Assumes that the block is in a currently loaded chunk.",
+				},
+				Respawn =
+				{
+					Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet.",
+				},
+				SendAboveActionBarMessage =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Sends the specified message to the player (shows above action bar, doesn't show for < 1.8 clients).",
+				},
+				SendBlocksAround =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockRange",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sends all the world's blocks in BlockRange from the specified coords to the player, as a BlockChange packet. Range defaults to 1 (only one block sent).",
+				},
+				SendMessage =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Sends the specified message to the player.",
+				},
+				SendMessageFailure =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For a command that failed to run because of insufficient permissions, etc.",
+				},
+				SendMessageFatal =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Prepends Red [FATAL] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For something serious, such as a plugin crash, etc.",
+				},
+				SendMessageInfo =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Prepends Yellow [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Informational message, such as command usage, etc.",
+				},
+				SendMessagePrivateMsg =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "SenderName",
+							Type = "string",
+						},
+					},
+					Notes = "Prepends Light Blue [MSG: *SenderName*] / prepends SenderName and colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For private messaging.",
+				},
+				SendMessageSuccess =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Success notification.",
+				},
+				SendMessageWarning =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Denotes that something concerning, such as plugin reload, is about to happen.",
+				},
+				SendRotation =
+				{
+					Params =
+					{
+						{
+							Name = "YawDegrees",
+							Type = "number",
+						},
+						{
+							Name = "PitchDegrees",
+							Type = "number",
+						},
+					},
+					Notes = "Sends the specified rotation to the player, forcing them to look that way",
+				},
+				SendSystemMessage =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Sends the specified message to the player (doesn't show for < 1.8 clients).",
+				},
+				SetBedPos =
+				{
+					Params =
+					{
+						{
+							Name = "Position",
+							Type = "Vector3i",
+						},
+						{
+							Name = "World",
+							Type = "cWorld*",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sets the position and world of the player's respawn point, which is also known as the bed position. The player will respawn at this position and world upon death. If the world is not specified, it is set to the player's current world.",
+				},
+				SetCanFly =
+				{
+					Params =
+					{
+						{
+							Name = "CanFly",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets if the player can fly or not.",
+				},
+				SetCrouch =
+				{
+					Params =
+					{
+						{
+							Name = "IsCrouched",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the crouch state, broadcasts the change to other players.",
+				},
+				SetCurrentExperience =
+				{
+					Params =
+					{
+						{
+							Name = "XPAmount",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the current amount of experience (and indirectly, the XP level).",
+				},
+				SetCustomName =
+				{
+					Params =
+					{
+						{
+							Name = "CustomName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the custom name for this player. If you want to disable the custom name, simply set an empty string. The custom name will be used in the tab-list, in the player nametag and in the tab-completion.",
+				},
+				SetFlying =
+				{
+					Params =
+					{
+						{
+							Name = "IsFlying",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets if the player is flying or not.",
+				},
+				SetFlyingMaxSpeed =
+				{
+					Params =
+					{
+						{
+							Name = "FlyingMaxSpeed",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the flying maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client.",
+				},
+				SetFoodExhaustionLevel =
+				{
+					Params =
+					{
+						{
+							Name = "ExhaustionLevel",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the food exhaustion to the specified level.",
+				},
+				SetFoodLevel =
+				{
+					Params =
+					{
+						{
+							Name = "FoodLevel",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the food level (number of half-drumsticks on-screen)",
+				},
+				SetFoodPoisonedTicksRemaining =
+				{
+					Params =
+					{
+						{
+							Name = "FoodPoisonedTicksRemaining",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the number of ticks remaining for food poisoning. Doesn't send foodpoisoning effect to the client, use FoodPoison() for that.",
+				},
+				SetFoodSaturationLevel =
+				{
+					Params =
+					{
+						{
+							Name = "FoodSaturationLevel",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the food saturation (overcharge of the food level).",
+				},
+				SetFoodTickTimer =
+				{
+					Params =
+					{
+						{
+							Name = "FoodTickTimer",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied.",
+				},
+				SetGameMode =
+				{
+					Params =
+					{
+						{
+							Name = "NewGameMode",
+							Type = "Globals#GameMode",
+						},
+					},
+					Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit.",
+				},
+				SetIsFishing =
+				{
+					Params =
+					{
+						{
+							Name = "IsFishing",
+							Type = "boolean",
+						},
+						{
+							Name = "FloaterEntityID",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously",
+				},
+				SetName =
+				{
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player.",
+				},
+				SetNormalMaxSpeed =
+				{
+					Params =
+					{
+						{
+							Name = "NormalMaxSpeed",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the normal (walking) maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client, if appropriate.",
+				},
+				SetSprint =
+				{
+					Params =
+					{
+						{
+							Name = "IsSprinting",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the player is sprinting or not.",
+				},
+				SetSprintingMaxSpeed =
+				{
+					Params =
+					{
+						{
+							Name = "SprintingMaxSpeed",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the sprinting maximum speed, relative to the game default speed. The default value is 1.3. Sends the updated speed to the client, if appropriate.",
+				},
+				SetTeam =
+				{
+					Params =
+					{
+						{
+							Name = "Team",
+							Type = "cTeam",
+						},
+					},
+					Notes = "Moves the player to the specified team.",
+				},
+				SetVisible =
+				{
+					Params =
+					{
+						{
+							Name = "IsVisible",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the player visibility to other players",
+				},
+				TossEquippedItem =
+				{
+					Params =
+					{
+						{
+							Name = "Amount",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Notes = "Tosses the item that the player has selected in their hotbar. Amount defaults to 1.",
+				},
+				TossHeldItem =
+				{
+					Params =
+					{
+						{
+							Name = "Amount",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Notes = "Tosses the item held by the cursor, when the player is in a UI window. Amount defaults to 1.",
+				},
+				TossPickup =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Tosses a pickup newly created from the specified item.",
+				},
+				Unfreeze =
+				{
+					Notes = "Allows the player to move again, canceling the effects of Freeze()",
+				},
+				XpForLevel =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "XPLevel",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the total amount of XP needed for the specified XP level. Inverse of CalcLevelFromXp().",
+				},
 			},
 			Constants =
 			{
-				EATING_TICKS   = { Notes = "Number of ticks required for consuming an item." },
-				MAX_FOOD_LEVEL = { Notes = "The maximum food level value. When the food level is at this value, the player cannot eat." },
-				MAX_HEALTH     = { Notes = "The maximum health value" },
+				EATING_TICKS =
+				{
+					Notes = "Number of ticks required for consuming an item.",
+				},
+				MAX_FOOD_LEVEL =
+				{
+					Notes = "The maximum food level value. When the food level is at this value, the player cannot eat.",
+				},
+				MAX_HEALTH =
+				{
+					Notes = "The maximum health value",
+				},
 			},
 			Inherits = "cPawn",
-		},  -- cPlayer
-
+		},
 		cRankManager =
 		{
 			Desc = [[
@@ -1998,43 +12081,561 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				AddGroup = { Params = "GroupName", Return = "", Notes = "Adds the group of the specified name. Logs a warning and does nothing if the group already exists." },
-				AddGroupToRank = { Params = "GroupName, RankName", Return = "bool", Notes = "Adds the specified group to the specified rank. Returns true on success, false on failure - if the group name or the rank name is not found." },
-				AddPermissionToGroup = { Params = "Permission, GroupName", Return = "bool", Notes = "Adds the specified permission to the specified group. Returns true on success, false on failure - if the group name is not found." },
-				AddRank = { Params = "RankName, MsgPrefix, MsgSuffix, MsgNameColorCode", Return = "", Notes = "Adds a new rank of the specified name and with the specified message visuals. Logs an info message and does nothing if the rank already exists." },
-				ClearPlayerRanks = { Params = "", Return = "", Notes = "Removes all player ranks from the database. Note that this doesn't change the cPlayer instances for the already connected players, you need to update all the instances manually." },
-				GetAllGroups = { Params = "", Return = "array-table of groups' names", Notes = "Returns an array-table containing the names of all the groups that are known to the manager." },
-				GetAllPermissions = { Params = "", Return = "array-table of permissions", Notes = "Returns an array-table containing all the permissions that are known to the manager." },
-				GetAllPlayerUUIDs = { Params = "", Return = "array-table of uuids", Notes = "Returns the short uuids of all players stored in the rank DB, sorted by the players' names (case insensitive)." },
-				GetAllRanks = { Params = "", Return = "array-table of ranks' names", Notes = "Returns an array-table containing the names of all the ranks that are known to the manager." },
-				GetDefaultRank = { Params = "", Return = "string", Notes = "Returns the name of the default rank. " },
-				GetGroupPermissions = { Params = "GroupName", Return = "array-table of permissions", Notes = "Returns an array-table containing the permissions that the specified group contains." },
-				GetPlayerGroups = { Params = "PlayerUUID", Return = "array-table of groups' names", Notes = "Returns an array-table of the names of the groups that are assigned to the specified player through their rank. Returns an empty table if the player is not known or has no rank or groups assigned to them." },
-				GetPlayerMsgVisuals = { Params = "PlayerUUID", Return = "MsgPrefix, MsgSuffix, MsgNameColorCode", Notes = "Returns the message visuals assigned to the player. If the player is not explicitly assigned a rank, the default rank's visuals are returned. If there is an error, no value is returned at all." },
-				GetPlayerPermissions = { Params = "PlayerUUID", Return = "array-table of permissions", Notes = "Returns the permissions that the specified player is assigned through their rank. Returns the default rank's permissions if the player has no explicit rank assigned to them. Returns an empty array on error." },
-				GetPlayerRankName = { Params = "PlayerUUID", Return = "RankName", Notes = "Returns the name of the rank that is assigned to the specified player. An empty string (NOT the default rank) is returned if the player has no rank assigned to them." },
-				GetPlayerName = { Params = "PlayerUUID", Return = "PlayerName", Notes = "Returns the last name that the specified player has, for a player in the ranks database. An empty string is returned if the player isn't in the database." },
-				GetRankGroups = { Params = "RankName", Return = "array-table of groups' names", Notes = "Returns an array-table of the names of all the groups that are assigned to the specified rank. Returns an empty table if there is no such rank." },
-				GetRankPermissions = { Params = "RankName", Return = "array-table of permissions", Notes = "Returns an array-table of all the permissions that are assigned to the specified rank through its groups. Returns an empty table if there is no such rank." },
-				GetRankVisuals = { Params = "RankName", Return = "MsgPrefix, MsgSuffix, MsgNameColorCode", Notes = "Returns the message visuals for the specified rank. Returns no value if the specified rank does not exist." },
-				GroupExists = { Params = "GroupName", Return = "bool", Notes = "Returns true iff the specified group exists." },
-				IsGroupInRank = { Params = "GroupName, RankName", Return = "bool", Notes = "Returns true iff the specified group is assigned to the specified rank." },
-				IsPermissionInGroup = { Params = "Permission, GroupName", Return = "bool", Notes = "Returns true iff the specified permission is assigned to the specified group." },
-				IsPlayerRankSet = { Params = "PlayerUUID", Return = "bool", Notes = "Returns true iff the specified player has a rank assigned to them." },
-				RankExists = { Params = "RankName", Return = "bool", Notes = "Returns true iff the specified rank exists." },
-				RemoveGroup = { Params = "GroupName", Return = "", Notes = "Removes the specified group completely. The group will be removed from all the ranks using it and then erased from the manager. Logs an info message and does nothing if the group doesn't exist." },
-				RemoveGroupFromRank = { Params = "GroupName, RankName", Return = "", Notes = "Removes the specified group from the specified rank. The group will still exist, even if it isn't assigned to any rank. Logs an info message and does nothing if the group or rank doesn't exist." },
-				RemovePermissionFromGroup = { Params = "Permission, GroupName", Return = "", Notes = "Removes the specified permission from the specified group. Logs an info message and does nothing if the group doesn't exist." },
-				RemovePlayerRank = { Params = "PlayerUUID", Return = "", Notes = "Removes the player's rank; the player's left without a rank. Note that this doesn't change the {{cPlayer}} instances for the already connected players, you need to update all the instances manually. No action if the player has no rank assigned to them already." },
-				RemoveRank = { Params = "RankName, [ReplacementRankName]", Return = "", Notes = "Removes the specified rank. If ReplacementRankName is given, the players that have RankName will get their rank set to ReplacementRankName. If it isn't given, or is an invalid rank, the players will be removed from the manager, their ranks will be unset completely. Logs an info message and does nothing if the rank is not found." },
-				RenameGroup = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified group. Logs an info message and does nothing if the group is not found or the new name is already used." },
-				RenameRank = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified rank. Logs an info message and does nothing if the rank is not found or the new name is already used." },
-				SetDefaultRank = { Params = "RankName", Return = "bool", Notes = "Sets the specified rank as the default rank. Returns true on success, false on failure (rank doesn't exist)." },
-				SetPlayerRank = { Params = "PlayerUUID, PlayerName, RankName", Return = "", Notes = "Updates the rank for the specified player. The player name is provided for reference, the UUID is used for identification. Logs a warning and does nothing if the rank is not found." },
-				SetRankVisuals = { Params = "RankName, MsgPrefix, MsgSuffix, MsgNameColorCode", Return = "", Notes = "Updates the rank's message visuals. Logs an info message and does nothing if rank not found." },
+				AddGroup =
+				{
+					Params =
+					{
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+					},
+					Notes = "Adds the group of the specified name. Logs a warning and does nothing if the group already exists.",
+				},
+				AddGroupToRank =
+				{
+					Params =
+					{
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Adds the specified group to the specified rank. Returns true on success, false on failure - if the group name or the rank name is not found.",
+				},
+				AddPermissionToGroup =
+				{
+					Params =
+					{
+						{
+							Name = "Permission",
+							Type = "string",
+						},
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Adds the specified permission to the specified group. Returns true on success, false on failure - if the group name is not found.",
+				},
+				AddRank =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+						{
+							Name = "MsgPrefix",
+							Type = "string",
+						},
+						{
+							Name = "MsgSuffix",
+							Type = "string",
+						},
+						{
+							Name = "MsgNameColorCode",
+							Type = "string",
+						},
+					},
+					Notes = "Adds a new rank of the specified name and with the specified message visuals. Logs an info message and does nothing if the rank already exists.",
+				},
+				ClearPlayerRanks =
+				{
+					Notes = "Removes all player ranks from the database. Note that this doesn't change the cPlayer instances for the already connected players, you need to update all the instances manually.",
+				},
+				GetAllGroups =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table containing the names of all the groups that are known to the manager.",
+				},
+				GetAllPermissions =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table containing all the permissions that are known to the manager.",
+				},
+				GetAllPlayerUUIDs =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns the short uuids of all players stored in the rank DB, sorted by the players' names (case insensitive).",
+				},
+				GetAllRanks =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table containing the names of all the ranks that are known to the manager.",
+				},
+				GetDefaultRank =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the default rank. ",
+				},
+				GetGroupPermissions =
+				{
+					Params =
+					{
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table containing the permissions that the specified group contains.",
+				},
+				GetPlayerGroups =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table of the names of the groups that are assigned to the specified player through their rank. Returns an empty table if the player is not known or has no rank or groups assigned to them.",
+				},
+				GetPlayerMsgVisuals =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "MsgPrefix",
+							Type = "string",
+						},
+						{
+							Name = "MsgSuffix",
+							Type = "string",
+						},
+						{
+							Name = "MsgNameColorCode",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the message visuals assigned to the player. If the player is not explicitly assigned a rank, the default rank's visuals are returned. If there is an error, no value is returned at all.",
+				},
+				GetPlayerName =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the last name that the specified player has, for a player in the ranks database. An empty string is returned if the player isn't in the database.",
+				},
+				GetPlayerPermissions =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table containing all permissions that the specified player is assigned through their rank. Returns the default rank's permissions if the player has no explicit rank assigned to them. Returns an empty array on error.",
+				},
+				GetPlayerRankName =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the rank that is assigned to the specified player. An empty string (NOT the default rank) is returned if the player has no rank assigned to them.",
+				},
+				GetRankGroups =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table of the names of all the groups that are assigned to the specified rank. Returns an empty table if there is no such rank.",
+				},
+				GetRankPermissions =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns an array-table of all the permissions that are assigned to the specified rank through its groups. Returns an empty table if there is no such rank.",
+				},
+				GetRankVisuals =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "MsgPrefix",
+							Type = "string",
+						},
+						{
+							Name = "MsgSuffix",
+							Type = "string",
+						},
+						{
+							Name = "MsgNameColorCode",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the message visuals for the specified rank. Returns no value if the specified rank does not exist.",
+				},
+				GroupExists =
+				{
+					Params =
+					{
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true iff the specified group exists.",
+				},
+				IsGroupInRank =
+				{
+					Params =
+					{
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true iff the specified group is assigned to the specified rank.",
+				},
+				IsPermissionInGroup =
+				{
+					Params =
+					{
+						{
+							Name = "Permission",
+							Type = "string",
+						},
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true iff the specified permission is assigned to the specified group.",
+				},
+				IsPlayerRankSet =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true iff the specified player has a rank assigned to them.",
+				},
+				RankExists =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true iff the specified rank exists.",
+				},
+				RemoveGroup =
+				{
+					Params =
+					{
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+					},
+					Notes = "Removes the specified group completely. The group will be removed from all the ranks using it and then erased from the manager. Logs an info message and does nothing if the group doesn't exist.",
+				},
+				RemoveGroupFromRank =
+				{
+					Params =
+					{
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Notes = "Removes the specified group from the specified rank. The group will still exist, even if it isn't assigned to any rank. Logs an info message and does nothing if the group or rank doesn't exist.",
+				},
+				RemovePermissionFromGroup =
+				{
+					Params =
+					{
+						{
+							Name = "Permission",
+							Type = "string",
+						},
+						{
+							Name = "GroupName",
+							Type = "string",
+						},
+					},
+					Notes = "Removes the specified permission from the specified group. Logs an info message and does nothing if the group doesn't exist.",
+				},
+				RemovePlayerRank =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+					},
+					Notes = "Removes the player's rank; the player's left without a rank. Note that this doesn't change the {{cPlayer}} instances for the already connected players, you need to update all the instances manually. No action if the player has no rank assigned to them already.",
+				},
+				RemoveRank =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+						{
+							Name = "ReplacementRankName",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Notes = "Removes the specified rank. If ReplacementRankName is given, the players that have RankName will get their rank set to ReplacementRankName. If it isn't given, or is an invalid rank, the players will be removed from the manager, their ranks will be unset completely. Logs an info message and does nothing if the rank is not found.",
+				},
+				RenameGroup =
+				{
+					Params =
+					{
+						{
+							Name = "OldName",
+							Type = "string",
+						},
+						{
+							Name = "NewName",
+							Type = "string",
+						},
+					},
+					Notes = "Renames the specified group. Logs an info message and does nothing if the group is not found or the new name is already used.",
+				},
+				RenameRank =
+				{
+					Params =
+					{
+						{
+							Name = "OldName",
+							Type = "string",
+						},
+						{
+							Name = "NewName",
+							Type = "string",
+						},
+					},
+					Notes = "Renames the specified rank. Logs an info message and does nothing if the rank is not found or the new name is already used.",
+				},
+				SetDefaultRank =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the specified rank as the default rank. Returns true on success, false on failure (rank doesn't exist).",
+				},
+				SetPlayerRank =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+					},
+					Notes = "Updates the rank for the specified player. The player name is provided for reference, the UUID is used for identification. Logs a warning and does nothing if the rank is not found.",
+				},
+				SetRankVisuals =
+				{
+					Params =
+					{
+						{
+							Name = "RankName",
+							Type = "string",
+						},
+						{
+							Name = "MsgPrefix",
+							Type = "string",
+						},
+						{
+							Name = "MsgSuffix",
+							Type = "string",
+						},
+						{
+							Name = "MsgNameColorCode",
+							Type = "string",
+						},
+					},
+					Notes = "Updates the rank's message visuals. Logs an info message and does nothing if rank not found.",
+				},
 			},
-		},  -- cRankManager
-
+		},
 		cRoot =
 		{
 			Desc = [[
@@ -2050,45 +12651,465 @@ a_Player:OpenWindow(Window);
 			{
 				BroadcastChat =
 				{
-					{ Params = "MessageText, MessageType", Return = "", Notes = "Broadcasts a message to all players, with its message type set to MessageType (default: mtCustom)." },
-					{ Params = "{{cCompositeChat|CompositeChat}}", Return = "", Notes = "Broadcasts a {{cCompositeChat|composite chat message}} to all players." },
+					{
+						Params =
+						{
+							{
+								Name = "MessageText",
+								Type = "string",
+							},
+							{
+								Name = "MessageType",
+								Type = "eMessageType",
+							},
+						},
+						Notes = "Broadcasts a message to all players, with its message type set to MessageType (default: mtCustom).",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "CompositeChat",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Broadcasts a {{cCompositeChat|composite chat message}} to all players.",
+					},
 				},
-				BroadcastChatDeath = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtDeath. Use for when a player has died." },
-				BroadcastChatFailure = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtFailure. Use for a command that failed to run because of insufficient permissions, etc." },
-				BroadcastChatFatal = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtFatal. Use for a plugin that crashed, or similar." },
-				BroadcastChatInfo = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtInfo. Use for informational messages, such as command usage." },
-				BroadcastChatJoin = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtJoin. Use for players joining the server." },
-				BroadcastChatLeave = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtLeave. Use for players leaving the server." },
-				BroadcastChatSuccess = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtSuccess. Use for success messages." },
-				BroadcastChatWarning = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtWarning. Use for concerning events, such as plugin reload etc." },
-				CreateAndInitializeWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Creates a new world and initializes it. If there is a world whith the same name it returns nil.<br><br><b>NOTE:</b> This function is currently unsafe, do not use!" },
-				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "bool", Notes = "Calls the given callback function for the player with the name best matching the name string provided.<br>This function is case-insensitive and will match partial names.<br>Returns false if player not found or there is ambiguity, true otherwise. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre>" },
-				DoWithPlayerByUUID = { Params = "PlayerUUID, CallbackFunction", Return = "bool", Notes = "If there is the player with the uuid, calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
-				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
-				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
-				Get = { Params = "", Return = "Root object", Notes = "(STATIC) This function returns the cRoot object." },
-				GetBrewingRecipe = { Params = "{{cItem|cItem}}, {{cItem|cItem}}", Return = "{{cItem|cItem}}", Notes = "(STATIC) Returns the result item, if a recipe has been found. If no recipe is found, returns no value." },
-				GetBuildCommitID = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travis CI / Jenkins) it returns the exact commit hash used for the build. For unofficial local builds, returns the approximate commit hash (since the true one cannot be determined), formatted as \"approx: &lt;CommitHash&gt;\"." },
-				GetBuildDateTime = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travic CI / Jenkins) it returns the date and time of the build. For unofficial local builds, returns the approximate datetime of the commit (since the true one cannot be determined), formatted as \"approx: &lt;DateTime-iso8601&gt;\"." },
-				GetBuildID = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travis CI / Jenkins) it returns the unique ID of the build, as recognized by the build system. For unofficial local builds, returns the string \"Unknown\"." },
-				GetBuildSeriesName = { Params = "", Return = "string", Notes = "(STATIC) For official builds (Travis CI / Jenkins) it returns the series name of the build (for example \"Cuberite Windows x64 Master\"). For unofficial local builds, returns the string \"local build\"." },
-				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
-				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
-				GetFurnaceFuelBurnTime = { Params = "{{cItem|Fuel}}", Return = "number", Notes = "(STATIC) Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel." },
-				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that Cuberite supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
-				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire Cuberite process is using, in KiB. Negative if the OS doesn't support this query." },
-				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
-				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },
-				GetProtocolVersionTextFromInt = { Params = "Protocol Version", Return = "string", Notes = "Returns the Minecraft version from the given Protocol. If there is no version found, it returns 'Unknown protocol(Parameter)'" },
-				GetServer = { Params = "", Return = "{{cServer|cServer}}", Notes = "Returns the cServer object." },
-				GetServerUpTime = { Params = "", Return = "number", Notes = "Returns the uptime of the server in seconds." },
-				GetTotalChunkCount = { Params = "", Return = "number", Notes = "Returns the amount of loaded chunks." },
-				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire Cuberite process is using, in KiB. Negative if the OS doesn't support this query." },
-				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object." },
-				GetWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Returns the cWorld object of the given world. It returns nil if there is no world with the given name." },
-				QueueExecuteConsoleCommand = { Params = "Message", Return = "", Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread. The command's output will be sent to console." },
-				SaveAllChunks = { Params = "", Return = "", Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved." },
-				SetPrimaryServerVersion = { Params = "Protocol Version", Return = "", Notes = "Sets the servers PrimaryServerVersion to the given protocol number." }
+				BroadcastChatDeath =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtDeath. Use for when a player has died.",
+				},
+				BroadcastChatFailure =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtFailure. Use for a command that failed to run because of insufficient permissions, etc.",
+				},
+				BroadcastChatFatal =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtFatal. Use for a plugin that crashed, or similar.",
+				},
+				BroadcastChatInfo =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtInfo. Use for informational messages, such as command usage.",
+				},
+				BroadcastChatJoin =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtJoin. Use for players joining the server.",
+				},
+				BroadcastChatLeave =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtLeave. Use for players leaving the server.",
+				},
+				BroadcastChatSuccess =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtSuccess. Use for success messages.",
+				},
+				BroadcastChatWarning =
+				{
+					Params =
+					{
+						{
+							Name = "MessageText",
+							Type = "string",
+						},
+					},
+					Notes = "Broadcasts the specified message to all players, with its message type set to mtWarning. Use for concerning events, such as plugin reload etc.",
+				},
+				DoWithPlayerByUUID =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is the player with the uuid, calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
+				},
+				FindAndDoWithPlayer =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the given callback function for the player with the name best matching the name string provided.<br>This function is case-insensitive and will match partial names.<br>Returns false if player not found or there is ambiguity, true otherwise. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre>",
+				},
+				ForEachPlayer =
+				{
+					Params =
+					{
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>",
+				},
+				ForEachWorld =
+				{
+					Params =
+					{
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>",
+				},
+				Get =
+				{
+					IsStatic = true,
+					Returns =
+					{
+						{
+							Type = "cRoot",
+						},
+					},
+					Notes = "Returns the one and only cRoot object.",
+				},
+				GetBrewingRecipe =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Bottle",
+							Type = "cItem",
+						},
+						{
+							Name = "Ingredient",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the result item, if a recipe has been found to brew the Ingredient into Bottle. If no recipe is found, returns no value.",
+				},
+				GetBuildCommitID =
+				{
+					IsStatic = true,
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "For official builds (Travis CI / Jenkins) it returns the exact commit hash used for the build. For unofficial local builds, returns the approximate commit hash (since the true one cannot be determined), formatted as \"approx: &lt;CommitHash&gt;\".",
+				},
+				GetBuildDateTime =
+				{
+					IsStatic = true,
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "For official builds (Travic CI / Jenkins) it returns the date and time of the build. For unofficial local builds, returns the approximate datetime of the commit (since the true one cannot be determined), formatted as \"approx: &lt;DateTime-iso8601&gt;\".",
+				},
+				GetBuildID =
+				{
+					IsStatic = true,
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "For official builds (Travis CI / Jenkins) it returns the unique ID of the build, as recognized by the build system. For unofficial local builds, returns the string \"Unknown\".",
+				},
+				GetBuildSeriesName =
+				{
+					IsStatic = true,
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "For official builds (Travis CI / Jenkins) it returns the series name of the build (for example \"Cuberite Windows x64 Master\"). For unofficial local builds, returns the string \"local build\".",
+				},
+				GetCraftingRecipes =
+				{
+					Returns =
+					{
+						{
+							Type = "cCraftingRecipe",
+						},
+					},
+					Notes = "Returns the CraftingRecipes object",
+				},
+				GetDefaultWorld =
+				{
+					Returns =
+					{
+						{
+							Type = "cWorld",
+						},
+					},
+					Notes = "Returns the world object from the default world.",
+				},
+				GetFurnaceFuelBurnTime =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Fuel",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel.",
+				},
+				GetFurnaceRecipe =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "InItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "OutItem",
+							Type = "cItem",
+						},
+						{
+							Name = "NumTicks",
+							Type = "number",
+						},
+						{
+							Name = "InItem",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that Cuberite supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value.",
+				},
+				GetPhysicalRAMUsage =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the amount of physical RAM that the entire Cuberite process is using, in KiB. Negative if the OS doesn't support this query.",
+				},
+				GetPluginManager =
+				{
+					Returns =
+					{
+						{
+							Type = "cPluginManager",
+						},
+					},
+					Notes = "Returns the cPluginManager object.",
+				},
+				GetPrimaryServerVersion =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the servers primary server version.",
+				},
+				GetProtocolVersionTextFromInt =
+				{
+					Params =
+					{
+						{
+							Name = "ProtocolVersionNumber",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the Minecraft client version from the given Protocol version number. If there is no version found, it returns 'Unknown protocol (Number)'",
+				},
+				GetServer =
+				{
+					Returns =
+					{
+						{
+							Type = "cServer",
+						},
+					},
+					Notes = "Returns the cServer object.",
+				},
+				GetServerUpTime =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the uptime of the server in seconds.",
+				},
+				GetTotalChunkCount =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the amount of loaded chunks.",
+				},
+				GetVirtualRAMUsage =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the amount of virtual RAM that the entire Cuberite process is using, in KiB. Negative if the OS doesn't support this query.",
+				},
+				GetWebAdmin =
+				{
+					Returns =
+					{
+						{
+							Type = "cWebAdmin",
+						},
+					},
+					Notes = "Returns the cWebAdmin object.",
+				},
+				GetWorld =
+				{
+					Params =
+					{
+						{
+							Name = "WorldName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cWorld",
+						},
+					},
+					Notes = "Returns the cWorld object of the given world. It returns nil if there is no world with the given name.",
+				},
+				QueueExecuteConsoleCommand =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+					},
+					Notes = "Queues a console command for execution through the cServer class. The command will be executed in the tick thread. The command's output will be sent to console.",
+				},
+				SaveAllChunks =
+				{
+					Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved.",
+				},
+				SetPrimaryServerVersion =
+				{
+					Params =
+					{
+						{
+							Name = "Protocol Version",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the servers PrimaryServerVersion to the given protocol number.",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -2115,8 +13136,7 @@ end
 					]],
 				},
 			},
-		},  -- cRoot
-
+		},
 		cScoreboard =
 		{
 			Desc = [[
@@ -2124,29 +13144,264 @@ end
 			]],
 			Functions =
 			{
-				AddPlayerScore = { Params = "Name, Type, Value", Return = "", Notes = "Adds a value to all player scores of the specified objective type." },
-				ForEachObjective = { Params = "CallBackFunction", Return = "bool", Notes = "Calls the specified callback for each objective in the scoreboard. Returns true if all objectives have been processed (including when there are zero objectives), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cObjective|Objective}})</pre> The callback should return false or no value to continue with the next objective, or true to abort the enumeration." },
-				ForEachTeam = { Params = "CallBackFunction", Return = "bool", Notes = "Calls the specified callback for each team in the scoreboard. Returns true if all teams have been processed (including when there are zero teams), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cObjective|Objective}})</pre> The callback should return false or no value to continue with the next team, or true to abort the enumeration." },
-				GetNumObjectives = { Params = "", Return = "number", Notes = "Returns the nuber of registered objectives." },
-				GetNumTeams = { Params = "", Return = "number", Notes = "Returns the number of registered teams." },
-				GetObjective = { Params = "string", Return = "{{cObjective}}", Notes = "Returns the objective with the specified name." },
-				GetObjectiveIn = { Params = "DisplaySlot", Return = "{{cObjective}}", Notes = "Returns the objective in the specified display slot. Can be nil." },
-				GetTeam = { Params = "string", Return = "{{cTeam}}", Notes = "Returns the team with the specified name." },
-				RegisterObjective = { Params = "Name, DisplayName, Type", Return = "{{cObjective}}", Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, nil on error." },
-				RegisterTeam = { Params = "Name, DisplayName, Prefix, Suffix", Return = "{{cTeam}}", Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error." },
-				RemoveObjective = { Params = "string", Return = "bool", Notes = "Removes the objective with the specified name. Returns true if operation was successful." },
-				RemoveTeam = { Params = "string", Return = "bool", Notes = "Removes the team with the specified name. Returns true if operation was successful." },
-				SetDisplay = { Params = "Name, DisplaySlot", Return = "", Notes = "Updates the currently displayed objective." },
+				AddPlayerScore =
+				{
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+						{
+							Name = "Type",
+							Type = "<unknown>",
+						},
+						{
+							Name = "Value",
+							Type = "<unknown>",
+						},
+					},
+					Notes = "Adds a value to all player scores of the specified objective type.",
+				},
+				ForEachObjective =
+				{
+					Params =
+					{
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each objective in the scoreboard. Returns true if all objectives have been processed (including when there are zero objectives), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cObjective|Objective}})</pre> The callback should return false or no value to continue with the next objective, or true to abort the enumeration.",
+				},
+				ForEachTeam =
+				{
+					Params =
+					{
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each team in the scoreboard. Returns true if all teams have been processed (including when there are zero teams), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cObjective|Objective}})</pre> The callback should return false or no value to continue with the next team, or true to abort the enumeration.",
+				},
+				GetNumObjectives =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the nuber of registered objectives.",
+				},
+				GetNumTeams =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of registered teams.",
+				},
+				GetObjective =
+				{
+					Params =
+					{
+						{
+							Name = "string",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cObjective",
+						},
+					},
+					Notes = "Returns the objective with the specified name.",
+				},
+				GetObjectiveIn =
+				{
+					Params =
+					{
+						{
+							Name = "DisplaySlot",
+							Type = "<unknown>",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cObjective",
+						},
+					},
+					Notes = "Returns the objective in the specified display slot. Can be nil.",
+				},
+				GetTeam =
+				{
+					Params =
+					{
+						{
+							Name = "TeamName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cTeam",
+						},
+					},
+					Notes = "Returns the team with the specified name.",
+				},
+				GetTeamNames =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns the names of all teams, as an array-table of strings",
+				},
+				RegisterObjective =
+				{
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+						{
+							Name = "DisplayName",
+							Type = "string",
+						},
+						{
+							Name = "Type",
+							Type = "<unknown>",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cObjective",
+						},
+					},
+					Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, nil on error.",
+				},
+				RegisterTeam =
+				{
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+						{
+							Name = "DisplayName",
+							Type = "string",
+						},
+						{
+							Name = "Prefix",
+							Type = "<unknown>",
+						},
+						{
+							Name = "Suffix",
+							Type = "<unknown>",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cTeam",
+						},
+					},
+					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error.",
+				},
+				RemoveObjective =
+				{
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Removes the objective with the specified name. Returns true if operation was successful.",
+				},
+				RemoveTeam =
+				{
+					Params =
+					{
+						{
+							Name = "TeamName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Removes the team with the specified name. Returns true if operation was successful.",
+				},
+				SetDisplay =
+				{
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+						{
+							Name = "DisplaySlot",
+							Type = "<unknown>",
+						},
+					},
+					Notes = "Updates the currently displayed objective.",
+				},
 			},
 			Constants =
 			{
-				dsCount = { Notes = "" },
-				dsList = { Notes = "" },
-				dsName = { Notes = "" },
-				dsSidebar = { Notes = "" },
+				dsCount =
+				{
+					Notes = "",
+				},
+				dsList =
+				{
+					Notes = "",
+				},
+				dsName =
+				{
+					Notes = "",
+				},
+				dsSidebar =
+				{
+					Notes = "",
+				},
 			},
-		}, -- cScoreboard
-
+		},
 		cServer =
 		{
 			Desc = [[
@@ -2158,16 +13413,106 @@ end
 				]],
 			Functions =
 			{
-				GetDescription = { Return = "string", Notes = "Returns the server description set in the settings.ini." },
-				GetMaxPlayers = { Return = "number", Notes = "Returns the max amount of players who can join the server." },
-				GetNumPlayers = { Return = "number", Notes = "Returns the amount of players online." },
-				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
-				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
-				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
-				ShouldAuthenticate = { Params = "", Return = "bool", Notes = "Returns true iff the server is set to authenticate players (\"online mode\")." },
+				DoesAllowMultiLogin =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if players can log in multiple times from the same account (normally used for debugging), false if only one player per name is allowed.",
+				},
+				GetDescription =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the server description set in the settings.ini.",
+				},
+				GetMaxPlayers =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the max amount of players who can join the server.",
+				},
+				GetNumPlayers =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the amount of players online.",
+				},
+				GetServerID =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the ID of the server?",
+				},
+				IsHardcore =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the server is hardcore (players get banned on death).",
+				},
+				IsPlayerInQueue =
+				{
+					Params =
+					{
+						{
+							Name = "Username",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified player is queued to be transferred to a World.",
+				},
+				SetMaxPlayers =
+				{
+					Params =
+					{
+						{
+							Name = "MaxPlayers",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the max amount of players who can join.",
+				},
+				ShouldAuthenticate =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true iff the server is set to authenticate players (\"online mode\").",
+				},
 			},
-		},  -- cServer
-
+		},
 		cStringCompression =
 		{
 			Desc = [[
@@ -2178,17 +13523,103 @@ end
 local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 </pre>
 			]],
-
 			Functions =
 			{
-				CompressStringGZIP   = {Params = "string", Return = "string", Notes = "Compress a string using GZIP"},
-				CompressStringZLIB   = {Params = "string, factor", Return = "string", Notes = "Compresses a string using ZLIB. Factor 0 is no compression and factor 9 is maximum compression"},
-				InflateString        = {Params = "string", Return = "string", Notes = "Uncompresses a string using Inflate"},
-				UncompressStringGZIP = {Params = "string", Return = "string", Notes = "Uncompress a string using GZIP"},
-				UncompressStringZLIB = {Params = "string, uncompressed length", Return = "string", Notes = "Uncompresses a string using ZLIB"},
+				CompressStringGZIP =
+				{
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Compresses data in a string using GZIP",
+				},
+				CompressStringZLIB =
+				{
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+						{
+							Name = "factor",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Compresses data in a string using ZLIB. Factor 0 is no compression and factor 9 is maximum compression.",
+				},
+				InflateString =
+				{
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Uncompresses a string using Inflate",
+				},
+				UncompressStringGZIP =
+				{
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Uncompress a string using GZIP",
+				},
+				UncompressStringZLIB =
+				{
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+						{
+							Name = "UncompressedLength",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Uncompresses Data using ZLIB",
+				},
 			},
 		},
-
 		cTeam =
 		{
 			Desc = [[
@@ -2196,43 +13627,382 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 			]],
 			Functions =
 			{
-				AddPlayer = { Params = "string", Returns = "bool", Notes = "Adds a player to this team. Returns true if the operation was successful." },
-				AllowsFriendlyFire = { Params = "", Return = "bool", Notes = "Returns whether team friendly fire is allowed." },
-				CanSeeFriendlyInvisible = { Params = "", Return = "bool", Notes = "Returns whether players can see invisible teammates." },
-				HasPlayer = { Params = "string", Returns = "bool", Notes = "Returns whether the specified player is a member of this team." },
-				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the team." },
-				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the team." },
-				GetNumPlayers = { Params = "", Return = "number", Notes = "Returns the number of registered players." },
-				GetPrefix = { Params = "", Return = "string", Notes = "Returns the prefix prepended to the names of the members of this team." },
-				RemovePlayer = { Params = "string", Returns = "bool", Notes = "Removes the player with the specified name from this team. Returns true if the operation was successful." },
-				Reset = { Params = "", Returns = "", Notes = "Removes all players from this team." },
-				GetSuffix = { Params = "", Return = "string", Notes = "Returns the suffix appended to the names of the members of this team." },
-				SetCanSeeFriendlyInvisible = { Params = "bool", Return = "", Notes = "Set whether players can see invisible teammates." },
-				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of this team. (i.e. what will be shown to the players)" },
-				SetFriendlyFire = { Params = "bool", Return = "", Notes = "Sets whether team friendly fire is allowed." },
-				SetPrefix = { Params = "string", Return = "", Notes = "Sets the prefix prepended to the names of the members of this team." },
-				SetSuffix = { Params = "string", Return = "", Notes = "Sets the suffix appended to the names of the members of this team." },
+				AddPlayer =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Adds a player to this team. Returns true if the operation was successful.",
+				},
+				AllowsFriendlyFire =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether team friendly fire is allowed.",
+				},
+				CanSeeFriendlyInvisible =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether players can see invisible teammates.",
+				},
+				GetDisplayName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the display name of the team.",
+				},
+				GetName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the internal name of the team.",
+				},
+				GetNumPlayers =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of registered players.",
+				},
+				GetPrefix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the prefix prepended to the names of the members of this team.",
+				},
+				GetSuffix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the suffix appended to the names of the members of this team.",
+				},
+				HasPlayer =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified player is a member of this team.",
+				},
+				RemovePlayer =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Removes the player with the specified name from this team. Returns true if the operation was successful.",
+				},
+				Reset =
+				{
+					Notes = "Removes all players from this team.",
+				},
+				SetCanSeeFriendlyInvisible =
+				{
+					Params =
+					{
+						{
+							Name = "CanSeeFriendlyInvisible",
+							Type = "boolean",
+						},
+					},
+					Notes = "Set whether players can see invisible teammates.",
+				},
+				SetDisplayName =
+				{
+					Params =
+					{
+						{
+							Name = "DisplayName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the display name of this team. (i.e. what will be shown to the players)",
+				},
+				SetFriendlyFire =
+				{
+					Params =
+					{
+						{
+							Name = "AllowFriendlyFire",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether team friendly fire is allowed.",
+				},
+				SetPrefix =
+				{
+					Params =
+					{
+						{
+							Name = "Prefix",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the prefix prepended to the names of the members of this team.",
+				},
+				SetSuffix =
+				{
+					Params =
+					{
+						{
+							Name = "Suffix",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the suffix appended to the names of the members of this team.",
+				},
 			},
-		}, -- cTeam
-
+		},
 		cTNTEntity =
 		{
 			Desc = "This class manages a TNT entity.",
 			Functions =
 			{
-				Explode = { Return = "", Notes = "Explode the tnt." },
-				GetFuseTicks = { Return = "number", Notes = "Returns the fuse ticks until the tnt will explode." },
-				SetFuseTicks = { Return = "number", Notes = "Set the fuse ticks until the tnt will explode." },
+				Explode =
+				{
+					Notes = "Explode the tnt.",
+				},
+				GetFuseTicks =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the fuse ticks - the number of game ticks until the tnt explodes.",
+				},
+				SetFuseTicks =
+				{
+					Params =
+					{
+						{
+							Name = "TicksUntilExplosion",
+							Type = "number",
+						},
+					},
+					Notes = "Set the fuse ticks until the tnt will explode.",
+				},
 			},
 			Inherits = "cEntity",
 		},
-
+		cUrlParser =
+		{
+			Desc = [[
+			Provides a parser for generic URLs that returns the individual components of the URL.</p>
+			<p>
+			Note that all functions are static. Call them by using "cUrlParser:Parse(...)" etc.
+			]],
+			Functions =
+			{
+				GetDefaultPort =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Scheme",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the default port that should be used for the given scheme (protocol). Returns zero if the scheme is not known.",
+				},
+				IsKnownScheme =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Scheme",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the scheme (protocol) is recognized by the parser.",
+				},
+				Parse =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "URL",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Scheme",
+							Type = "string",
+						},
+						{
+							Name = "Username",
+							Type = "string",
+						},
+						{
+							Name = "Password",
+							Type = "string",
+						},
+						{
+							Name = "Host",
+							Type = "string",
+						},
+						{
+							Name = "Port",
+							Type = "string",
+						},
+						{
+							Name = "Path",
+							Type = "string",
+						},
+						{
+							Name = "Query",
+							Type = "string",
+						},
+						{
+							Name = "Fragment",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the individual parts of the URL. Parts that are not explicitly specified in the URL are empty, the default port for the scheme is used. If parsing fails, the function returns nil and an error message.",
+				},
+				ParseAuthorityPart =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "AuthPart",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Username",
+							Type = "string",
+						},
+						{
+							Name = "Password",
+							Type = "string",
+						},
+						{
+							Name = "Host",
+							Type = "string",
+						},
+						{
+							Name = "Port",
+							Type = "string",
+						},
+					},
+					Notes = "Parses the Authority part of the URL. Parts that are not explicitly specified in the AuthPart are returned empty, the port is returned zero. If parsing fails, the function returns nil and an error message.",
+				},
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Code example",
+					Contents = [[
+						The following code fragment uses the cUrlParser to parse an URL string into its components, and
+						prints those components out:
+<pre class="prettyprint lang-lua">
+local Scheme, Username, Password, Host, Port, Path, Query, Fragment = cUrlParser:Parse(
+	"http://anonymous:user@example.com@ftp.cuberite.org:9921/releases/2015/?sort=date#files"
+)
+if not(Scheme) then
+	-- Parsing failed, the second returned value (in Username) is the error message:
+	LOG("  Error: " .. (Username or "<nil>"))
+else
+	LOG("  Scheme   = " .. Scheme)    -- "http"
+	LOG("  Username = " .. Username)  -- "anonymous"
+	LOG("  Password = " .. Password)  -- "user@example.com"
+	LOG("  Host     = " .. Host)      -- "ftp.cuberite.org"
+	LOG("  Port     = " .. Port)      -- 9921
+	LOG("  Path     = " .. Path)      -- "releases/2015/"
+	LOG("  Query    = " .. Query)     -- "sort=date"
+	LOG("  Fragment = " .. Fragment)  -- "files"
+end
+</pre>
+					]],
+				},
+			},
+		},
 		cWebPlugin =
 		{
 			Desc = "",
-			Functions = {},
-		},  -- cWebPlugin
+			Functions =
+			{
 
+			},
+		},
 		cWindow =
 		{
 			Desc = [[
@@ -2251,34 +14021,221 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 			]],
 			Functions =
 			{
-				GetSlot = { Params = "{{cPlayer|Player}}, SlotNumber", Return = "{{cItem}}", Notes = "Returns the item at the specified slot for the specified player. Returns nil and logs to server console on error." },
-				GetWindowID = { Params = "", Return = "number", Notes = "Returns the ID of the window, as used by the network protocol" },
-				GetWindowTitle = { Params = "", Return = "string", Notes = "Returns the window title that will be displayed to the player" },
-				GetWindowType = { Params = "", Return = "number", Notes = "Returns the type of the window, one of the constants in the table above" },
-				IsSlotInPlayerHotbar = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player hotbar" },
-				IsSlotInPlayerInventory = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory or in the hotbar. Note that this returns false for armor slots!" },
-				IsSlotInPlayerMainInventory = { Params = "SlotNum", Return = "bool", Notes = "Returns true if the specified slot number is in the player's main inventory" },
-				SetProperty = { Params = "PropertyID, PropartyValue, {{cPlayer|Player}}", Return = "", Notes = "Sends the UpdateWindowProperty (0x69) packet to the specified player; or to all players who are viewing this window if Player is not specified or nil." },
-				SetSlot = { Params = "{{cPlayer|Player}}, SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the contents of the specified slot for the specified player. Ignored if the slot number is invalid" },
-				SetWindowTitle = { Params = "string", Return = "", Notes = "Sets the window title that will be displayed to the player" },
+				GetSlot =
+				{
+					Params =
+					{
+						{
+							Name = "Player",
+							Type = "cPlayer",
+						},
+						{
+							Name = "SlotNumber",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item at the specified slot for the specified player. Returns nil and logs to server console on error.",
+				},
+				GetWindowID =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the ID of the window, as used by the network protocol",
+				},
+				GetWindowTitle =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the window title that will be displayed to the player",
+				},
+				GetWindowType =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the type of the window, one of the constants in the table above",
+				},
+				GetWindowTypeName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the textual representation of the window's type, such as \"minecraft:chest\".",
+				},
+				IsSlotInPlayerHotbar =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified slot number is in the player hotbar",
+				},
+				IsSlotInPlayerInventory =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified slot number is in the player's main inventory or in the hotbar. Note that this returns false for armor slots!",
+				},
+				IsSlotInPlayerMainInventory =
+				{
+					Params =
+					{
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified slot number is in the player's main inventory",
+				},
+				SetProperty =
+				{
+					Params =
+					{
+						{
+							Name = "PropertyID",
+							Type = "number",
+						},
+						{
+							Name = "PropertyValue",
+							Type = "number",
+						},
+						{
+							Name = "Player",
+							Type = "cPlayer",
+							IsOptional = true,
+						},
+					},
+					Notes = "Updates a numerical property associated with the window. Typically used for furnace progressbars. Sends the UpdateWindowProperty packet to the specified Player, or to all current clients of the window if Player is not specified.",
+				},
+				SetSlot =
+				{
+					Params =
+					{
+						{
+							Name = "Player",
+							Type = "cPlayer",
+						},
+						{
+							Name = "SlotNum",
+							Type = "number",
+						},
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the contents of the specified slot for the specified player. Ignored if the slot number is invalid",
+				},
+				SetWindowTitle =
+				{
+					Params =
+					{
+						{
+							Name = "WindowTitle",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the window title that will be displayed to the player",
+				},
 			},
 			Constants =
 			{
-				wtInventory = { Notes = "An inventory window" },
-				wtChest = { Notes = "A {{cChestEntity|chest}} or doublechest window" },
-				wtWorkbench = { Notes = "A workbench (crafting table) window" },
-				wtFurnace = { Notes = "A {{cFurnaceEntity|furnace}} window" },
-				wtDropSpenser = { Notes = "A {{cDropperEntity|dropper}} or a {{cDispenserEntity|dispenser}} window" },
-				wtEnchantment = { Notes = "An enchantment table window" },
-				wtBrewery = { Notes = "A brewing stand window" },
-				wtNPCTrade = { Notes = "A villager trade window" },
-				wtBeacon = { Notes = "A beacon window" },
-				wtAnvil = { Notes = "An anvil window" },
-				wtHopper = { Notes = "A {{cHopperEntity|hopper}} window" },
-				wtAnimalChest = { Notes = "A horse or donkey window" },
+				wtAnimalChest =
+				{
+					Notes = "A horse or donkey window",
+				},
+				wtAnvil =
+				{
+					Notes = "An anvil window",
+				},
+				wtBeacon =
+				{
+					Notes = "A beacon window",
+				},
+				wtBrewery =
+				{
+					Notes = "A brewing stand window",
+				},
+				wtChest =
+				{
+					Notes = "A {{cChestEntity|chest}} or doublechest window",
+				},
+				wtDropSpenser =
+				{
+					Notes = "A {{cDropperEntity|dropper}} or a {{cDispenserEntity|dispenser}} window",
+				},
+				wtEnchantment =
+				{
+					Notes = "An enchantment table window",
+				},
+				wtFurnace =
+				{
+					Notes = "A {{cFurnaceEntity|furnace}} window",
+				},
+				wtHopper =
+				{
+					Notes = "A {{cHopperEntity|hopper}} window",
+				},
+				wtInventory =
+				{
+					Notes = "An inventory window",
+				},
+				wtNPCTrade =
+				{
+					Notes = "A villager trade window",
+				},
+				wtWorkbench =
+				{
+					Notes = "A workbench (crafting table) window",
+				},
 			},
-		},  -- cWindow
-
+		},
 		cWorld =
 		{
 			Desc = [[
@@ -2311,189 +14268,3254 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				<p>
 				Game time is also handled by the world. It provides the time-of-day and the total world age.
 			]],
-
 			Functions =
 			{
-				AreCommandBlocksEnabled = { Params = "", Return = "bool", Notes = "Returns whether command blocks are enabled on the (entire) server" },
-				BroadcastBlockAction = { Params = "BlockX, BlockY, BlockZ, ActionByte1, ActionByte2, BlockType, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Broadcasts the BlockAction packet to all clients who have the appropriate chunk loaded (except ExcludeClient). The contents of the packet are specified by the parameters for the call, the blocktype needn't match the actual block that is present in the world data at the specified location." },
-				BroadcastChat = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the Message to all players in this world, except the optional ExcludeClient. No formatting is done by the server." },
-				BroadcastChatDeath = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Gray [DEATH] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For when a player dies." },
-				BroadcastChatFailure = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a command that failed to run because of insufficient permissions, etc." },
-				BroadcastChatFatal = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Red [FATAL] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a plugin that crashed, or similar." },
-				BroadcastChatInfo = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Yellow [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For informational messages, such as command usage." },
-				BroadcastChatSuccess = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For success messages." },
-				BroadcastChatWarning = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For concerning events, such as plugin reload etc." },
-				BroadcastEntityAnimation = { Params = "{{cEntity|TargetEntity}}, Animation, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends an animation of an entity to all clienthandles (except ExcludeClient if given)" },
-				BroadcastParticleEffect = { Params = "ParticleName, X, Y, Z, OffSetX, OffSetY, OffSetZ, ParticleData, ParticleAmmount, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}" },
-				BroadcastSoundEffect = { Params = "SoundName, X, Y, Z, Volume, Pitch, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient" },
-				BroadcastSoundParticleEffect = { Params = "EffectID, X, Y, Z, EffectData, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient" },
-				CastThunderbolt = { Params = "X, Y, Z", Return = "", Notes = "Creates a thunderbolt at the specified coords" },
-				ChangeWeather = { Params = "", Return = "", Notes = "Forces the weather to change in the next game tick. Weather is changed according to the normal rules: wSunny <-> wRain <-> wStorm" },
-				ChunkStay = { Params = "ChunkCoordTable, OnChunkAvailable, OnAllChunksAvailable", Return = "", Notes = "Queues the specified chunks to be loaded or generated and calls the specified callbacks once they are loaded. ChunkCoordTable is an arra-table of chunk coords, each coord being a table of 2 numbers: { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ...}. When any of those chunks are made available (including being available at the start of this call), the OnChunkAvailable() callback is called. When all the chunks are available, the OnAllChunksAvailable() callback is called. The function signatures are: <pre class=\"prettyprint lang-lua\">function OnChunkAvailable(ChunkX, ChunkZ)\nfunction OnAllChunksAvailable()</pre> All return values from the callbacks are ignored." },
-				CreateProjectile = { Params = "X, Y, Z, {{cProjectileEntity|ProjectileKind}}, {{cEntity|Creator}}, {{cItem|Originating Item}}, [{{Vector3d|Speed}}]", Return = "", Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). The item that created the projectile entity, commonly the {{cPlayer|player}}'s currently equipped item, is used at present for fireworks to correctly set their entity metadata. It is not used for any other projectile. Optional speed indicates the initial speed for the projectile." },
-				DigBlock = { Params = "X, Y, Z", Return = "", Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors." },
-				DoExplosionAt = { Params = "Force, X, Y, Z, CanCauseFire, Source, SourceData", Return = "", Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source." },
-				DoWithBlockEntityAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a block entity at the specified coords, calls the CallbackFunction with the {{cBlockEntity}} parameter representing the block entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The function returns false if there is no block entity, or if there is, it returns the bool value that the callback has returned. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
-				DoWithBrewingstandAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a brewingstand at the specified coords, calls the CallbackFunction with the {{cBrewingstandEntity}} parameter representing the brewingstand. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBrewingstandEntity|cBrewingstandEntity}})</pre> The function returns false if there is no brewingstand, or if there is, it returns the bool value that the callback has returned." },
-				DoWithBeaconAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a beacon at the specified coords, calls the CallbackFunction with the {{cBeaconEntity}} parameter representing the beacon. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBeaconEntity|BeaconEntity}})</pre> The function returns false if there is no beacon, or if there is, it returns the bool value that the callback has returned." },
-				DoWithChestAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a chest at the specified coords, calls the CallbackFunction with the {{cChestEntity}} parameter representing the chest. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}})</pre> The function returns false if there is no chest, or if there is, it returns the bool value that the callback has returned." },
-				DoWithCommandBlockAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a command block at the specified coords, calls the CallbackFunction with the {{cCommandBlockEntity}} parameter representing the command block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cCommandBlockEntity|CommandBlockEntity}})</pre> The function returns false if there is no command block, or if there is, it returns the bool value that the callback has returned." },
-				DoWithDispenserAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a dispenser at the specified coords, calls the CallbackFunction with the {{cDispenserEntity}} parameter representing the dispenser. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDispenserEntity|DispenserEntity}})</pre> The function returns false if there is no dispenser, or if there is, it returns the bool value that the callback has returned." },
-				DoWithDropSpenserAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a dropper or a dispenser at the specified coords, calls the CallbackFunction with the {{cDropSpenserEntity}} parameter representing the dropper or dispenser. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropSpenserEntity|DropSpenserEntity}})</pre> Note that this can be used to access both dispensers and droppers in a similar way. The function returns false if there is neither dispenser nor dropper, or if there is, it returns the bool value that the callback has returned." },
-				DoWithDropperAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a dropper at the specified coords, calls the CallbackFunction with the {{cDropperEntity}} parameter representing the dropper. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropperEntity|DropperEntity}})</pre> The function returns false if there is no dropper, or if there is, it returns the bool value that the callback has returned." },
-				DoWithEntityByID = { Params = "EntityID, CallbackFunction", Return = "bool", Notes = "If an entity with the specified ID exists, calls the callback with the {{cEntity}} parameter representing the entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The function returns false if the entity was not found, and it returns the same bool value that the callback has returned if the entity was found." },
-				DoWithFlowerPotAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a flower pot at the specified coords, calls the CallbackFunction with the {{cFlowerPotEntity}} parameter representing the flower pot. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFlowerPotEntity|FlowerPotEntity}})</pre> The function returns false if there is no flower pot, or if there is, it returns the bool value that the callback has returned." },
-				DoWithFurnaceAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a furnace at the specified coords, calls the CallbackFunction with the {{cFurnaceEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}})</pre> The function returns false if there is no furnace, or if there is, it returns the bool value that the callback has returned." },
-				DoWithMobHeadAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a mob head at the specified coords, calls the CallbackFunction with the {{cMobHeadEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMobHeadEntity|MobHeadEntity}})</pre> The function returns false if there is no mob head, or if there is, it returns the bool value that the callback has returned." },
-				DoWithNoteBlockAt = { Params = "BlockX, BlockY, BlockZ, CallbackFunction", Return = "bool", Notes = "If there is a note block at the specified coords, calls the CallbackFunction with the {{cNoteEntity}} parameter representing the note block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cNoteEntity|NoteEntity}})</pre> The function returns false if there is no note block, or if there is, it returns the bool value that the callback has returned." },
-				DoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "bool", Notes = "If there is a player of the specified name (exact match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
-				DoWithPlayerByUUID = { Params = "PlayerUUID, CallbackFunction", Return = "bool", Notes = "If there is the player with the uuid, calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
+				AreCommandBlocksEnabled =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether command blocks are enabled on the (entire) server",
+				},
+				BroadcastBlockAction =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "ActionByte1",
+							Type = "number",
+						},
+						{
+							Name = "ActionByte2",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Broadcasts the BlockAction packet to all clients who have the appropriate chunk loaded (except ExcludeClient). The contents of the packet are specified by the parameters for the call, the blocktype needn't match the actual block that is present in the world data at the specified location.",
+				},
+				BroadcastChat =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+						{
+							Name = "ChatPrefix",
+							Type = "eMessageType",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sends the Message to all players in this world, except the optional ExcludeClient. No formatting is done by the server.",
+				},
+				BroadcastChatDeath =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Prepends Gray [DEATH] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For when a player dies.",
+				},
+				BroadcastChatFailure =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a command that failed to run because of insufficient permissions, etc.",
+				},
+				BroadcastChatFatal =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Prepends Red [FATAL] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a plugin that crashed, or similar.",
+				},
+				BroadcastChatInfo =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Prepends Yellow [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For informational messages, such as command usage.",
+				},
+				BroadcastChatSuccess =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For success messages.",
+				},
+				BroadcastChatWarning =
+				{
+					Params =
+					{
+						{
+							Name = "Message",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For concerning events, such as plugin reload etc.",
+				},
+				BroadcastEntityAnimation =
+				{
+					Params =
+					{
+						{
+							Name = "TargetEntity",
+							Type = "cEntity",
+						},
+						{
+							Name = "Animation",
+							Type = "number",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sends an animation of an entity to all clienthandles (except ExcludeClient if given)",
+				},
+				BroadcastParticleEffect =
+				{
+					Params =
+					{
+						{
+							Name = "ParticleName",
+							Type = "string",
+						},
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "OffsetX",
+							Type = "number",
+						},
+						{
+							Name = "OffsetY",
+							Type = "number",
+						},
+						{
+							Name = "OffsetZ",
+							Type = "number",
+						},
+						{
+							Name = "ParticleData",
+							Type = "number",
+						},
+						{
+							Name = "ParticleAmount",
+							Type = "number",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}",
+				},
+				BroadcastSoundEffect =
+				{
+					Params =
+					{
+						{
+							Name = "SoundName",
+							Type = "string",
+						},
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "Volume",
+							Type = "number",
+						},
+						{
+							Name = "Pitch",
+							Type = "number",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient",
+				},
+				BroadcastSoundParticleEffect =
+				{
+					Params =
+					{
+						{
+							Name = "EffectID",
+							Type = "number",
+						},
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "EffectData",
+							Type = "string",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient",
+				},
+				CastThunderbolt =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+					},
+					Notes = "Creates a thunderbolt at the specified coords",
+				},
+				ChangeWeather =
+				{
+					Notes = "Forces the weather to change in the next game tick. Weather is changed according to the normal rules: wSunny <-> wRain <-> wStorm",
+				},
+				ChunkStay =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkCoordTable",
+							Type = "table",
+						},
+						{
+							Name = "OnChunkAvailable",
+							Type = "function",
+						},
+						{
+							Name = "OnAllChunksAvailable",
+							Type = "function",
+						},
+					},
+					Notes = "Queues the specified chunks to be loaded or generated and calls the specified callbacks once they are loaded. ChunkCoordTable is an arra-table of chunk coords, each coord being a table of 2 numbers: { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ...}. When any of those chunks are made available (including being available at the start of this call), the OnChunkAvailable() callback is called. When all the chunks are available, the OnAllChunksAvailable() callback is called. The function signatures are: <pre class=\"prettyprint lang-lua\">function OnChunkAvailable(ChunkX, ChunkZ)\
+function OnAllChunksAvailable()</pre> All return values from the callbacks are ignored.",
+				},
+				CreateProjectile =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "ProjectileKind",
+							Type = "cProjectileEntity#eKind",
+						},
+						{
+							Name = "Creator",
+							Type = "cEntity",
+						},
+						{
+							Name = "Originating Item",
+							Type = "cItem",
+						},
+						{
+							Name = "Speed",
+							Type = "Vector3d",
+							IsOptional = true,
+						},
+					},
+					Notes = "Creates a new projectile of the specified kind at the specified coords. The projectile's creator is set to Creator (may be nil). The item that created the projectile entity, commonly the {{cPlayer|player}}'s currently equipped item, is used at present for fireworks to correctly set their entity metadata. It is not used for any other projectile. Optional speed indicates the initial speed for the projectile.",
+				},
+				DigBlock =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+					},
+					Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors.",
+				},
+				DoExplosionAt =
+				{
+					Params =
+					{
+						{
+							Name = "Force",
+							Type = "number",
+						},
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "CanCauseFire",
+							Type = "boolean",
+						},
+						{
+							Name = "Source",
+							Type = "eExplosionSource",
+						},
+						{
+							Name = "SourceData",
+							Type = "any",
+						},
+					},
+					Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source.",
+				},
+				DoWithBeaconAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a beacon at the specified coords, calls the CallbackFunction with the {{cBeaconEntity}} parameter representing the beacon. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBeaconEntity|BeaconEntity}})</pre> The function returns false if there is no beacon, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithBlockEntityAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a block entity at the specified coords, calls the CallbackFunction with the {{cBlockEntity}} parameter representing the block entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The function returns false if there is no block entity, or if there is, it returns the bool value that the callback has returned. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant.",
+				},
+				DoWithBrewingstandAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a brewingstand at the specified coords, calls the CallbackFunction with the {{cBrewingstandEntity}} parameter representing the brewingstand. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBrewingstandEntity|cBrewingstandEntity}})</pre> The function returns false if there is no brewingstand, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithChestAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a chest at the specified coords, calls the CallbackFunction with the {{cChestEntity}} parameter representing the chest. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}})</pre> The function returns false if there is no chest, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithCommandBlockAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a command block at the specified coords, calls the CallbackFunction with the {{cCommandBlockEntity}} parameter representing the command block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cCommandBlockEntity|CommandBlockEntity}})</pre> The function returns false if there is no command block, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithDispenserAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a dispenser at the specified coords, calls the CallbackFunction with the {{cDispenserEntity}} parameter representing the dispenser. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDispenserEntity|DispenserEntity}})</pre> The function returns false if there is no dispenser, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithDropperAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a dropper at the specified coords, calls the CallbackFunction with the {{cDropperEntity}} parameter representing the dropper. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropperEntity|DropperEntity}})</pre> The function returns false if there is no dropper, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithDropSpenserAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a dropper or a dispenser at the specified coords, calls the CallbackFunction with the {{cDropSpenserEntity}} parameter representing the dropper or dispenser. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cDropSpenserEntity|DropSpenserEntity}})</pre> Note that this can be used to access both dispensers and droppers in a similar way. The function returns false if there is neither dispenser nor dropper, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithEntityByID =
+				{
+					Params =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If an entity with the specified ID exists, calls the callback with the {{cEntity}} parameter representing the entity. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The function returns false if the entity was not found, and it returns the same bool value that the callback has returned if the entity was found.",
+				},
+				DoWithFlowerPotAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a flower pot at the specified coords, calls the CallbackFunction with the {{cFlowerPotEntity}} parameter representing the flower pot. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFlowerPotEntity|FlowerPotEntity}})</pre> The function returns false if there is no flower pot, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithFurnaceAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a furnace at the specified coords, calls the CallbackFunction with the {{cFurnaceEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}})</pre> The function returns false if there is no furnace, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithMobHeadAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a mob head at the specified coords, calls the CallbackFunction with the {{cMobHeadEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMobHeadEntity|MobHeadEntity}})</pre> The function returns false if there is no mob head, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithNoteBlockAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a note block at the specified coords, calls the CallbackFunction with the {{cNoteEntity}} parameter representing the note block. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cNoteEntity|NoteEntity}})</pre> The function returns false if there is no note block, or if there is, it returns the bool value that the callback has returned.",
+				},
+				DoWithPlayer =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is a player of the specified name (exact match), calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
+				},
+				DoWithPlayerByUUID =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerUUID",
+							Type = "string",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "If there is the player with the uuid, calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
+				},
 				FastSetBlock =
 				{
-					{ Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!" },
-					{ Params = "{{Vector3i|BlockCoords}}, BlockType, BlockMeta", Return = "", Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!" },
+					{
+						Params =
+						{
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "BlockCoords",
+								Type = "Vector3i",
+							},
+							{
+								Name = "BlockType",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!",
+					},
 				},
-				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "bool", Notes = "Calls the given callback function for the player with the name best matching the name string provided.<br>This function is case-insensitive and will match partial names.<br>Returns false if player not found or there is ambiguity, true otherwise. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre>" },
-				ForEachBlockEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each block entity in the chunk. Returns true if all block entities in the chunk have been processed (including when there are zero block entities), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The callback should return false or no value to continue with the next block entity, or true to abort the enumeration. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
-				ForEachBrewingstandInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each brewingstand in the chunk. Returns true if all brewingstands in the chunk have been processed (including when there are zero brewingstands), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBrewingstandEntity|cBrewingstandEntity}})</pre> The callback should return false or no value to continue with the next brewingstand, or true to abort the enumeration." },
-				ForEachChestInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each chest in the chunk. Returns true if all chests in the chunk have been processed (including when there are zero chests), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}})</pre> The callback should return false or no value to continue with the next chest, or true to abort the enumeration." },
-				ForEachEntity = { Params = "CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each entity in the loaded world. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
-				ForEachEntityInBox = { Params = "{{cBoundingBox|Box}}, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each entity in the specified bounding box. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. If any chunk within the bounding box is not valid, it is silently skipped without any notification. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
-				ForEachEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each entity in the specified chunk. Returns true if all the entities have been processed (including when there are zero entities), or false if the chunk is not loaded or the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
-				ForEachFurnaceInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each furnace in the chunk. Returns true if all furnaces in the chunk have been processed (including when there are zero furnaces), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}})</pre> The callback should return false or no value to continue with the next furnace, or true to abort the enumeration." },
-				ForEachPlayer = { Params = "CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each player in the loaded world. Returns true if all the players have been processed (including when there are zero players), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The callback should return false or no value to continue with the next player, or true to abort the enumeration." },
-				GenerateChunk = { Params = "ChunkX, ChunkZ", Return = "", Notes = "Queues the specified chunk in the chunk generator. Ignored if the chunk is already generated (use RegenerateChunk() to force chunk re-generation)." },
-				GetBiomeAt = { Params = "BlockX, BlockZ", Return = "eBiome", Notes = "Returns the biome at the specified coords. Reads the biome from the chunk, if it is loaded, otherwise it uses the chunk generator to provide the biome value." },
+				FindAndDoWithPlayer =
+				{
+					Params =
+					{
+						{
+							Name = "PlayerName",
+							Type = "string",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the given callback function for the player with the name best matching the name string provided.<br>This function is case-insensitive and will match partial names.<br>Returns false if player not found or there is ambiguity, true otherwise. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre>",
+				},
+				ForEachBlockEntityInChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each block entity in the chunk. Returns true if all block entities in the chunk have been processed (including when there are zero block entities), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The callback should return false or no value to continue with the next block entity, or true to abort the enumeration. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant.",
+				},
+				ForEachBrewingstandInChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each brewingstand in the chunk. Returns true if all brewingstands in the chunk have been processed (including when there are zero brewingstands), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBrewingstandEntity|cBrewingstandEntity}})</pre> The callback should return false or no value to continue with the next brewingstand, or true to abort the enumeration.",
+				},
+				ForEachChestInChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each chest in the chunk. Returns true if all chests in the chunk have been processed (including when there are zero chests), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}})</pre> The callback should return false or no value to continue with the next chest, or true to abort the enumeration.",
+				},
+				ForEachEntity =
+				{
+					Params =
+					{
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each entity in the loaded world. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration.",
+				},
+				ForEachEntityInBox =
+				{
+					Params =
+					{
+						{
+							Name = "Box",
+							Type = "cBoundingBox",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each entity in the specified bounding box. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. If any chunk within the bounding box is not valid, it is silently skipped without any notification. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration.",
+				},
+				ForEachEntityInChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each entity in the specified chunk. Returns true if all the entities have been processed (including when there are zero entities), or false if the chunk is not loaded or the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration.",
+				},
+				ForEachFurnaceInChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each furnace in the chunk. Returns true if all furnaces in the chunk have been processed (including when there are zero furnaces), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}})</pre> The callback should return false or no value to continue with the next furnace, or true to abort the enumeration.",
+				},
+				ForEachPlayer =
+				{
+					Params =
+					{
+						{
+							Name = "CallbackFunction",
+							Type = "function",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the specified callback for each player in the loaded world. Returns true if all the players have been processed (including when there are zero players), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The callback should return false or no value to continue with the next player, or true to abort the enumeration.",
+				},
+				GenerateChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+					},
+					Notes = "Queues the specified chunk in the chunk generator. Ignored if the chunk is already generated (use RegenerateChunk() to force chunk re-generation).",
+				},
+				GetBiomeAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "eBiome",
+							Type = "EMCSBiome",
+						},
+					},
+					Notes = "Returns the biome at the specified coords. Reads the biome from the chunk, if it is loaded, otherwise it uses the chunk generator to provide the biome value.",
+				},
 				GetBlock =
 				{
-					{ Params = "BlockX, BlockY, BlockZ", Return = "BLOCKTYPE", Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
-					{ Params = "{{Vector3i|BlockCoords}}", Return = "BLOCKTYPE", Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
+					{
+						Params =
+						{
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "BLOCKTYPE",
+								Type = "number",
+							},
+						},
+						Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "BlockCoords",
+								Type = "Vector3i",
+							},
+						},
+						Returns =
+						{
+							{
+								Name = "BLOCKTYPE",
+								Type = "number",
+							},
+						},
+						Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					},
 				},
-				GetBlockBlockLight = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded." },
-				GetBlockInfo = { Params = "BlockX, BlockY, BlockZ", Return = "BlockValid, BlockType, BlockMeta, BlockSkyLight, BlockBlockLight", Notes = "Returns the complete block info for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true." },
+				GetBlockBlockLight =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Pos",
+								Type = "Vector3i",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					},
+				},
+				GetBlockInfo =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsBlockValid",
+							Type = "boolean",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+						{
+							Name = "BlockSkyLight",
+							Type = "number",
+						},
+						{
+							Name = "BlockBlockLight",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the complete block info for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true.",
+				},
 				GetBlockMeta =
 				{
-					{ Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
-					{ Params = "{{Vector3i|BlockCoords}}", Return = "number", Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
+					{
+						Params =
+						{
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "BlockCoords",
+								Type = "Vector3i",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "number",
+							},
+						},
+						Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					},
 				},
-				GetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the block skylight of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
-				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BlockValid, BlockType, BlockMeta", Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true." },
-				GetDefaultWeatherInterval = { Params = "eWeather", Return = "", Notes = "Returns the default weather interval for the specific weather type. Returns -1 for any unknown weather." },
-				GetDimension = { Params = "", Return = "eDimension", Notes = "Returns the dimension of the world - dimOverworld, dimNether or dimEnd." },
-				GetGameMode = { Params = "", Return = "eGameMode", Notes = "Returns the gamemode of the world - gmSurvival, gmCreative or gmAdventure." },
-				GetGeneratorQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks that are queued in the chunk generator." },
-				GetHeight = { Params = "BlockX, BlockZ", Return = "number", Notes = "Returns the maximum height of the particula block column in the world. If the chunk is not loaded, it waits for it to load / generate. <b>WARNING</b>: Do not use, Use TryGetHeight() instead for a non-waiting version, otherwise you run the risk of a deadlock!" },
-				GetIniFileName = { Params = "", Return = "string", Notes = "Returns the name of the world.ini file that the world uses to store the information." },
-				GetLightingQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks in the lighting thread's queue." },
-				GetLinkedEndWorldName = { Params = "", Return = "string", Notes = "Returns the name of the end world this world is linked to." },
-				GetLinkedNetherWorldName = { Params = "", Return = "string", Notes = "Returns the name of the Netherworld linked to this world." },
-				GetLinkedOverworldName = { Params = "", Return = "string", Notes = "Returns the name of the world this world is linked to." },
-				GetMapManager = { Params = "", Return = "{{cMapManager}}", Notes = "Returns the {{cMapManager|MapManager}} object used by this world." },
-				GetMaxCactusHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which cacti will grow naturally." },
-				GetMaxNetherPortalHeight = { Params = "", Return = "number", Notes = "Returns the maximum height for a nether portal" },
-				GetMaxNetherPortalWidth = { Params = "", Return = "number", Notes = "Returns the maximum width for a nether portal" },
-				GetMaxSugarcaneHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which sugarcane will grow naturally." },
-				GetMaxViewDistance = { Params = "", Return = "number", Notes = "Returns the maximum viewdistance that players can see in this world. The view distance is the amount of chunks around the player that the player can see." },
-				GetMinNetherPortalHeight = { Params = "", Return = "number", Notes = "Returns the minimum height for a nether portal" },
-				GetMinNetherPortalWidth = { Params = "", Return = "number", Notes = "Returns the minimum width for a nether portal" },
-				GetName = { Params = "", Return = "string", Notes = "Returns the name of the world, as specified in the settings.ini file." },
-				GetNumChunks = { Params = "", Return = "number", Notes = "Returns the number of chunks currently loaded." },
-				GetScoreBoard = { Params = "", Return = "{{cScoreBoard}}", Notes = "Returns the {{cScoreBoard|ScoreBoard}} object used by this world. " },
-				GetSignLines = { Params = "BlockX, BlockY, BlockZ", Return = "IsValid, [Line1, Line2, Line3, Line4]", Notes = "Returns true and the lines of a sign at the specified coords, or false if there is no sign at the coords." },
-				GetSpawnX = { Params = "", Return = "number", Notes = "Returns the X coord of the default spawn" },
-				GetSpawnY = { Params = "", Return = "number", Notes = "Returns the Y coord of the default spawn" },
-				GetSpawnZ = { Params = "", Return = "number", Notes = "Returns the Z coord of the default spawn" },
-				GetStorageLoadQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks queued up for loading" },
-				GetStorageSaveQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks queued up for saving" },
-				GetTicksUntilWeatherChange = { Params = "", Return = "number", Notes = "Returns the number of ticks that will pass before the weather is changed" },
-				GetTimeOfDay = { Params = "", Return = "number", Notes = "Returns the number of ticks that have passed from the sunrise, 0 .. 24000." },
-				GetTNTShrapnelLevel = { Params = "", Return = "{{Globals#ShrapnelLevel|ShrapnelLevel}}", Notes = "Returns the shrapnel level, representing the block types that are propelled outwards following an explosion. Based on this value and a random picker, blocks are selectively converted to physics entities (FallingSand) and flung outwards." },
-				GetWeather = { Params = "", Return = "eWeather", Notes = "Returns the current weather in the world (wSunny, wRain, wStorm). To check for weather, use IsWeatherXXX() functions instead." },
-				GetWorldAge = { Params = "", Return = "number", Notes = "Returns the total age of the world, in ticks. The age always grows, cannot be set by plugins and is unrelated to TimeOfDay." },
-				GrowCactus = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "", Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight())." },
-				GrowMelonPumpkin = { Params = "BlockX, BlockY, BlockZ, StemType", Return = "", Notes = "Grows a melon or pumpkin, based on the stem type specified (assumed to be in the coords provided). Checks for normal melon / pumpkin growth conditions - stem not having another produce next to it and suitable ground below." },
-				GrowRipePlant = { Params = "BlockX, BlockY, BlockZ, IsByBonemeal", Return = "bool", Notes = "Grows the plant at the specified coords. If IsByBonemeal is true, checks first if the specified plant type is bonemealable in the settings. Returns true if the plant was grown, false if not." },
-				GrowSugarcane = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "", Notes = "Grows a sugarcane block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum sugarcane growth (GetMaxSugarcaneHeight())." },
-				GrowTree = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome." },
-				GrowTreeByBiome = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords." },
-				GrowTreeFromSapling = { Params = "BlockX, BlockY, BlockZ, SaplingMeta", Return = "", Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta (the sapling itself needn't be present)." },
-				IsBlockDirectlyWatered = { Params = "BlockX, BlockY, BlockZ", Return = "bool", Notes = "Returns true if the specified block has a water block right next to it (on the X/Z axes)" },
-				IsDaylightCycleEnabled = { Params = "", Return = "bool", Notes = "Returns true if the daylight cycle is enabled." },
-				IsDeepSnowEnabled = { Params = "", Return = "bool", Notes = "Returns whether the configuration has DeepSnow enabled." },
-				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmAdventure." },
-				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmCreative." },
-				IsGameModeSpectator = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmSpectator." },
-				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmSurvival." },
-				IsPVPEnabled = { Params = "", Return = "bool", Notes = "Returns whether PVP is enabled in the world settings." },
-				IsTrapdoorOpen = { Params = "BlockX, BlockY, BlockZ", Return = "bool", Notes = "Returns false if there is no trapdoor there or if the block isn't a trapdoor or if the chunk wasn't loaded. Returns true if trapdoor is open." },
-				IsWeatherRain = { Params = "", Return = "bool", Notes = "Returns true if the current world is raining." },
-				IsWeatherRainAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the specified location is raining (takes into account biomes)." },
-				IsWeatherStorm = { Params = "", Return = "bool", Notes = "Returns true if the current world is stormy." },
-				IsWeatherStormAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the specified location is stormy (takes into account biomes)." },
-				IsWeatherSunny = { Params = "", Return = "bool", Notes = "Returns true if the current weather is sunny." },
-				IsWeatherSunnyAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the current weather is sunny at the specified location (takes into account biomes)." },
-				IsWeatherWet = { Params = "", Return = "bool", Notes = "Returns true if the current world has any precipitation (rain or storm)." },
-				IsWeatherWetAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the specified location has any precipitation (rain or storm) (takes into account biomes)." },
-				PrepareChunk = { Params = "ChunkX, ChunkZ, [Callback]", Return = "", Notes = "Queues the chunk for preparing - making sure that it's generated and lit. It is legal to call with no callback. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback(ChunkX, ChunkZ)</pre>" },
-				QueueBlockForTick = { Params = "BlockX, BlockY, BlockZ, TicksToWait", Return = "", Notes = "Queues the specified block to be ticked after the specified number of gameticks." },
-				QueueSaveAllChunks = { Params = "", Return = "", Notes = "Queues all chunks to be saved in the world storage thread" },
-				QueueSetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta, TickDelay", Return = "", Notes = "Queues the block to be set to the specified blocktype and meta after the specified amount of game ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are handled correctly." },
-				QueueTask = { Params = "TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
-				QueueUnloadUnusedChunks = { Params = "", Return = "", Notes = "Queues a cTask that unloads chunks that are no longer needed and are saved." },
-				RegenerateChunk = { Params = "ChunkX, ChunkZ", Return = "", Notes = "Queues the specified chunk to be re-generated, overwriting the current data. To queue a chunk for generating only if it doesn't exist, use the GenerateChunk() instead." },
-				ScheduleTask = { Params = "DelayTicks, TaskFunction", Return = "", Notes = "Queues the specified function to be executed in the world's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cWorld|World}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead." },
-				SendBlockTo = { Params = "BlockX, BlockY, BlockZ, {{cPlayer|Player}}", Return = "", Notes = "Sends the block at the specified coords to the specified player's client, as an UpdateBlock packet." },
-				SetAreaBiome = {
-					{ Params = "MinX, MaxX, MinZ, MaxZ, EMCSBiome", Return = "bool", Notes = "Sets the biome in the rectangular area specified. Returns true if successful, false if any of the chunks were unloaded." },
-					{ Params = "{{cCuboid|Cuboid}}, EMCSBiome", Return = "bool", Notes = "Sets the biome in the cuboid specified. Returns true if successful, false if any of the chunks were unloaded. The cuboid needn't be sorted." },
+				GetBlockSkyLight =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block skylight of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
 				},
-				SetBiomeAt = { Params = "BlockX, BlockZ, EMCSBiome", Return = "bool", Notes = "Sets the biome at the specified block coords. Returns true if successful, false otherwise." },
-				SetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances." },
+				GetBlockTypeMeta =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsBlockValid",
+							Type = "boolean",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true.",
+				},
+				GetDefaultWeatherInterval =
+				{
+					Params =
+					{
+						{
+							Name = "Weather",
+							Type = "eWeather",
+						},
+					},
+					Notes = "Returns the default weather interval for the specific weather type. Returns -1 for any unknown weather.",
+				},
+				GetDimension =
+				{
+					Returns =
+					{
+						{
+							Type = "eDimension",
+						},
+					},
+					Notes = "Returns the dimension of the world - dimOverworld, dimNether or dimEnd.",
+				},
+				GetGameMode =
+				{
+					Returns =
+					{
+						{
+							Type = "eGameMode",
+						},
+					},
+					Notes = "Returns the gamemode of the world - gmSurvival, gmCreative or gmAdventure.",
+				},
+				GetGeneratorQueueLength =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of chunks that are queued in the chunk generator.",
+				},
+				GetHeight =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum height of the particula block column in the world. If the chunk is not loaded, it waits for it to load / generate. <b>WARNING</b>: Do not use, Use TryGetHeight() instead for a non-waiting version, otherwise you run the risk of a deadlock!",
+				},
+				GetIniFileName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the world.ini file that the world uses to store the information.",
+				},
+				GetLightingQueueLength =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of chunks in the lighting thread's queue.",
+				},
+				GetLinkedEndWorldName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the end world this world is linked to.",
+				},
+				GetLinkedNetherWorldName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the Netherworld linked to this world.",
+				},
+				GetLinkedOverworldName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the world this world is linked to.",
+				},
+				GetMapManager =
+				{
+					Returns =
+					{
+						{
+							Type = "cMapManager",
+						},
+					},
+					Notes = "Returns the {{cMapManager|MapManager}} object used by this world.",
+				},
+				GetMaxCactusHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the configured maximum height to which cacti will grow naturally.",
+				},
+				GetMaxNetherPortalHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum height for a nether portal",
+				},
+				GetMaxNetherPortalWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum width for a nether portal",
+				},
+				GetMaxSugarcaneHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the configured maximum height to which sugarcane will grow naturally.",
+				},
+				GetMaxViewDistance =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the maximum viewdistance that players can see in this world. The view distance is the amount of chunks around the player that the player can see.",
+				},
+				GetMinNetherPortalHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the minimum height for a nether portal",
+				},
+				GetMinNetherPortalWidth =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the minimum width for a nether portal",
+				},
+				GetName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the world, as specified in the settings.ini file.",
+				},
+				GetNumChunks =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of chunks currently loaded.",
+				},
+				GetNumUnusedDirtyChunks =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of unused dirty chunks. That's the number of chunks that we can save and then unload.",
+				},
+				GetScoreBoard =
+				{
+					Returns =
+					{
+						{
+							Type = "cScoreBoard",
+						},
+					},
+					Notes = "Returns the {{cScoreBoard|ScoreBoard}} object used by this world. ",
+				},
+				GetSeed =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the seed of the world.",
+				},
+				GetSignLines =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsValid",
+							Type = "boolean",
+						},
+						{
+							Name = "Line1",
+							Type = "string",
+							IsOptional = true,
+						},
+						{
+							Name = "Line2",
+							Type = "string",
+							IsOptional = true,
+						},
+						{
+							Name = "Line3",
+							Type = "string",
+							IsOptional = true,
+						},
+						{
+							Name = "Line4",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Notes = "Returns true and the lines of a sign at the specified coords, or false if there is no sign at the coords.",
+				},
+				GetSpawnX =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the X coord of the default spawn",
+				},
+				GetSpawnY =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Y coord of the default spawn",
+				},
+				GetSpawnZ =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the Z coord of the default spawn",
+				},
+				GetStorageLoadQueueLength =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of chunks queued up for loading",
+				},
+				GetStorageSaveQueueLength =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of chunks queued up for saving",
+				},
+				GetTicksUntilWeatherChange =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of ticks that will pass before the weather is changed",
+				},
+				GetTimeOfDay =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of ticks that have passed from the sunrise, 0 .. 24000.",
+				},
+				GetTNTShrapnelLevel =
+				{
+					Returns =
+					{
+						{
+							Name = "ShrapnelLevel",
+							Type = "Globals#eShrapnelLevel",
+						},
+					},
+					Notes = "Returns the shrapnel level, representing the block types that are propelled outwards following an explosion. Based on this value and a random picker, blocks are selectively converted to physics entities (FallingSand) and flung outwards.",
+				},
+				GetWeather =
+				{
+					Returns =
+					{
+						{
+							Type = "eWeather",
+						},
+					},
+					Notes = "Returns the current weather in the world (wSunny, wRain, wStorm). To check for weather, use IsWeatherXXX() functions instead.",
+				},
+				GetWorldAge =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the total age of the world, in ticks. The age always grows, cannot be set by plugins and is unrelated to TimeOfDay.",
+				},
+				GrowCactus =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "NumBlocksToGrow",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight()). Returns the amount of blocks the cactus grew inside this call.",
+				},
+				GrowMelonPumpkin =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "StemBlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Grows a melon or pumpkin, based on the stem block type specified (assumed to be at the coords provided). Checks for normal melon / pumpkin growth conditions - stem not having another produce next to it and suitable ground below. Returns true if the melon or pumpkin grew successfully.",
+				},
+				GrowRipePlant =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "IsByBonemeal",
+							Type = "boolean",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Grows the plant at the specified coords. If IsByBonemeal is true, checks first if the specified plant type is bonemealable in the settings. Returns true if the plant was grown, false if not.",
+				},
+				GrowSugarcane =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "NumBlocksToGrow",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Grows a sugarcane block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum sugarcane growth (GetMaxSugarcaneHeight()). Returns the amount of blocks the sugarcane grew inside this call.",
+				},
+				GrowTree =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome.",
+				},
+				GrowTreeByBiome =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords.",
+				},
+				GrowTreeFromSapling =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "SaplingMeta",
+							Type = "number",
+						},
+					},
+					Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta (the sapling itself needn't be present).",
+				},
+				IsBlockDirectlyWatered =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified block has a water block right next to it (on the X/Z axes)",
+				},
+				IsDaylightCycleEnabled =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the daylight cycle is enabled.",
+				},
+				IsDeepSnowEnabled =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the configuration has DeepSnow enabled.",
+				},
+				IsGameModeAdventure =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current gamemode is gmAdventure.",
+				},
+				IsGameModeCreative =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current gamemode is gmCreative.",
+				},
+				IsGameModeSpectator =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current gamemode is gmSpectator.",
+				},
+				IsGameModeSurvival =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current gamemode is gmSurvival.",
+				},
+				IsPVPEnabled =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether PVP is enabled in the world settings.",
+				},
+				IsTrapdoorOpen =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns false if there is no trapdoor there or if the block isn't a trapdoor or if the chunk wasn't loaded. Returns true if trapdoor is open.",
+				},
+				IsWeatherRain =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current world is raining (no thunderstorm).",
+				},
+				IsWeatherRainAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified location is raining (takes biomes into account - it never rains in a desert).",
+				},
+				IsWeatherStorm =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current world is stormy.",
+				},
+				IsWeatherStormAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified location is stormy (takes biomes into account - no storm in a desert).",
+				},
+				IsWeatherSunny =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current weather is sunny.",
+				},
+				IsWeatherSunnyAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current weather is sunny at the specified location (takes into account biomes).",
+				},
+				IsWeatherWet =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the current world has any precipitation (rain or storm).",
+				},
+				IsWeatherWetAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified location has any precipitation (rain or storm) (takes biomes into account, deserts are never wet).",
+				},
+				PrepareChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+						{
+							Name = "Callback",
+							Type = "function",
+							IsOptional = true,
+						},
+					},
+					Notes = "Queues the chunk for preparing - making sure that it's generated and lit. It is legal to call with no callback. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback(ChunkX, ChunkZ)</pre>",
+				},
+				QueueBlockForTick =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "TicksToWait",
+							Type = "number",
+						},
+					},
+					Notes = "Queues the specified block to be ticked after the specified number of gameticks.",
+				},
+				QueueSaveAllChunks =
+				{
+					Notes = "Queues all chunks to be saved in the world storage thread",
+				},
+				QueueSetBlock =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+						{
+							Name = "TickDelay",
+							Type = "number",
+						},
+					},
+					Notes = "Queues the block to be set to the specified blocktype and meta after the specified amount of game ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are handled correctly.",
+				},
+				QueueTask =
+				{
+					Params =
+					{
+						{
+							Name = "TaskFunction",
+							Type = "function",
+						},
+					},
+					Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead.",
+				},
+				QueueUnloadUnusedChunks =
+				{
+					Notes = "Queues a cTask that unloads chunks that are no longer needed and are saved.",
+				},
+				RegenerateChunk =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+					},
+					Notes = "Queues the specified chunk to be re-generated, overwriting the current data. To queue a chunk for generating only if it doesn't exist, use the GenerateChunk() instead.",
+				},
+				ScheduleTask =
+				{
+					Params =
+					{
+						{
+							Name = "DelayTicks",
+							Type = "number",
+						},
+						{
+							Name = "TaskFunction",
+							Type = "function",
+						},
+					},
+					Notes = "Queues the specified function to be executed in the world's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cWorld|World}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead.",
+				},
+				SendBlockTo =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "Player",
+							Type = "cPlayer",
+						},
+					},
+					Notes = "Sends the block at the specified coords to the specified player's client, as an UpdateBlock packet.",
+				},
+				SetAreaBiome =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "MinX",
+								Type = "number",
+							},
+							{
+								Name = "MaxX",
+								Type = "number",
+							},
+							{
+								Name = "MinZ",
+								Type = "number",
+							},
+							{
+								Name = "MaxZ",
+								Type = "number",
+							},
+							{
+								Name = "Biome",
+								Type = "EMCSBiome",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Sets the biome in the rectangular area specified. Returns true if successful, false if any of the chunks were unloaded.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Cuboid",
+								Type = "cCuboid",
+							},
+							{
+								Name = "Biome",
+								Type = "EMCSBiome",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Sets the biome in the cuboid specified. Returns true if successful, false if any of the chunks were unloaded. The cuboid needn't be sorted.",
+					},
+				},
+				SetBiomeAt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the biome at the specified block coords. Returns true if successful, false otherwise.",
+				},
+				SetBlock =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+						{
+							Name = "ShouldSendToClients",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances. If ShouldSendToClients is true (default), the change is broadcast to all players who have this chunk loaded; if false, the change is made server-side only.",
+				},
 				SetBlockMeta =
 				{
-					{ Params = "BlockX, BlockY, BlockZ, BlockMeta", Return = "", Notes = "Sets the meta for the block at the specified coords." },
-					{ Params = "{{Vector3i|BlockCoords}}, BlockMeta", Return = "", Notes = "Sets the meta for the block at the specified coords." },
+					{
+						Params =
+						{
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+							{
+								Name = "ShouldMarkChunkDirty",
+								Type = "boolean",
+								IsOptional = true,
+							},
+							{
+								Name = "ShouldSendToClients",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Notes = "Sets the meta for the block at the specified coords. If ShouldMarkChunkDirty is true (default), the chunk is marked dirty and will be saved later on. If ShouldSendToClients is true (default), the change is broadcast to all clients who have the chunk loaded, if false, the change is kept server-side only.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "BlockCoords",
+								Type = "Vector3i",
+							},
+							{
+								Name = "BlockMeta",
+								Type = "number",
+							},
+						},
+						Notes = "Sets the meta for the block at the specified coords.",
+					},
 				},
-				SetChunkAlwaysTicked = { Params = "ChunkX, ChunkZ, IsAlwaysTicked", Return = "", Notes = "Sets the chunk to always be ticked even when it doesn't contain any clients. IsAlwaysTicked set to true turns forced ticking on, set to false turns it off. Every call with 'true' should be paired with a later call with 'false', otherwise the ticking won't stop. Multiple actions can request ticking independently, the ticking will continue until the last call with 'false'. Note that when the chunk unloads, it loses the value of this flag." },
-				SetNextBlockTick = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Sets the blockticking to start at the specified block in the next tick." },
-				SetCommandBlockCommand = { Params = "BlockX, BlockY, BlockZ, Command", Return = "bool", Notes = "Sets the command to be executed in a command block at the specified coordinates. Returns if command was changed." },
-				SetCommandBlocksEnabled = { Params = "IsEnabled (bool)", Return = "", Notes = "Sets whether command blocks should be enabled on the (entire) server." },
-				SetDaylightCycleEnabled = { Params = "bool", Return = "", Notes = "Starts or stops the daylight cycle." },
-				SetLinkedEndWorldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the end portal should link to." },
-				SetLinkedNetherWorldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the nether portal should link to." },
-				SetLinkedOverworldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the nether portal should link to?" },
-				SetMaxViewDistance = { Params = "number", Return = "", Notes = "Sets the maximum viewdistance of the players in the world." },
-				SetMaxNetherPortalHeight = { Params = "number", Return = "", Notes = "Sets the maximum height for a nether portal" },
-				SetMaxNetherPortalWidth = { Params = "number", Return = "", Notes = "Sets the maximum width for a nether portal" },
-				SetMinNetherPortalHeight = { Params = "number", Return = "", Notes = "Sets the minimum height for a nether portal" },
-				SetMinNetherPortalWidth = { Params = "number", Return = "", Notes = "Sets the minimum width for a nether portal" },
-				SetShouldUseChatPrefixes = { Params = "", Return = "ShouldUse (bool)", Notes = "Sets whether coloured chat prefixes such as [INFO] is used with the SendMessageXXX() or BroadcastChatXXX(), or simply the entire message is coloured in the respective colour." },
-				SetSignLines = { Params = "X, Y, Z, Line1, Line2, Line3, Line4, [{{cPlayer|Player}}]", Return = "", Notes = "Sets the sign text at the specified coords. The sign-updating hooks are called for the change. The Player parameter is used to indicate the player from whom the change has come, it may be nil." },
-				SetTicksUntilWeatherChange = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks after which the weather will be changed." },
-				SetTimeOfDay = { Params = "TimeOfDayTicks", Return = "", Notes = "Sets the time of day, expressed as number of ticks past sunrise, in the range 0 .. 24000." },
-				SetTNTShrapnelLevel = { Params = "{{Globals#ShrapnelLevel|ShrapnelLevel}}", Return = "", Notes = "Sets the Shrampel level of the world." },
-				SetTrapdoorOpen = { Params = "BlockX, BlockY, BlockZ, bool", Return = "", Notes = "Opens or closes a trapdoor at the specific coordinates." },
-				SetWeather = { Params = "Weather", Return = "", Notes = "Sets the current weather (wSunny, wRain, wStorm) and resets the TicksUntilWeatherChange to the default value for the new weather. The normal weather-changing hooks are called for the change." },
-				ShouldBroadcastAchievementMessages = { Params = "", Return = "bool", Notes = "Returns true if the server should broadcast achievement messages in this world." },
-				ShouldBroadcastDeathMessages = { Params = "", Return = "bool", Notes = "Returns true if the server should broadcast death messages in this world." },
-				ShouldUseChatPrefixes = { Params = "", Return = "bool", Notes = "Returns whether coloured chat prefixes are prepended to chat messages or the entire message is simply coloured." },
-				ShouldLavaSpawnFire = { Params = "", Return = "bool", Notes = "Returns true if the world is configured to spawn fires near lava (world.ini: [Physics].ShouldLavaSpawnFire value)" },
+				SetChunkAlwaysTicked =
+				{
+					Params =
+					{
+						{
+							Name = "ChunkX",
+							Type = "number",
+						},
+						{
+							Name = "ChunkZ",
+							Type = "number",
+						},
+						{
+							Name = "IsAlwaysTicked",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the chunk to always be ticked even when it doesn't contain any clients. IsAlwaysTicked set to true turns forced ticking on, set to false turns it off. Every call with 'true' should be paired with a later call with 'false', otherwise the ticking won't stop. Multiple actions can request ticking independently, the ticking will continue until the last call with 'false'. Note that when the chunk unloads, it loses the value of this flag.",
+				},
+				SetCommandBlockCommand =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "Command",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the command to be executed in a command block at the specified coordinates. Returns if command was changed.",
+				},
+				SetCommandBlocksEnabled =
+				{
+					Params =
+					{
+						{
+							Name = "AreEnabled",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether command blocks should be enabled on the (entire) server.",
+				},
+				SetDaylightCycleEnabled =
+				{
+					Params =
+					{
+						{
+							Name = "IsEnabled",
+							Type = "boolean",
+						},
+					},
+					Notes = "Starts or stops the daylight cycle.",
+				},
+				SetLinkedEndWorldName =
+				{
+					Params =
+					{
+						{
+							Name = "WorldName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the name of the world that the end portal should link to.",
+				},
+				SetLinkedNetherWorldName =
+				{
+					Params =
+					{
+						{
+							Name = "WorldName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the name of the world that the nether portal should link to.",
+				},
+				SetLinkedOverworldName =
+				{
+					Params =
+					{
+						{
+							Name = "WorldName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the name of the world that the nether portal should link to?",
+				},
+				SetMaxNetherPortalHeight =
+				{
+					Params =
+					{
+						{
+							Name = "Height",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the maximum height for a nether portal",
+				},
+				SetMaxNetherPortalWidth =
+				{
+					Params =
+					{
+						{
+							Name = "Width",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the maximum width for a nether portal",
+				},
+				SetMaxViewDistance =
+				{
+					Params =
+					{
+						{
+							Name = "MaxViewDistance",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the maximum viewdistance of the players in the world. This maximum takes precedence over each player's ViewDistance setting.",
+				},
+				SetMinNetherPortalHeight =
+				{
+					Params =
+					{
+						{
+							Name = "Height",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the minimum height for a nether portal",
+				},
+				SetMinNetherPortalWidth =
+				{
+					Params =
+					{
+						{
+							Name = "Width",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the minimum width for a nether portal",
+				},
+				SetNextBlockTick =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the blockticking to start at the specified block in the next tick.",
+				},
+				SetShouldUseChatPrefixes =
+				{
+					Returns =
+					{
+						{
+							Name = "ShouldUseChatPrefixes",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether coloured chat prefixes such as [INFO] is used with the SendMessageXXX() or BroadcastChatXXX(), or simply the entire message is coloured in the respective colour.",
+				},
+				SetSignLines =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "Line1",
+							Type = "string",
+						},
+						{
+							Name = "Line2",
+							Type = "string",
+						},
+						{
+							Name = "Line3",
+							Type = "string",
+						},
+						{
+							Name = "Line4",
+							Type = "string",
+						},
+						{
+							Name = "Player",
+							Type = "cPlayer",
+							IsOptional = true,
+						},
+					},
+					Notes = "Sets the sign text at the specified coords. The sign-updating hooks are called for the change. The Player parameter is used to indicate the player from whom the change has come, it may be nil.",
+				},
+				SetSpawn =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the default spawn at the specified coords. Returns false if the new spawn couldn't be stored in the INI file.",
+				},
+				SetTicksUntilWeatherChange =
+				{
+					Params =
+					{
+						{
+							Name = "NumTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the number of ticks after which the weather will be changed.",
+				},
+				SetTimeOfDay =
+				{
+					Params =
+					{
+						{
+							Name = "TimeOfDayTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the time of day, expressed as number of ticks past sunrise, in the range 0 .. 24000.",
+				},
+				SetTNTShrapnelLevel =
+				{
+					Params =
+					{
+						{
+							Name = "ShrapnelLevel",
+							Type = "Globals#eShrapnelLevel",
+						},
+					},
+					Notes = "Sets the Shrapnel level of the world.",
+				},
+				SetTrapdoorOpen =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "IsOpen",
+							Type = "boolean",
+						},
+					},
+					Notes = "Opens or closes a trapdoor at the specific coordinates.",
+				},
+				SetWeather =
+				{
+					Params =
+					{
+						{
+							Name = "Weather",
+							Type = "eWeather",
+						},
+					},
+					Notes = "Sets the current weather (wSunny, wRain, wStorm) and resets the TicksUntilWeatherChange to the default value for the new weather. The normal weather-changing hooks are called for the change.",
+				},
+				ShouldBroadcastAchievementMessages =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the server should broadcast achievement messages in this world.",
+				},
+				ShouldBroadcastDeathMessages =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the server should broadcast death messages in this world.",
+				},
+				ShouldLavaSpawnFire =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the world is configured to spawn fires near lava (world.ini: [Physics].ShouldLavaSpawnFire value)",
+				},
+				ShouldUseChatPrefixes =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether coloured chat prefixes are prepended to chat messages or the entire message is simply coloured.",
+				},
+				SpawnBoat =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a boat at the specific coordinates. Returns the entity ID of the new boat, or {{cEntity#NO_ID|cEntity.NO_ID}} if no boat was created.",
+				},
+				SpawnExperienceOrb =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "Reward",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward",
+				},
+				SpawnFallingBlock =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta",
+				},
 				SpawnItemPickups =
 				{
-					{ Params = "{{cItems|Pickups}}, X, Y, Z, FlyAwaySpeed", Return = "", Notes = "Spawns the specified pickups at the position specified. The FlyAway speed is used to initialize the random speed in which the pickups fly away from the spawn position." },
-					{ Params = "{{cItems|Pickups}}, X, Y, Z, SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Spawns the specified pickups at the position specified. All the pickups fly away from the spawn position using the specified speed." },
+					{
+						Params =
+						{
+							{
+								Name = "Pickups",
+								Type = "cItems",
+							},
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+							{
+								Name = "Z",
+								Type = "number",
+							},
+							{
+								Name = "FlyAwaySpeed",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "IsPlayerCreated",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Notes = "Spawns the specified pickups at the position specified. The FlyAwaySpeed is a coefficient (default: 1) used to initialize the random speed in which the pickups fly away from the spawn position. The IsPlayerCreated parameter (default: false) is used to initialize the created {{cPickup}} object's IsPlayerCreated value.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Pickups",
+								Type = "cItems",
+							},
+							{
+								Name = "X",
+								Type = "number",
+							},
+							{
+								Name = "Y",
+								Type = "number",
+							},
+							{
+								Name = "Z",
+								Type = "number",
+							},
+							{
+								Name = "SpeedX",
+								Type = "number",
+							},
+							{
+								Name = "SpeedY",
+								Type = "number",
+							},
+							{
+								Name = "SpeedZ",
+								Type = "number",
+							},
+							{
+								Name = "IsPlayerCreated",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Notes = "Spawns the specified pickups at the position specified. All the pickups fly away from the spawn position using the specified speed. The IsPlayerCreated parameter (default: false) is used to initialize the created {{cPickup}} object's IsPlayerCreated value.",
+					},
 				},
-				SpawnMinecart = { Params = "X, Y, Z, MinecartType, Item, BlockHeight", Return = "number", Notes = "Spawns a minecart at the specific coordinates. MinecartType is the item type of the minecart. If the minecart is an empty minecart then the given item is the block inside the minecart, and blockheight is the distance of the block and the minecart." },
-				SpawnMob = { Params = "X, Y, Z, {{cMonster|MonsterType}}, [Baby]", Return = "EntityID", Notes = "Spawns the specified type of mob at the specified coords. If the Baby parameter is true, the mob will be a baby. Returns the EntityID of the creates entity, or -1 on failure. " },
-				SpawnFallingBlock = { Params = "X, Y, Z, BlockType, BlockMeta", Return = "EntityID", Notes = "Spawns an {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta" },
-				SpawnExperienceOrb = { Params = "X, Y, Z, Reward", Return = "EntityID", Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward" },
-				SpawnPrimedTNT = { Params = "X, Y, Z, FuseTicks, InitialVelocityCoeff", Return = "", Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value." },
-				TryGetHeight = { Params = "BlockX, BlockZ", Return = "IsValid, Height", Notes = "Returns true and height of the highest non-air block if the chunk is loaded, or false otherwise." },
-				UpdateSign = { Params = "X, Y, Z, Line1, Line2, Line3, Line4, [{{cPlayer|Player}}]", Return = "", Notes = "(<b>DEPRECATED</b>) Please use SetSignLines()." },
-				UseBlockEntity = { Params = "{{cPlayer|Player}}, BlockX, BlockY, BlockZ", Return = "", Notes = "Makes the specified Player use the block entity at the specified coords (open chest UI, etc.) If the cords are in an unloaded chunk or there's no block entity, ignores the call." },
-				VillagersShouldHarvestCrops = { Params = "", Return = "", Notes = "Returns true if villagers can harvest crops." },
-				WakeUpSimulators = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Wakes up the simulators for the specified block." },
-				WakeUpSimulatorsInArea = { Params = "MinBlockX, MaxBlockX, MinBlockY, MaxBlockY, MinBlockZ, MaxBlockZ", Return = "", Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive)." },
+				SpawnMinecart =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "MinecartType",
+							Type = "number",
+						},
+						{
+							Name = "Item",
+							Type = "cItem",
+							IsOptional = true,
+						},
+						{
+							Name = "BlockHeight",
+							Type = "number",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a minecart at the specific coordinates. MinecartType is the item type of the minecart. If the minecart is an empty minecart then the given Item (default: empty) is the block to be displayed inside the minecart, and BlockHeight (default: 1) is the relative distance of the block from the minecart. Returns the entity ID of the new minecart, or {{cEntity#NO_ID|cEntity.NO_ID}} if no minecart was created.",
+				},
+				SpawnMob =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "MonsterType",
+							Type = "cMonster",
+						},
+						{
+							Name = "IsBaby",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns the specified type of mob at the specified coords. If the Baby parameter is true, the mob will be a baby. Returns the EntityID of the creates entity, or -1 on failure. ",
+				},
+				SpawnPrimedTNT =
+				{
+					Params =
+					{
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "FuseTicks",
+							Type = "number",
+						},
+						{
+							Name = "InitialVelocityCoeff",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value.",
+				},
+				TryGetHeight =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "IsValid",
+							Type = "boolean",
+						},
+						{
+							Name = "Height",
+							Type = "number",
+						},
+					},
+					Notes = "Returns true and height of the highest non-air block if the chunk is loaded, or false otherwise.",
+				},
+				UpdateSign =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "Line1",
+							Type = "string",
+						},
+						{
+							Name = "Line2",
+							Type = "string",
+						},
+						{
+							Name = "Line3",
+							Type = "string",
+						},
+						{
+							Name = "Line4",
+							Type = "string",
+						},
+						{
+							Name = "Player",
+							Type = "cPlayer",
+							IsOptional = true,
+						},
+					},
+					Notes = "(<b>DEPRECATED</b>) Please use SetSignLines().",
+				},
+				UseBlockEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Player",
+							Type = "cPlayer",
+						},
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Makes the specified Player use the block entity at the specified coords (open chest UI, etc.) If the cords are in an unloaded chunk or there's no block entity, ignores the call.",
+				},
+				VillagersShouldHarvestCrops =
+				{
+					Notes = "Returns true if villagers can harvest crops.",
+				},
+				WakeUpSimulators =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Wakes up the simulators for the specified block.",
+				},
+				WakeUpSimulatorsInArea =
+				{
+					Params =
+					{
+						{
+							Name = "MinBlockX",
+							Type = "number",
+						},
+						{
+							Name = "MaxBlockX",
+							Type = "number",
+						},
+						{
+							Name = "MinBlockY",
+							Type = "number",
+						},
+						{
+							Name = "MaxBlockY",
+							Type = "number",
+						},
+						{
+							Name = "MinBlockZ",
+							Type = "number",
+						},
+						{
+							Name = "MaxBlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -2556,9 +17578,1194 @@ World:ForEachEntity(
 </pre></p>
 					]],
 				},
-			},  -- AdditionalInfo
-		},  -- cWorld
-
+			},
+		},
+		Globals =
+		{
+			Desc = [[
+				These functions are available directly, without a class instance. Any plugin can call them at any
+				time.
+			]],
+			Functions =
+			{
+				AddFaceDirection =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "BlockFace",
+							Type = "eBlockFace",
+						},
+						{
+							Name = "IsInverse",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
+				},
+				BlockFaceToString =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the string representation of the {{Globals#BlockFaces|eBlockFace}} constant. Uses the axis-direction-based names, such as BLOCK_FACE_XP.",
+				},
+				BlockStringToType =
+				{
+					Params =
+					{
+						{
+							Name = "BlockTypeString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BLOCKTYPE",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block type parsed from the given string",
+				},
+				Clamp =
+				{
+					Params =
+					{
+						{
+							Name = "Number",
+							Type = "number",
+						},
+						{
+							Name = "Min",
+							Type = "number",
+						},
+						{
+							Name = "Max",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Clamp the number to the specified range.",
+				},
+				ClickActionToString =
+				{
+					Params =
+					{
+						{
+							Name = "ClickAction",
+							Type = "eClickAction",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns a string description of the ClickAction enumerated value",
+				},
+				DamageTypeToString =
+				{
+					Params =
+					{
+						{
+							Name = "DamageType",
+							Type = "eDamageType",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Converts the {{Globals#eDamageType|DamageType}} to a string representation ",
+				},
+				EscapeString =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash",
+				},
+				GetChar =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+						{
+							Name = "Index",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "(<b>OBSOLETE</b>, use standard Lua string.sub() instead) Returns one character from the string, specified by index. ",
+				},
+				GetIniItemSet =
+				{
+					Params =
+					{
+						{
+							Name = "IniFile",
+							Type = "cIniFile",
+						},
+						{
+							Name = "SectionName",
+							Type = "string",
+						},
+						{
+							Name = "KeyName",
+							Type = "string",
+						},
+						{
+							Name = "DefaultValue",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item that has been read from the specified INI file value. If the value is not present in the INI file, the DefaultValue is stored in the file and parsed as the result. Returns empty item if the value cannot be parsed. ",
+				},
+				GetTime =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)",
+				},
+				IsBiomeNoDownfall =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms.",
+				},
+				IsValidBlock =
+				{
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if BlockType is a known block type",
+				},
+				IsValidItem =
+				{
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if ItemType is a known item type",
+				},
+				ItemToFullString =
+				{
+					Params =
+					{
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'",
+				},
+				ItemToString =
+				{
+					Params =
+					{
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the string representation of the item type",
+				},
+				ItemTypeToString =
+				{
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the string representation of ItemType ",
+				},
+				LOG =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "string",
+							},
+						},
+						Notes = "Logs a text into the server console and logfile using 'normal' severity (gray text)",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType.",
+					},
+				},
+				LOGERROR =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "string",
+							},
+						},
+						Notes = "Logs a text into the server console and logfile using 'error' severity (black text on red background)",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'error' severity (black text on red background)",
+					},
+				},
+				LOGINFO =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "string",
+							},
+						},
+						Notes = "Logs a text into the server console and logfile using 'info' severity (yellow text)",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'info' severity (yellow text)",
+					},
+				},
+				LOGWARN =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "string",
+							},
+						},
+						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
+					},
+				},
+				LOGWARNING =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "string",
+							},
+						},
+						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text)",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text)",
+					},
+				},
+				md5 =
+				{
+					Params =
+					{
+						{
+							Name = "Data",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "<b>OBSOLETE</b>, use the {{cCryptoHash}} functions instead.<br>Converts a string to a raw binary md5 hash.",
+				},
+				MirrorBlockFaceY =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it).",
+				},
+				NoCaseCompare =
+				{
+					Params =
+					{
+						{
+							Name = "Value1",
+							Type = "string",
+						},
+						{
+							Name = "Value2",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Case-insensitive string comparison; returns 0 if the strings are the same, -1 if Value1 is smaller and 1 if Value2 is smaller",
+				},
+				NormalizeAngleDegrees =
+				{
+					Params =
+					{
+						{
+							Name = "AngleDegrees",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "AngleDegrees",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the angle, wrapped into the [-180, +180) range.",
+				},
+				ReplaceString =
+				{
+					Params =
+					{
+						{
+							Name = "full-string",
+							Type = "string",
+						},
+						{
+							Name = "to-be-replaced-string",
+							Type = "string",
+						},
+						{
+							Name = "to-replace-string",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string",
+				},
+				RotateBlockFaceCCW =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees counter-clockwise.",
+				},
+				RotateBlockFaceCW =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise.",
+				},
+				StringSplit =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+						{
+							Name = "SeperatorsString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Returns and array-table of strings.",
+				},
+				StringSplitAndTrim =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+						{
+							Name = "SeperatorsString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string). Returns an array-table of strings.",
+				},
+				StringSplitWithQuotes =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+						{
+							Name = "SeperatorsString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Whitespace wrapped with single or double quotes will be ignored. Returns an array-table of strings.",
+				},
+				StringToBiome =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "BiomeType",
+							Type = "Globals#BiomeTypes",
+						},
+					},
+					Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value. Returns biInvalidBiome if the input is not a recognized biome.",
+				},
+				StringToDamageType =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "DamageType",
+							Type = "Globals#DamageType",
+						},
+					},
+					Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value. Returns -1 if the inupt is not a recognized damage type.",
+				},
+				StringToDimension =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Dimension",
+							Type = "Globals#WorldDimension",
+						},
+					},
+					Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value. Returns dimNotSet if the input is not a recognized dimension.",
+				},
+				StringToItem =
+				{
+					Params =
+					{
+						{
+							Name = "StringToParse",
+							Type = "string",
+						},
+						{
+							Name = "DestItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Parses the item specification in the given string and sets it into DestItem; returns true if successful",
+				},
+				StringToMobType =
+				{
+					Params =
+					{
+						{
+							Name = "MobTypeString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "MobType",
+							Type = "Globals#MobType",
+						},
+					},
+					Notes = "(<b>DEPRECATED!</b>) Please use cMonster:StringToMobType(). Converts a string representation to a {{Globals#MobType|MobType}} enumerated value",
+				},
+				StripColorCodes =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Removes all control codes used by MC for colors and styles",
+				},
+				TrimString =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Removes whitespace at both ends of the string",
+				},
+			},
+			Constants =
+			{
+				BLOCK_FACE_BOTTOM =
+				{
+					Notes = "Please use BLOCK_FACE_YM instead. Interacting with the bottom face of the block.",
+				},
+				BLOCK_FACE_EAST =
+				{
+					Notes = "Please use BLOCK_FACE_XM instead. Interacting with the eastern face of the block.",
+				},
+				BLOCK_FACE_MAX =
+				{
+					Notes = "Used for range checking - highest legal value for an {{Globals#eBlockFace|eBlockFace}}",
+				},
+				BLOCK_FACE_MIN =
+				{
+					Notes = "Used for range checking - lowest legal value for an {{Globals#eBlockFace|eBlockFace}}",
+				},
+				BLOCK_FACE_NONE =
+				{
+					Notes = "Interacting with no block face - swinging the item in the air",
+				},
+				BLOCK_FACE_NORTH =
+				{
+					Notes = "Please use BLOCK_FACE_ZM instead. Interacting with the northern face of the block.",
+				},
+				BLOCK_FACE_SOUTH =
+				{
+					Notes = "Please use BLOCK_FACE_ZP instead. Interacting with the southern face of the block.",
+				},
+				BLOCK_FACE_TOP =
+				{
+					Notes = "Please use BLOCK_FACE_YP instead. Interacting with the top face of the block.",
+				},
+				BLOCK_FACE_WEST =
+				{
+					Notes = "Please use BLOCK_FACE_XP instead. Interacting with the western face of the block.",
+				},
+				BLOCK_FACE_XM =
+				{
+					Notes = "Interacting with the X- face of the block",
+				},
+				BLOCK_FACE_XP =
+				{
+					Notes = "Interacting with the X+ face of the block",
+				},
+				BLOCK_FACE_YM =
+				{
+					Notes = "Interacting with the Y- face of the block",
+				},
+				BLOCK_FACE_YP =
+				{
+					Notes = "Interacting with the Y+ face of the block",
+				},
+				BLOCK_FACE_ZM =
+				{
+					Notes = "Interacting with the Z- face of the block",
+				},
+				BLOCK_FACE_ZP =
+				{
+					Notes = "Interacting with the Z+ face of the block",
+				},
+				DIG_STATUS_CANCELLED =
+				{
+					Notes = "The player has let go of the mine block key before finishing mining the block",
+				},
+				DIG_STATUS_DROP_HELD =
+				{
+					Notes = "The player has dropped a single item using the Drop Item key (default: Q)",
+				},
+				DIG_STATUS_DROP_STACK =
+				{
+					Notes = "The player has dropped a full stack of items using the Drop Item key (default: Q) while holding down a specific modifier key (in windows, control)",
+				},
+				DIG_STATUS_FINISHED =
+				{
+					Notes = "The player thinks that it has finished mining a block",
+				},
+				DIG_STATUS_SHOOT_EAT =
+				{
+					Notes = "The player has finished shooting a bow or finished eating",
+				},
+				DIG_STATUS_STARTED =
+				{
+					Notes = "The player has started digging",
+				},
+				DIG_STATUS_SWAP_ITEM_IN_HAND =
+				{
+					Notes = "The player has swapped their held item with the item in their offhand slot (1.9)",
+				},
+				E_META_DROPSPENSER_ACTIVATED =
+				{
+					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is currently activated. If this flag is set, the block must be unpowered first and powered again to shoot the next item.",
+				},
+				E_META_DROPSPENSER_FACING_MASK =
+				{
+					Notes = "A mask that indicates the bits of the metadata that specify the facing of droppers and dispensers.",
+				},
+				E_META_DROPSPENSER_FACING_XM =
+				{
+					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the negative X direction.",
+				},
+				E_META_DROPSPENSER_FACING_XP =
+				{
+					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive X direction.",
+				},
+				E_META_DROPSPENSER_FACING_YM =
+				{
+					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the negative Y direction.",
+				},
+				E_META_DROPSPENSER_FACING_YP =
+				{
+					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive Y direction.",
+				},
+				E_META_DROPSPENSER_FACING_ZM =
+				{
+					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the negative Z direction.",
+				},
+				E_META_DROPSPENSER_FACING_ZP =
+				{
+					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive Z direction.",
+				},
+				esBed =
+				{
+					Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed.",
+				},
+				esEnderCrystal =
+				{
+					Notes = "An ender crystal entity explosion. The SourceData param is the {{cEntity|ender crystal entity}} object.",
+				},
+				esGhastFireball =
+				{
+					Notes = "A ghast fireball explosion. The SourceData param is the {{cGhastFireballEntity|ghast fireball entity}} object.",
+				},
+				esMonster =
+				{
+					Notes = "A monster explosion (creeper). The SourceData param is the {{cMonster|monster entity}} object.",
+				},
+				esOther =
+				{
+					Notes = "Any other explosion. The SourceData param is unused.",
+				},
+				esPlugin =
+				{
+					Notes = "An explosion started by a plugin, without any further information. The SourceData param is unused. ",
+				},
+				esPrimedTNT =
+				{
+					Notes = "A TNT explosion. The SourceData param is the {{cTNTEntity|TNT entity}} object.",
+				},
+				esWitherBirth =
+				{
+					Notes = "An explosion at a wither's birth. The SourceData param is the {{cMonster|wither entity}} object.",
+				},
+				esWitherSkull =
+				{
+					Notes = "A wither skull explosion. The SourceData param is the {{cWitherSkullEntity|wither skull entity}} object.",
+				},
+				mtCustom =
+				{
+					Notes = "Send raw data without any processing",
+				},
+				mtDeath =
+				{
+					Notes = "Denotes death of player",
+				},
+				mtError =
+				{
+					Notes = "Something could not be done (i.e. command not executed due to insufficient privilege)",
+				},
+				mtFail =
+				{
+					Notes = "Something could not be done (i.e. command not executed due to insufficient privilege)",
+				},
+				mtFailure =
+				{
+					Notes = "Something could not be done (i.e. command not executed due to insufficient privilege)",
+				},
+				mtFatal =
+				{
+					Notes = "Something catastrophic occured (i.e. plugin crash)",
+				},
+				mtInfo =
+				{
+					Notes = "Informational message (i.e. command usage)",
+				},
+				mtInformation =
+				{
+					Notes = "Informational message (i.e. command usage)",
+				},
+				mtJoin =
+				{
+					Notes = "A player has joined the server",
+				},
+				mtLeave =
+				{
+					Notes = "A player has left the server",
+				},
+				mtMaxPlusOne =
+				{
+					Notes = "The first invalid type, used for checking on LuaAPI boundaries",
+				},
+				mtPM =
+				{
+					Notes = "Player to player messaging identifier",
+				},
+				mtPrivateMessage =
+				{
+					Notes = "Player to player messaging identifier",
+				},
+				mtSuccess =
+				{
+					Notes = "Something executed successfully",
+				},
+				mtWarning =
+				{
+					Notes = "Something concerning (i.e. reload) is about to happen",
+				},
+			},
+			ConstantGroups =
+			{
+				eBlockFace =
+				{
+					Include = "^BLOCK_FACE_.*",
+					TextBefore = [[
+						These constants are used to describe individual faces of the block. They are used when the
+						client is interacting with a block in the {{OnPlayerBreakingBlock|HOOK_PLAYER_BREAKING_BLOCK}},
+						{{OnPlayerBrokenBlock|HOOK_PLAYER_BROKEN_BLOCK}}, {{OnPlayerLeftClick|HOOK_PLAYER_LEFT_CLICK}},
+						{{OnPlayerPlacedBlock|HOOK_PLAYER_PLACED_BLOCK}}, {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}},
+						{{OnPlayerRightClick|HOOK_PLAYER_RIGHT_CLICK}}, {{OnPlayerUsedBlock|HOOK_PLAYER_USED_BLOCK}},
+						{{OnPlayerUsedItem|HOOK_PLAYER_USED_ITEM}}, {{OnPlayerUsingBlock|HOOK_PLAYER_USING_BLOCK}},
+						and {{OnPlayerUsingItem|HOOK_PLAYER_USING_ITEM}} hooks, or when the {{cLineBlockTracer}} hits a
+						block, etc.
+					]],
+				},
+				eBlockType =
+				{
+					Include = "^E_BLOCK_.*",
+					TextBefore = [[
+						These constants are used for block types. They correspond directly with MineCraft's data values
+						for blocks.
+					]],
+				},
+				eClickAction =
+				{
+					Include = "^ca.*",
+					TextBefore = [[
+						These constants are used to signalize various interactions that the user can do with the
+						{{cWindow|UI windows}}. The server translates the protocol events into these constants. Note
+						that there is a global ClickActionToString() function that can translate these constants into
+						their textual representation.
+					]],
+				},
+				eDamageType =
+				{
+					Include = "^dt.*",
+					TextBefore = [[
+						These constants are used for specifying the cause of damage to entities. They are used in the
+						{{TakeDamageInfo}} structure, as well as in {{cEntity}}'s damage-related API functions.
+					]],
+				},
+				DigStatuses =
+				{
+					Include = "^DIG_STATUS_.*",
+					TextBefore = [[
+						These constants are used to describe digging statuses, but in reality cover several more cases.
+						They are used with {{OnPlayerLeftClick|HOOK_PLAYER_LEFT_CLICK}}.
+					]],
+				},
+				eDimension =
+				{
+					Include = "^dim.*",
+					TextBefore = [[
+						These constants represent dimension of a world. In Cuberite, the dimension is only reflected in
+						the world's overall tint - overworld gets sky-like colors and dark shades, the nether gets
+						reddish haze and the end gets dark haze. World generator is not directly affected by the
+						dimension, same as fluid simulators; those only default to the expected values if not set
+						specifically otherwise in the world.ini file.
+					]],
+				},
+				eExplosionSource =
+				{
+					Include = "^es.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of explosions. They are used in
+						the {{OnExploded|HOOK_EXPLODED}} hook, {{OnExploding|HOOK_EXPLODING}} hook and in the
+						{{cWorld}}:DoExplosionAt() function. These constants also dictate the type of the additional
+						data provided with the explosions, such as the exploding creeper {{cEntity|entity}} or the
+						{{Vector3i|coords}} of the exploding bed.
+					]],
+				},
+				eGameMode =
+				{
+					Include =
+					{
+						"^gm.*",
+						"^eGameMode_.*",
+					},
+					TextBefore = [[
+						The following constants are used for the gamemode - survival, creative or adventure. Use the
+						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
+					]],
+				},
+				EMCSBiome =
+				{
+					Include = "^bi.*",
+					TextBefore = [[
+						These constants represent the biomes that the server understands. Note that there is a global
+						StringToBiome() function that can convert a string into one of these constants.
+					]],
+				},
+				eMessageType =
+				{
+					-- Need to be specified explicitly, because there's also eMonsterType using the same "mt" prefix
+					Include =
+					{
+						"mtCustom",
+						"mtDeath",
+						"mtError",
+						"mtFail",
+						"mtFailure",
+						"mtFatal",
+						"mtInfo",
+						"mtInformation",
+						"mtJoin",
+						"mtLeave",
+						"mtMaxPlusOne",
+						"mtPrivateMessage",
+						"mtPM",
+						"mtSuccess",
+						"mtWarning",
+					},
+					TextBefore = [[
+						These constants are used together with messaging functions and classes, they specify the type of
+						message being sent. The server can be configured to modify the message text (add prefixes) based
+						on the message's type.
+					]],
+				},
+				eMonsterType =
+				{
+					Include =
+					{
+						"mtInvalidType",
+						"mtBat",
+						"mtBlaze",
+						"mtCaveSpider",
+						"mtChicken",
+						"mtCow",
+						"mtCreeper",
+						"mtEnderDragon",
+						"mtEnderman",
+						"mtGhast",
+						"mtGiant",
+						"mtGuardian",
+						"mtHorse",
+						"mtIronGolem",
+						"mtMagmaCube",
+						"mtMooshroom",
+						"mtOcelot",
+						"mtPig",
+						"mtRabbit",
+						"mtSheep",
+						"mtSilverfish",
+						"mtSkeleton",
+						"mtSlime",
+						"mtSnowGolem",
+						"mtSpider",
+						"mtSquid",
+						"mtVillager",
+						"mtWitch",
+						"mtWither",
+						"mtWolf",
+						"mtZombie",
+						"mtZombiePigman",
+						"mtMax",
+					},
+					TextBefore = [[
+						The following constants are used for distinguishing between the individual mob types:
+					]],
+				},
+				eShrapnelLevel =
+				{
+					Include = "^sl.*",
+					TextBefore = [[
+						The following constants define the block types that are propelled outwards after an explosion.
+					]],
+				},
+				eSpreadSource =
+				{
+					Include = "^ss.*",
+					TextBefore = [[
+						These constants are used to differentiate the various sources of spreads, such as grass growing.
+						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
+					]],
+				},
+				eWeather =
+				{
+					Include =
+					{
+						"^eWeather_.*",
+						"wSunny",
+						"wRain",
+						"wStorm",
+						"wThunderstorm",
+					},
+					TextBefore = [[
+						These constants represent the weather in the world. Note that unlike vanilla, Cuberite allows
+						different weathers even in non-overworld {{Globals#eDimension|dimensions}}.
+					]],
+				},
+				ItemTypes =
+				{
+					Include = "^E_ITEM_.*",
+					TextBefore = [[
+						These constants are used for item types. They correspond directly with MineCraft's data values
+						for items.
+					]],
+				},
+				MetaValues =
+				{
+					Include = "^E_META_.*",
+				},
+			},
+		},
 		ItemCategory =
 		{
 			Desc = [[
@@ -2567,17 +18774,222 @@ World:ForEachEntity(
 			]],
 			Functions =
 			{
-				IsArmor      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of an armor." },
-				IsAxe        = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of an axe." },
-				IsBoots      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of boots." },
-				IsChestPlate = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a chestplate." },
-				IsHelmet     = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a helmet." },
-				IsHoe        = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a hoe." },
-				IsLeggings   = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a leggings." },
-				IsPickaxe    = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a pickaxe." },
-				IsShovel     = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a shovel." },
-				IsSword      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a sword." },
-				IsTool       = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a tool (axe, hoe, pickaxe, shovel or FIXME: sword)" },
+				IsArmor =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of an armor.",
+				},
+				IsAxe =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of an axe.",
+				},
+				IsBoots =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of boots.",
+				},
+				IsChestPlate =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a chestplate.",
+				},
+				IsHelmet =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a helmet.",
+				},
+				IsHoe =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a hoe.",
+				},
+				IsLeggings =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a leggings.",
+				},
+				IsMinecart =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a minecart.",
+				},
+				IsPickaxe =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a pickaxe.",
+				},
+				IsShovel =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a shovel.",
+				},
+				IsSword =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a sword.",
+				},
+				IsTool =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a tool (axe, hoe, pickaxe, shovel or FIXME: sword)",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -2593,10 +19005,9 @@ if (ItemCategory.IsShovel(HeldItem.m_ItemType)) then
 end
 </pre>
 					]],
-				}
+				},
 			},
-		},  -- ItemCategory
-
+		},
 		lxp =
 		{
 			Desc = [[
@@ -2615,13 +19026,44 @@ end
 			]],
 			Functions =
 			{
-				new = {Params = "CallbacksTable, [SeparatorChar]", Return = "XMLParser object", Notes = "Creates a new XML parser object, with the specified callbacks table and optional separator character."},
+				new =
+				{
+					Params =
+					{
+						{
+							Name = "CallbacksTable",
+							Type = "table",
+						},
+						{
+							Name = "SeparatorChar",
+							Type = "string",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "XMLParser object",
+							Type = "table",
+						},
+					},
+					Notes = "Creates a new XML parser object, with the specified callbacks table and optional separator character.",
+				},
 			},
 			Constants =
 			{
-				_COPYRIGHT = { Notes = "" },
-				_DESCRIPTION = { Notes = "" },
-				_VERSION = { Notes = "" },
+				_COPYRIGHT =
+				{
+					Notes = "",
+				},
+				_DESCRIPTION =
+				{
+					Notes = "",
+				},
+				_VERSION =
+				{
+					Notes = "",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -2700,20 +19142,54 @@ Parser:close();
 </pre>
 					]],
 				},
-			},  -- AdditionalInfo
-		},  -- lxp
-
+			},
+		},
 		sqlite3 =
 		{
 			Desc = [[
 			]],
-
 			Functions =
 			{
-				complete = { Params = "string", Return = "bool", Notes = "Returns true if the string sql comprises one or more complete SQL statements and false otherwise." },
-				open = { Params = "FileName", Return = "DBClass", Notes = [[
+				complete =
+				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
+					Params =
+					{
+						{
+							Name = "SQL",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the input string comprises one or more complete SQL statements.",
+				},
+				open =
+				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
+					Params =
+					{
+						{
+							Name = "FileName",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "DBClass",
+							Type = "SQLite DB object",
+						},
+					},
+					Notes = [[
 					Opens (or creates if it does not exist) an SQLite database with name filename and returns its
-					handle as userdata (the returned object should be used for all further method calls in connection
+					handle (the returned object should be used for all further method calls in connection
 					with this specific database, see
 					{{http://lua.sqlite.org/index.cgi/doc/tip/doc/lsqlite3.wiki#database_methods|Database methods}}).
 					Example:
@@ -2726,12 +19202,35 @@ myDB = sqlite3.open('MyDatabaseFile.sqlite3')
 -- Close the database:
 myDB:close()
 </pre>
-				]], },
-				open_memory = { Return = "DBClass", Notes = "Opens an SQLite database in memory and returns its handle as userdata. In case of an error, the function returns nil, an error code and an error message. (In-memory databases are volatile as they are never stored on disk.)" },
-				version = { Return = "string", Notes = "Returns a string with SQLite version information, in the form 'x.y[.z]'." },
+				]],
+				},
+				open_memory =
+				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
+					Returns =
+					{
+						{
+							Name = "DBClass",
+							Type = "SQLite DB object",
+						},
+					},
+					Notes = "Opens an SQLite database in memory and returns its handle. In case of an error, the function returns nil, an error code and an error message. (In-memory databases are volatile as they are never stored on disk.)",
+				},
+				version =
+				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns a string with SQLite version information, in the form 'x.y[.z]'.",
+				},
 			},
 		},
-
 		TakeDamageInfo =
 		{
 			Desc = [[
@@ -2740,11 +19239,31 @@ myDB:close()
 			]],
 			Variables =
 			{
-				Attacker = { Type = "{{cEntity}}", Notes = "The entity who is attacking. Only valid if dtAttack." },
-				DamageType = { Type = "eDamageType", Notes = "Source of the damage. One of the dtXXX constants." },
-				FinalDamage = { Type = "number", Notes = "	The final amount of damage that will be applied to the Receiver. It is the RawDamage minus any Receiver's armor-protection " },
-				Knockback = { Type = "{{Vector3d}}", Notes = "Vector specifying the amount and direction of knockback that will be applied to the Receiver " },
-				RawDamage = { Type = "number", Notes = "Amount of damage that the attack produces on the Receiver, including the Attacker's equipped weapon, but excluding the Receiver's armor." },
+				Attacker =
+				{
+					Type = "{{cEntity}}",
+					Notes = "The entity who is attacking. Only valid if dtAttack.",
+				},
+				DamageType =
+				{
+					Type = "eDamageType",
+					Notes = "Source of the damage. One of the dtXXX constants.",
+				},
+				FinalDamage =
+				{
+					Type = "number",
+					Notes = "The final amount of damage that will be applied to the Receiver. It is the RawDamage minus any Receiver's armor-protection.",
+				},
+				Knockback =
+				{
+					Type = "{{Vector3d}}",
+					Notes = "Vector specifying the amount and direction of knockback that will be applied to the Receiver ",
+				},
+				RawDamage =
+				{
+					Type = "number",
+					Notes = "Amount of damage that the attack produces on the Receiver, including the Attacker's equipped weapon, but excluding the Receiver's armor.",
+				},
 			},
 			AdditionalInfo =
 			{
@@ -2765,9 +19284,8 @@ end
 </pre>
 					]],
 				},
-			},  -- AdditionalInfo
-		},  -- TakeDamageInfo
-
+			},
+		},
 		tolua =
 		{
 			Desc = [[
@@ -2778,213 +19296,100 @@ end
 			]],
 			Functions =
 			{
-				cast = { Params = "Object, TypeStr", Return = "Object", Notes = "Casts the object to the specified type.<br/><b>Note:</b> This is a potentially unsafe operation and it could crash the server. There is normally no need to use this function at all, so don't use it unless you know exactly what you're doing." },
-				getpeer = { Params = "", Return = "", Notes = "" },
-				inherit = { Params = "", Return = "", Notes = "" },
-				releaseownership = { Params = "", Return = "", Notes = "" },
-				setpeer = { Params = "", Return = "", Notes = "" },
-				takeownership = { Params = "", Return = "", Notes = "" },
-				type = { Params = "Object", Return = "TypeStr", Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ classes, too." },
-			},
-		},  -- tolua
-
-		Globals =
-		{
-			Desc = [[
-				These functions are available directly, without a class instance. Any plugin can call them at any
-				time.
-			]],
-			Functions =
-			{
-				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, [IsInverse]", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}"},
-				BlockFaceToString = {Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "string", Notes = "Returns the string representation of the {{Globals#BlockFaces|eBlockFace}} constant. Uses the axis-direction-based names, such as BLOCK_FACE_XP." },
-				BlockStringToType = {Params = "BlockTypeString", Return = "BLOCKTYPE", Notes = "Returns the block type parsed from the given string"},
-				Clamp = {Params = "Number, Min, Max", Return = "number", Notes = "Clamp the number to the specified range."},
-				ClickActionToString = {Params = "{{Globals#ClickAction|ClickAction}}", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
-				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
-				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
-				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
-				GetIniItemSet = { Params = "IniFile, SectionName, KeyName, DefaultValue", Return = "{{cItem}}", Notes = "Returns the item that has been read from the specified INI file value. If the value is not present in the INI file, the DefaultValue is stored in the file and parsed as the result. Returns empty item if the value cannot be parsed. " },
-				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
-				IsBiomeNoDownfall = {Params = "Biome", Return = "bool", Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms." },
-				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
-				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
-				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
-				ItemToString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item type"},
-				ItemTypeToString = {Params = "ItemType", Return = "string", Notes = "Returns the string representation of ItemType "},
-				LOG =
+				cast =
 				{
-					{Params = "string", Notes = "Logs a text into the server console using 'normal' severity (gray text)"},
-					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType."},
+					Params =
+					{
+						{
+							Name = "Object",
+							Type = "any",
+						},
+						{
+							Name = "TypeStr",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Object",
+							Type = "any",
+						},
+					},
+					Notes = "Casts the object to the specified type.<br/><b>Note:</b> This is a potentially unsafe operation and it could crash the server. There is normally no need to use this function at all, so don't use it unless you know exactly what you're doing.",
 				},
-				LOGERROR =
+				getpeer =
 				{
-					{Params = "string", Notes = "Logs a text into the server console using 'error' severity (black text on red background)"},
-					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'error' severity (black text on red background)"},
+					Notes = "",
 				},
-				LOGINFO =
+				inherit =
 				{
-					{Params = "string", Notes = "Logs a text into the server console using 'info' severity (yellow text)"},
-					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'info' severity (yellow text)"},
+					Notes = "",
 				},
-				LOGWARN =
+				releaseownership =
 				{
-					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
-					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead"},
+					Notes = "",
 				},
-				LOGWARNING =
+				setpeer =
 				{
-					{Params = "string", Notes = "Logs a text into the server console using 'warning' severity (red text)"},
-					{Params = "{{cCompositeChat|CompositeChat}}", Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console using 'warning' severity (red text)"},
+					Notes = "",
 				},
-				MirrorBlockFaceY = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it)." },
-				NoCaseCompare = {Params = "string, string", Return = "number", Notes = "Case-insensitive string comparison; returns 0 if the strings are the same"},
-				NormalizeAngleDegrees = { Params = "AngleDegrees", Return = "AngleDegrees", Notes = "Returns the angle, wrapped into the [-180, +180) range." },
-				ReplaceString = {Params = "full-string, to-be-replaced-string, to-replace-string", Return = "string", Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string"},
-				RotateBlockFaceCCW = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees counter-clockwise." },
-				RotateBlockFaceCW = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise." },
-				StringSplit = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered."},
-				StringSplitAndTrim = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string)"},
-				StringSplitWithQuotes = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Whitespace wrapped with single or double quotes will be ignored"},
-				StringToBiome = {Params = "string", Return = "{{Globals#BiomeTypes|BiomeType}}", Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value"},
-				StringToDamageType = {Params = "string", Return = "{{Globals#DamageType|DamageType}}", Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value."},
-				StringToDimension = {Params = "string", Return = "{{Globals#WorldDimension|Dimension}}", Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value"},
-				StringToItem = {Params = "string, {{cItem|cItem}}", Return = "bool", Notes = "Parses the given string and sets the item; returns true if successful"},
-				StringToMobType = {Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "<b>DEPRECATED!</b> Please use cMonster:StringToMobType(). Converts a string representation to a {{Globals#MobType|MobType}} enumerated value"},
-				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
-				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
-				md5 = {Params = "string", Return = "string", Notes = "<b>OBSOLETE</b>, use the {{cCryptoHash}} functions instead.<br>Converts a string to a raw binary md5 hash."},
-			},
-			ConstantGroups =
-			{
-				BlockTypes =
+				takeownership =
 				{
-					Include = "^E_BLOCK_.*",
-					TextBefore = [[
-						These constants are used for block types. They correspond directly with MineCraft's data values
-						for blocks.
-					]],
+					Notes = "",
 				},
-				ItemTypes =
+				type =
 				{
-					Include = "^E_ITEM_.*",
-					TextBefore = [[
-						These constants are used for item types. They correspond directly with MineCraft's data values
-						for items.
-					]],
-				},
-				MetaValues =
-				{
-					Include = "^E_META_.*",
-				},
-				BiomeTypes =
-				{
-					Include = "^bi.*",
-					TextBefore = [[
-						These constants represent the biomes that the server understands. Note that there is a global
-						StringToBiome() function that can convert a string into one of these constants.
-					]],
-				},
-				BlockFaces =
-				{
-					Include = "^BLOCK_FACE_.*",
-					TextBefore = [[
-						These constants are used to describe individual faces of the block. They are used when the
-						client is interacting with a block in the {{OnPlayerBreakingBlock|HOOK_PLAYER_BREAKING_BLOCK}},
-						{{OnPlayerBrokenBlock|HOOK_PLAYER_BROKEN_BLOCK}}, {{OnPlayerLeftClick|HOOK_PLAYER_LEFT_CLICK}},
-						{{OnPlayerPlacedBlock|HOOK_PLAYER_PLACED_BLOCK}}, {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}},
-						{{OnPlayerRightClick|HOOK_PLAYER_RIGHT_CLICK}}, {{OnPlayerUsedBlock|HOOK_PLAYER_USED_BLOCK}},
-						{{OnPlayerUsedItem|HOOK_PLAYER_USED_ITEM}}, {{OnPlayerUsingBlock|HOOK_PLAYER_USING_BLOCK}},
-						and {{OnPlayerUsingItem|HOOK_PLAYER_USING_ITEM}} hooks, or when the {{cLineBlockTracer}} hits a
-						block, etc.
-					]],
-				},
-				ClickAction =
-				{
-					Include = "^ca.*",
-					TextBefore = [[
-						These constants are used to signalize various interactions that the user can do with the
-						{{cWindow|UI windows}}. The server translates the protocol events into these constants. Note
-						that there is a global ClickActionToString() function that can translate these constants into
-						their textual representation.
-					]],
-				},
-				WorldDimension =
-				{
-					Include = "^dim.*",
-					TextBefore = [[
-						These constants represent dimension of a world. In Cuberite, the dimension is only reflected in
-						the world's overall tint - overworld gets sky-like colors and dark shades, the nether gets
-						reddish haze and the end gets dark haze. World generator is not directly affected by the
-						dimension, same as fluid simulators; those only default to the expected values if not set
-						specifically otherwise in the world.ini file.
-					]],
-				},
-				DamageType =
-				{
-					Include = "^dt.*",
-					TextBefore = [[
-						These constants are used for specifying the cause of damage to entities. They are used in the
-						{{TakeDamageInfo}} structure, as well as in {{cEntity}}'s damage-related API functions.
-					]],
-				},
-				GameMode =
-				{
-					Include = { "^gm.*", "^eGameMode_.*" },
-					TextBefore = [[
-						The following constants are used for the gamemode - survival, creative or adventure. Use the
-						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
-					]],
-				},
-				MobType =
-				{
-					Include = { "^mt.*" },
-					TextBefore = [[
-						The following constants are used for distinguishing between the individual mob types:
-					]],
-				},
-				Weather =
-				{
-					Include = { "^eWeather_.*", "wSunny", "wRain", "wStorm", "wThunderstorm" },
-					TextBefore = [[
-						These constants represent the weather in the world. Note that unlike vanilla, Cuberite allows
-						different weathers even in non-overworld {{Globals#WorldDimension|dimensions}}.
-					]],
-				},
-				ExplosionSource =
-				{
-					Include = "^es.*",
-					TextBefore = [[
-						These constants are used to differentiate the various sources of explosions. They are used in
-						the {{OnExploded|HOOK_EXPLODED}} hook, {{OnExploding|HOOK_EXPLODING}} hook and in the
-						{{cWorld}}:DoExplosionAt() function. These constants also dictate the type of the additional
-						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
-						{{Vector3i|coords}} of the exploding bed.
-					]],
-				},
-				SpreadSource =
-				{
-					Include = "^ss.*",
-					TextBefore = [[
-						These constants are used to differentiate the various sources of spreads, such as grass growing.
-						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
-					]],
-				},
-				ShrapnelLevel =
-				{
-					Include = "^sl.*",
-					TextBefore = [[
-						The following constants define the block types  that are propelled outwards after an explosion.
-					]],
+					Params =
+					{
+						{
+							Name = "Object",
+							Type = "any",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "TypeStr",
+							Type = "string",
+						},
+					},
+					Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ classes, too.",
 				},
 			},
-		},  -- Globals
+		},
 	},
-
-
+	ExtraPages =
+	{
+		{
+			FileName = "Writing-a-Cuberite-plugin.html",
+			Title = "Writing a Cuberite plugin",
+		},
+		{
+			FileName = "InfoFile.html",
+			Title = "Using the Info.lua file",
+		},
+		{
+			FileName = "SettingUpDecoda.html",
+			Title = "Setting up the Decoda Lua IDE",
+		},
+		{
+			FileName = "SettingUpZeroBrane.html",
+			Title = "Setting up the ZeroBrane Studio Lua IDE",
+		},
+		{
+			FileName = "UsingChunkStays.html",
+			Title = "Using ChunkStays",
+		},
+		{
+			FileName = "WebWorldThreads.html",
+			Title = "Webserver vs World threads",
+		},
+	},
 	IgnoreClasses =
 	{
 		"^coroutine$",
+		"^g_TrackedPages$",
 		"^debug$",
 		"^io$",
 		"^math$",
@@ -2993,23 +19398,11 @@ end
 		"^string$",
 		"^table$",
 		"^g_Stats$",
-		"^g_TrackedPages$",
 	},
-
 	IgnoreFunctions =
 	{
 		"Globals.assert",
-		"Globals.collectgarbage",
-		"Globals.xpcall",
-		"Globals.decoda_output",  -- When running under Decoda, this function gets added to the global namespace
-		"sqlite3.__newindex",
-		"%a+%.__%a+",        -- AnyClass.__Anything
-		"%a+%.%.collector",  -- AnyClass..collector
-		"%a+%.new",          -- AnyClass.new
-		"%a+%.new_local",    -- AnyClass.new_local
-		"%a+%.delete",       -- AnyClass.delete
-
-		-- Functions global in the APIDump plugin:
+		"%a+%.delete",
 		"CreateAPITables",
 		"DumpAPIHtml",
 		"DumpAPITxt",
@@ -3019,13 +19412,20 @@ end
 		"ListUndocumentedObjects",
 		"ListUnexportedObjects",
 		"LoadAPIFiles",
+		"Globals.collectgarbage",
 		"ReadDescriptions",
 		"ReadHooks",
 		"WriteHtmlClass",
 		"WriteHtmlHook",
 		"WriteStats",
+		"Globals.xpcall",
+		"Globals.decoda_output",
+		"sqlite3.__newindex",
+		"%a+%.__%a+",
+		"%a+%.%.collector",
+		"%a+%.new",
+		"%a+%.new_local",
 	},
-
 	IgnoreConstants =
 	{
 		"cChestEntity.__cBlockEntityWindowOwner__",
@@ -3033,22 +19433,11 @@ end
 		"cFurnaceEntity.__cBlockEntityWindowOwner__",
 		"cHopperEntity.__cBlockEntityWindowOwner__",
 		"cLuaWindow.__cItemGrid__cListener__",
-		"Globals._CuberiteInternal_.*",  -- Ignore all internal Cuberite constants
+		"Globals._CuberiteInternal_.*",
+		"Globals.esMax",
 	},
-
 	IgnoreVariables =
 	{
-		"__.*__",  -- tolua exports multiple inheritance this way
-	} ,
-
-	ExtraPages =
-	{
-		-- No sorting is provided for these, they will be output in the same order as defined here
-		{ FileName = "Writing-a-Cuberite-plugin.html", Title = "Writing a Cuberite plugin" },
-		{ FileName = "InfoFile.html",                  Title = "Using the Info.lua file" },
-		{ FileName = "SettingUpDecoda.html",           Title = "Setting up the Decoda Lua IDE" },
-		{ FileName = "SettingUpZeroBrane.html",        Title = "Setting up the ZeroBrane Studio Lua IDE" },
-		{ FileName = "UsingChunkStays.html",           Title = "Using ChunkStays" },
-		{ FileName = "WebWorldThreads.html",           Title = "Webserver vs World threads" },
-	}
-} ;
+		"__.*__",
+	},
+}

@@ -61,7 +61,7 @@ function Initialize(a_Plugin)
 	-- TestUUIDFromName()
 	-- TestRankMgr()
 	TestFileExt()
-	TestFileLastMod()
+	-- TestFileLastMod()
 	TestPluginInterface()
 	
 	local LastSelfMod = cFile:GetLastModificationTime(a_Plugin:GetLocalFolder() .. "/Debuggers.lua")
@@ -1459,7 +1459,7 @@ function HandleCompo(a_Split, a_Player)
 	-- Send one composite message to self:
 	local msg = cCompositeChat()
 	msg:AddTextPart("Hello! ", "b@e")  -- bold yellow
-	msg:AddUrlPart("MCServer", "http://mc-server.org")
+	msg:AddUrlPart("Cuberite", "http://cuberite.org")
 	msg:AddTextPart(" rules! ")
 	msg:AddRunCommandPart("Set morning", "/time set 0")
 	a_Player:SendMessage(msg)
@@ -1557,7 +1557,7 @@ function OnPlayerJoined(a_Player)
 	-- Test composite chat chaining:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "http://www.mc-server.org", "u@2")
+		:AddUrlPart(a_Player:GetName(), "http://cuberite.org", "u@2")
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")
 		:AddRunCommandPart(" SetDay", "/time set 0")
 	)
@@ -1876,8 +1876,8 @@ end
 
 function HandleConsoleSchedule(a_Split)
 	local prev = os.clock()
-	LOG("Scheduling a task for 2 seconds in the future (current os.clock is " .. prev .. ")")
-	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
+	LOG("Scheduling a task for 5 seconds in the future (current os.clock is " .. prev .. ")")
+	cRoot:Get():GetDefaultWorld():ScheduleTask(5 * 20,
 		function ()
 			local current = os.clock()
 			local diff = current - prev
@@ -1915,6 +1915,139 @@ local function SqDistPtFromLine(x, y, x1, y1, x2, y2)
 	else
 		return (py * dx - px * dy) * (py * dx - px * dy) / (px * px + py * py)
 	end
+end
+
+
+
+
+
+function HandleConsoleTestBbox(a_Split, a_EntireCmd)
+	-- Test bbox intersection:
+	local bbox1 = cBoundingBox(0, 5, 0, 5, 0, 5)
+	local bbox2 = cBoundingBox(bbox1)  -- Make a copy
+	bbox2:Move(20, 20, 20)
+	local bbox3 = cBoundingBox(bbox1)  -- Make a copy
+	bbox3:Move(2, 2, 2)
+	local doesIntersect, intersection = bbox1:Intersect(bbox2)
+	LOG("Bbox 2 intersection: " .. tostring(doesIntersect))
+	LOG("  Intersection type: " .. type(intersection) .. " / " .. tolua.type(intersection))
+	if (intersection) then
+		LOG("  {" .. intersection:GetMinX() .. ", " .. intersection:GetMinY() .. ", " .. intersection:GetMinZ() .. "}")
+		LOG("  {" .. intersection:GetMaxX() .. ", " .. intersection:GetMaxY() .. ", " .. intersection:GetMaxZ() .. "}")
+	end
+	doesIntersect, intersection = bbox1:Intersect(bbox3)
+	LOG("Bbox 3 intersection: " .. tostring(doesIntersect))
+	LOG("  Intersection type: " .. type(intersection) .. " / " .. tolua.type(intersection))
+	if (intersection) then
+		LOG("  {" .. intersection:GetMinX() .. ", " .. intersection:GetMinY() .. ", " .. intersection:GetMinZ() .. "}")
+		LOG("  {" .. intersection:GetMaxX() .. ", " .. intersection:GetMaxY() .. ", " .. intersection:GetMaxZ() .. "}")
+	end
+	
+	-- Test line intersection:
+	local lines =
+	{
+		{ Vector3d(5, 0, 5), Vector3d(5, 1, 5) },
+		{ Vector3d(0, 0, 0), Vector3d(0, 1, 0) },
+	}
+	for idx, line in ipairs(lines) do
+		local doesIntersect, coeff, face = bbox2:CalcLineIntersection(line[1], line[2])
+		LOG("Line " .. idx .. " intersection: " .. tostring(doesIntersect))
+		LOG("  Coeff: " .. tostring(coeff))
+		LOG("  Face: " .. tostring(face))
+		local doesIntersect2, coeff2, face2 = cBoundingBox:CalcLineIntersection(bbox2:GetMin(), bbox2:GetMax(), line[1], line[2])
+		assert(doesIntersect == doesIntersect2)
+		assert(coeff == coeff2)
+		assert(face == face2)
+	end
+	
+	return true
+end
+
+
+
+
+
+function HandleConsoleTestCall(a_Split, a_EntireCmd)
+	LOG("Testing inter-plugin calls")
+	LOG("Note: These will fail if the Core plugin is not enabled")
+	
+	-- Test calling the HandleConsoleWeather handler:
+	local pm = cPluginManager
+	LOG("Calling Core's HandleConsoleWeather")
+	local isSuccess = pm:CallPlugin("Core", "HandleConsoleWeather",
+		{
+			"/weather",
+			"rain",
+		}
+	)
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+	
+	-- Test injecting some code:
+	LOG("Injecting code into the Core plugin")
+	isSuccess = pm:CallPlugin("Core", "dofile", pm:GetCurrentPlugin():GetLocalFolder() .. "/Inject.lua")
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+	
+	-- Test the full capabilities of the table-passing API, using the injected function:
+	LOG("Calling injected code")
+	isSuccess = pm:CallPlugin("Core", "injectedPrintParams",
+		{
+			"test",
+			nil,
+			{
+				"test",
+				"test"
+			},
+			[10] = "test",
+			["test"] = "test",
+			[{"test"}] = "test",
+			[true] = "test",
+		}
+	)
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+
+	return true
+end
+
+
+
+
+
+function HandleConsoleTestJson(a_Split, a_EntireCmd)
+	LOG("Testing Json parsing...")
+	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5], "d": true }]])
+	assert(t1.a == 1)
+	assert(t1.b == "2")
+	assert(t1.c[1] == 3)
+	assert(t1.c[2] == "4")
+	assert(t1.c[3] == 5)
+	assert(t1.d == true)
+	LOG("Json parsing example 1 successful")
+
+	local t2, msg = cJson:Parse([[{"some": invalid, json}]])
+	assert(t2 == nil)
+	assert(type(msg) == "string")
+	LOG("Json parsing an invalid string: Error message returned: " .. msg)
+	
+	LOG("Json parsing test succeeded")
+	
+	LOG("Testing Json serializing...")
+	local s1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}, d = true}, {indentation = " "})
+	LOG("Serialization result: " .. (s1 or "<nil>"))
+	LOG("Json serializing test succeeded")
+	
+	return true
 end
 
 
@@ -2002,6 +2135,107 @@ end
 
 
 
+function HandleConsoleTestUrlClient(a_Split, a_EntireCmd)
+	local url = a_Split[2] or "https://github.com"
+	local isSuccess, msg = cUrlClient:Get(url,
+		function (a_Body, a_SecondParam)
+			if not(a_Body) then
+				-- An error has occurred, a_SecondParam is the error message
+				LOG("Error while retrieving URL \"" .. url .. "\": " .. (a_SecondParam or "<no message>"))
+				return
+			end
+			-- Body received, a_SecondParam is the HTTP headers dictionary-table
+			assert(type(a_Body) == "string")
+			assert(type(a_SecondParam) == "table")
+			LOG("URL body received, length is " .. string.len(a_Body) .. " bytes and there are these headers:")
+			for k, v in pairs(a_SecondParam) do
+				LOG("  \"" .. k .. "\": \"" .. v .. "\"")
+			end
+			LOG("(headers list finished)")
+		end
+	)
+	if not(isSuccess) then
+		LOG("cUrlClient request failed: " .. (msg or "<no message>"))
+	end
+	return true
+end
+
+
+
+
+
+function HandleConsoleTestUrlParser(a_Split, a_EntireCmd)
+	LOG("Testing cUrlParser...")
+	local UrlsToTest =
+	{
+		"invalid URL",
+		"https://github.com",
+		"ftp://anonymous:user@example.com@ftp.cuberite.org:9921/releases/2015/2015-12-25.zip",
+		"ftp://anonymous:user:name:with:colons@example.com@ftp.cuberite.org:9921",
+		"http://google.com/",
+		"http://google.com/?q=cuberite",
+		"http://google.com/search?q=cuberite",
+		"http://google.com/some/search?q=cuberite#results",
+		"http://google.com/?q=cuberite#results",
+		"http://google.com/#results",
+		"ftp://cuberite.org:9921/releases/2015/2015-12-25.zip",
+		"mailto:support@cuberite.org",
+	}
+	for _, u in ipairs(UrlsToTest) do
+		LOG("URL: " .. u)
+		local scheme, username, password, host, port, path, query, fragment = cUrlParser:Parse(u)
+		if not(scheme) then
+			LOG("  Error: " .. (username or "<nil>"))
+		else
+			LOG("  Scheme   = " .. scheme)
+			LOG("  Username = " .. username)
+			LOG("  Password = " .. password)
+			LOG("  Host     = " .. host)
+			LOG("  Port     = " .. port)
+			LOG("  Path     = " .. path)
+			LOG("  Query    = " .. query)
+			LOG("  Fragment = " .. fragment)
+		end
+	end
+	LOG("cUrlParser test complete")
+	return true
+end
+
+
+
+
+
+function HandleConsoleUuid(a_Split, a_EntireCmd)
+	-- Check params:
+	local playerName = a_Split[2]
+	if not(playerName) then
+		return true, "Usage: uuid <PlayerName>"
+	end
+	
+	-- Query with cache:
+	LOG("Player " .. playerName .. ":")
+	local cachedUuid = cMojangAPI:GetUUIDFromPlayerName(playerName, true)
+	if not(cachedUuid) then
+		LOG("  - not in the UUID cache")
+	else
+		LOG("  - in the cache: \"" .. cachedUuid .. "\"")
+	end
+	
+	-- Query online:
+	local onlineUuid = cMojangAPI:GetUUIDFromPlayerName(playerName, false)
+	if not(onlineUuid) then
+		LOG("  - UUID not available online")
+	else
+		LOG("  - online: \"" .. onlineUuid .. "\"")
+	end
+	
+	return true
+end
+
+
+
+
+
 function HandleConsoleBBox(a_Split)
 	local bbox = cBoundingBox(0, 10, 0, 10, 0, 10)
 	local v1 = Vector3d(1, 1, 1)
@@ -2052,6 +2286,97 @@ function HandleConsoleBBox(a_Split)
 	
 	return true
 end
+
+
+
+
+
+function HandleConsoleDownload(a_Split)
+	-- Check params:
+	local url = a_Split[2]
+	local fnam = a_Split[3]
+	if (not(url) or not(fnam)) then
+		return true, "Missing parameters. Usage: download <url> <filename>"
+	end
+	
+	local callbacks =
+	{
+		OnStatusLine = function (self, a_HttpVersion, a_Status, a_Rest)
+			if (a_Status ~= 200) then
+				LOG("Cannot download " .. url .. ", HTTP error code " .. a_Status)
+				return
+			end
+			
+			local f, err = io.open(fnam, "wb")
+			if not(f) then
+				LOG("Cannot download " .. url .. ", error opening the file " .. fnam .. ": " .. (err or "<no message>"))
+				return
+			end
+			self.m_File = f
+		end,
+
+		OnBodyData = function (self, a_Data)
+			if (self.m_File) then
+				self.m_File:write(a_Data)
+			end
+		end,
+		
+		OnBodyFinished = function (self)
+			if (self.m_File) then
+				self.m_File:close()
+				LOG("File " .. fnam .. " has been downloaded.")
+			end
+		end,
+	}
+	
+	local isSuccess, msg = cUrlClient:Get(url, callbacks)
+	if not(isSuccess) then
+		LOG("Cannot start an URL download: " .. (msg or "<no message>"))
+		return true
+	end
+	return true
+end
+
+
+
+
+
+function HandleBlkCmd(a_Split, a_Player)
+	-- Gets info about the block the player is looking at.
+	local World = a_Player:GetWorld();
+
+	local Callbacks = {
+		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+			if (a_BlockType ~= E_BLOCK_AIR) then
+				a_Player:SendMessage("Block at " .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
+				return true;
+			end
+		end
+	};
+	
+	local EyePos = a_Player:GetEyePosition();
+	local LookVector = a_Player:GetLookVector();
+	LookVector:Normalize();
+	
+	local End = EyePos + LookVector * 50;
+	
+	cLineBlockTracer.Trace(World, Callbacks, EyePos.x, EyePos.y, EyePos.z, End.x, End.y, End.z);
+	
+	return true;
+end
+
+
+
+
+
+function HandleTeamsCmd(a_Split, a_Player)
+	local Scoreboard = a_Player:GetWorld():GetScoreBoard()
+
+	a_Player:SendMessage("Teams: " .. table.concat(Scoreboard:GetTeamNames(), ", "))
+
+	return true
+end
+
 
 
 

@@ -3,6 +3,7 @@
 <html>
 	<head>
 		<title>Cuberite Plugin Tutorial</title>
+		<link rel="canonical" href="http://api-docs.cuberite.org/">
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -209,10 +210,11 @@ function Explode(Split, Player)
 	-- Create a callback ExplodePlayer with parameter Explodee, which Cuberite calls for every player on the server
 	local HasExploded = false
 	local ExplodePlayer = function(Explodee)
-		-- If the player we are currently at is the one we specified as the parameter
+		-- If the player name matches exactly
 		if (Explodee:GetName() == Split[2]) then
-			-- Create an explosion at the same position as they are; see <a href="cWorld.html">API docs</a> for further details of this function
-			Player:GetWorld():DoExplosionAt(Explodee:GetPosX(), Explodee:GetPosY(), Explodee:GetPosZ(), false, esPlugin)
+			-- Create an explosion of force level 2 at the same position as they are
+			-- see <a href="cWorld.html">API docs</a> for further details of this function
+			Player:GetWorld():DoExplosionAt(2, Explodee:GetPosX(), Explodee:GetPosY(), Explodee:GetPosZ(), false, esPlugin)
 			Player:SendMessageSuccess(Split[2] .. " was successfully exploded")
 			HasExploded = true;
 			return true -- Signalize to Cuberite that we do not need to call this callback for any more players
@@ -251,5 +253,22 @@ end
 				prettyPrint();
 			</script>
 		</div>
+
+		<!-- Piwik -->
+		<script type="text/javascript">
+		  var _paq = _paq || [];
+		  _paq.push(['trackPageView']);
+		  _paq.push(['enableLinkTracking']);
+		  (function() {
+			var u="https://analytics.cuberite.org/";
+			_paq.push(['setTrackerUrl', u+'piwik.php']);
+			_paq.push(['setSiteId', 5]);
+			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+			g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
+		  })();
+		</script>
+		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
+		<!-- End Piwik Code -->
+
 	</body>
 </html>
