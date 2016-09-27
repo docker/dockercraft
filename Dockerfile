@@ -1,4 +1,4 @@
-FROM golang:1.6
+FROM golang:1.7.1
 
 ENV DOCKER_VERSION 1.12.1
 
@@ -9,8 +9,8 @@ RUN curl -sSL -o docker.tgz https://get.docker.com/builds/Linux/x86_64/docker-${
 	ln -s /bin/docker /bin/docker-${DOCKER_VERSION}
 
 # Copy Go code and install applications
-WORKDIR /go/src/github.com/docker/dockercraft
-COPY . .
+COPY ./go /go/src/dockercraft
+WORKDIR /go/src/dockercraft
 RUN go install
 
 # Download Cuberite server (Minecraft C++ server)
