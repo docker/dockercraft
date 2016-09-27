@@ -227,6 +227,8 @@ func (d *Daemon) handleMessage(message []byte) {
 		return
 	}
 
+	log.Debugf("handleMessage: %#v \n", tcpMsg)
+
 	switch tcpMsg.Cmd {
 	case "docker":
 		d.execDockerCmd(tcpMsg.Args)
@@ -371,6 +373,7 @@ func (d *Daemon) statCallback(id string, stats *docker.Stats, args ...interface{
 // execDockerCmd handles Docker commands
 func (d *Daemon) execDockerCmd(args []string) {
 	if len(args) > 0 {
+		log.Debugln("execDockerCmd:", d.BinaryName, args)
 		cmd := exec.Command(d.BinaryName, args...)
 		err := cmd.Run() // will wait for command to return
 		if err != nil {
@@ -540,12 +543,20 @@ func containerEventToTcpMsg(containerEvent ContainerEvent) ([]byte, error) {
 }
 
 func (d *Daemon) apiEventToContainerEvent(event *docker.APIEvents) (ContainerEvent, error) {
+
+	containerEvent := ContainerEvent{}
+	containerEvent.Id = event.ID
+
+	// don't try to inspect container in that case, it's already gone!
+	if event.Action == "destroy" {
+		return containerEvent, nil
+	}
+
+	log.Debugf("apiEventToContainerEvent: %#v\n", event)
 	container, err := d.Client.InspectContainer(event.ID)
 	if err != nil {
-		return ContainerEvent{}, err
+		return containerEvent, err
 	}
-	containerEvent := ContainerEvent{}
-	containerEvent.Id = container.ID
 	containerEvent.ImageRepo, containerEvent.ImageTag = splitRepoAndTag(event.From)
 	if containerEvent.ImageTag == "" {
 		containerEvent.ImageTag = "latest"
