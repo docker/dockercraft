@@ -1,10 +1,10 @@
 # Dockercraft
 
-![Dockercraft](../master/docs/img/logo.png?raw=true)
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/logo.png?raw=true)
 
 A simple Minecraft Docker client, to visualize and manage Docker containers.
 
-![Dockercraft](../master/docs/img/dockercraft.gif?raw=true)
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/dockercraft.gif?raw=true)
 
 [YouTube video](http://www.youtube.com/watch?v=eZDlJgJf55o)
 
@@ -60,7 +60,7 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 > 
 > example: `/docker run redis`.
 
-![Dockercraft](../master/docs/img/landscape.png?raw=true)
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/landscape.png?raw=true)
 
 ## Upcoming features
 
@@ -77,7 +77,7 @@ This is just the beginning for Dockercraft! We should be able to support a lot m
 If you're interested about Dockercraft's design, discussions happen in [that issue](https://github.com/docker/dockercraft/issues/19).
 Also, we're using [Magicavoxel](https://voxel.codeplex.com) to do these nice prototypes:
 
-![Dockercraft](../master/docs/img/voxelproto.jpg?raw=true)
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/voxelproto.jpg?raw=true)
 
 You can find our Magicavoxel patterns in [that folder](![Dockercraft](https://github.com/docker/dockercraft/tree/master/docs/magicavoxel)).
 
@@ -124,4 +124,4 @@ end
 
 Want to hack on Dockercraft? [Docker's contributions guidelines](https://github.com/docker/docker/blob/master/CONTRIBUTING.md) apply.
 
-![Dockercraft](../master/docs/img/contribute.png?raw=true)
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/contribute.png?raw=true)
