@@ -25,6 +25,10 @@ TCP_CLIENT = {
 		-- It is an Undefined Behavior to send data to a_TCPLink in or after this callback
 		-- All returned values are ignored
 		LOG("tcp client OnError: " .. ErrorCode .. ": " .. ErrorMsg)
+
+		-- retry to establish connection
+		LOG("retry cNetwork:Connect")
+		cNetwork:Connect("127.0.0.1",25566,TCP_CLIENT)
 	end,
 	
 	OnReceivedData = function (TCPConn, Data)
@@ -54,6 +58,10 @@ TCP_CLIENT = {
 		-- No other callback will be called for this link from now on
 		-- All returned values are ignored
 		LOG("tcp client OnRemoteClosed")
+
+		-- retry to establish connection
+		LOG("retry cNetwork:Connect")
+		cNetwork:Connect("127.0.0.1",25566,TCP_CLIENT)
 	end,
 }
 

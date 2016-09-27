@@ -4,7 +4,7 @@ set -e
 
 # Start goproxy
 echo Starting Dockercraft
-dockercraft -daemon &
+dockercraft &
 
 # start Minecraft C++ server
 cd /srv/world

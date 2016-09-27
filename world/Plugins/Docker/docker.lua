@@ -47,13 +47,7 @@ function Initialize(Plugin)
 	-- make all players admin
 	cRankManager:SetDefaultRank("Admin")
 
-	local connected = cNetwork:Connect("127.0.0.1",25566,TCP_CLIENT)
-	if not(connected) 
-	then
-		LOG("TCP CLIENT CAN'T CONNECT")
-	else 
-		LOG("TCP CLIENT CONNECTED!")
-	end
+	cNetwork:Connect("127.0.0.1",25566,TCP_CLIENT)
 
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
