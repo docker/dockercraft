@@ -1,4 +1,4 @@
-// Copyright 2015 go-dockerclient authors. All rights reserved.
+// Copyright 2013 go-dockerclient authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,18 +8,20 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
-	"github.com/fsouza/go-dockerclient/external/github.com/hashicorp/go-cleanhttp"
+	"golang.org/x/net/context"
 )
 
 func TestNewAPIClient(t *testing.T) {
@@ -31,8 +33,8 @@ func TestNewAPIClient(t *testing.T) {
 	if client.endpoint != endpoint {
 		t.Errorf("Expected endpoint %s. Got %s.", endpoint, client.endpoint)
 	}
-	// test unix socket endpoints
-	endpoint = "unix:///var/run/docker.sock"
+	// test native endpoints
+	endpoint = nativeRealEndpoint
 	client, err = NewClient(endpoint)
 	if err != nil {
 		t.Fatal(err)
@@ -241,7 +243,7 @@ func TestGetURL(t *testing.T) {
 		{"http://localhost:4243", "/containers/ps", "http://localhost:4243/containers/ps"},
 		{"tcp://localhost:4243", "/containers/ps", "http://localhost:4243/containers/ps"},
 		{"http://localhost:4243/////", "/", "http://localhost:4243/"},
-		{"unix:///var/run/docker.socket", "/containers", "/containers"},
+		{nativeRealEndpoint, "/containers", "/containers"},
 	}
 	for _, tt := range tests {
 		client, _ := NewClient(tt.endpoint)
@@ -254,21 +256,21 @@ func TestGetURL(t *testing.T) {
 	}
 }
 
-func TestGetFakeUnixURL(t *testing.T) {
+func TestGetFakeNativeURL(t *testing.T) {
 	var tests = []struct {
 		endpoint string
 		path     string
 		expected string
 	}{
-		{"unix://var/run/docker.sock", "/", "http://unix.sock/"},
-		{"unix://var/run/docker.socket", "/", "http://unix.sock/"},
-		{"unix://var/run/docker.sock", "/containers/ps", "http://unix.sock/containers/ps"},
+		{nativeRealEndpoint, "/", "http://unix.sock/"},
+		{nativeRealEndpoint, "/", "http://unix.sock/"},
+		{nativeRealEndpoint, "/containers/ps", "http://unix.sock/containers/ps"},
 	}
 	for _, tt := range tests {
 		client, _ := NewClient(tt.endpoint)
 		client.endpoint = tt.endpoint
 		client.SkipServerVersionCheck = true
-		got := client.getFakeUnixURL(tt.path)
+		got := client.getFakeNativeURL(tt.path)
 		if got != tt.expected {
 			t.Errorf("getURL(%q): Got %s. Want %s.", tt.path, got, tt.expected)
 		}
@@ -323,25 +325,6 @@ func TestQueryString(t *testing.T) {
 	}
 }
 
-func TestNewAPIVersionFailures(t *testing.T) {
-	var tests = []struct {
-		input         string
-		expectedError string
-	}{
-		{"1-0", `Unable to parse version "1-0"`},
-		{"1.0-beta", `Unable to parse version "1.0-beta": "0-beta" is not an integer`},
-	}
-	for _, tt := range tests {
-		v, err := NewAPIVersion(tt.input)
-		if v != nil {
-			t.Errorf("Expected <nil> version, got %v.", v)
-		}
-		if err.Error() != tt.expectedError {
-			t.Errorf("NewAPIVersion(%q): wrong error. Want %q. Got %q", tt.input, tt.expectedError, err.Error())
-		}
-	}
-}
-
 func TestAPIVersions(t *testing.T) {
 	var tests = []struct {
 		a                              string
@@ -354,6 +337,9 @@ func TestAPIVersions(t *testing.T) {
 		{"1.11", "1.11", false, true, false, true},
 		{"1.10", "1.11", true, true, false, false},
 		{"1.11", "1.10", false, false, true, true},
+
+		{"1.11-ubuntu0", "1.11", false, true, false, true},
+		{"1.10", "1.11-el7", true, true, false, false},
 
 		{"1.9", "1.11", true, true, false, false},
 		{"1.11", "1.9", false, false, true, true},
@@ -421,55 +407,342 @@ func TestPingFailingWrongStatus(t *testing.T) {
 	}
 }
 
-func TestPingErrorWithUnixSocket(t *testing.T) {
+func TestPingErrorWithNativeClient(t *testing.T) {
+	srv, cleanup, err := newNativeServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("aaaaaaaaaaa-invalid-aaaaaaaaaaa"))
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanup()
+	srv.Start()
+	defer srv.Close()
+	endpoint := nativeBadEndpoint
+	client, err := NewClient(endpoint)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = client.Ping()
+	if err == nil {
+		t.Fatal("Expected non nil error, got nil")
+	}
+}
+
+func TestClientStreamTimeoutNotHit(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for i := 0; i < 5; i++ {
+			fmt.Fprintf(w, "%d\n", i)
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+	}))
+	client, err := NewClient(srv.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var w bytes.Buffer
+	err = client.stream("POST", "/image/create", streamOptions{
+		setRawTerminal:    true,
+		stdout:            &w,
+		inactivityTimeout: 300 * time.Millisecond,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := "0\n1\n2\n3\n4\n"
+	result := w.String()
+	if result != expected {
+		t.Fatalf("expected stream result %q, got: %q", expected, result)
+	}
+}
+
+func TestClientStreamInactivityTimeout(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for i := 0; i < 5; i++ {
+			fmt.Fprintf(w, "%d\n", i)
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+			time.Sleep(500 * time.Millisecond)
+		}
+	}))
+	client, err := NewClient(srv.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var w bytes.Buffer
+	err = client.stream("POST", "/image/create", streamOptions{
+		setRawTerminal:    true,
+		stdout:            &w,
+		inactivityTimeout: 100 * time.Millisecond,
+	})
+	if err != ErrInactivityTimeout {
+		t.Fatalf("expected request canceled error, got: %s", err)
+	}
+	expected := "0\n"
+	result := w.String()
+	if result != expected {
+		t.Fatalf("expected stream result %q, got: %q", expected, result)
+	}
+}
+
+func TestClientStreamContextDeadline(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "abc\n")
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		time.Sleep(500 * time.Millisecond)
+		fmt.Fprint(w, "def\n")
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+	}))
+	client, err := NewClient(srv.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var w bytes.Buffer
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+	err = client.stream("POST", "/image/create", streamOptions{
+		setRawTerminal: true,
+		stdout:         &w,
+		context:        ctx,
+	})
+	if err != context.DeadlineExceeded {
+		t.Fatalf("expected %s, got: %s", context.DeadlineExceeded, err)
+	}
+	expected := "abc\n"
+	result := w.String()
+	if result != expected {
+		t.Fatalf("expected stream result %q, got: %q", expected, result)
+	}
+}
+
+func TestClientStreamContextCancel(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "abc\n")
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		time.Sleep(500 * time.Millisecond)
+		fmt.Fprint(w, "def\n")
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+	}))
+	client, err := NewClient(srv.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var w bytes.Buffer
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		li, err := net.Listen("unix", "/tmp/echo.sock")
+		time.Sleep(200 * time.Millisecond)
+		cancel()
+	}()
+	err = client.stream("POST", "/image/create", streamOptions{
+		setRawTerminal: true,
+		stdout:         &w,
+		context:        ctx,
+	})
+	if err != context.Canceled {
+		t.Fatalf("expected %s, got: %s", context.Canceled, err)
+	}
+	expected := "abc\n"
+	result := w.String()
+	if result != expected {
+		t.Fatalf("expected stream result %q, got: %q", expected, result)
+	}
+}
+
+func TestClientDoContextDeadline(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(500 * time.Millisecond)
+	}))
+	client, err := NewClient(srv.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+	_, err = client.do("POST", "/image/create", doOptions{
+		context: ctx,
+	})
+	if err != context.DeadlineExceeded {
+		t.Fatalf("expected %s, got: %s", context.DeadlineExceeded, err)
+	}
+}
+
+func TestClientDoContextCancel(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(500 * time.Millisecond)
+	}))
+	client, err := NewClient(srv.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		cancel()
+	}()
+	_, err = client.do("POST", "/image/create", doOptions{
+		context: ctx,
+	})
+	if err != context.Canceled {
+		t.Fatalf("expected %s, got: %s", context.Canceled, err)
+	}
+}
+
+func TestClientStreamTimeoutNativeClient(t *testing.T) {
+	srv, cleanup, err := newNativeServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for i := 0; i < 5; i++ {
+			fmt.Fprintf(w, "%d\n", i)
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+			time.Sleep(500 * time.Millisecond)
+		}
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanup()
+	srv.Start()
+	defer srv.Close()
+	client, err := NewClient(nativeProtocol + "://" + srv.Listener.Addr().String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var w bytes.Buffer
+	err = client.stream("POST", "/image/create", streamOptions{
+		setRawTerminal:    true,
+		stdout:            &w,
+		inactivityTimeout: 100 * time.Millisecond,
+	})
+	if err != ErrInactivityTimeout {
+		t.Fatalf("expected request canceled error, got: %s", err)
+	}
+	expected := "0\n"
+	result := w.String()
+	if result != expected {
+		t.Fatalf("expected stream result %q, got: %q", expected, result)
+	}
+}
+
+func TestClientDoConcurrentStress(t *testing.T) {
+	var reqs []*http.Request
+	var mu sync.Mutex
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		reqs = append(reqs, r)
+		mu.Unlock()
+	})
+	var nativeSrvs []*httptest.Server
+	for i := 0; i < 3; i++ {
+		srv, cleanup, err := newNativeServer(handler)
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer li.Close()
-		if err != nil {
-			t.Fatalf("Expected to get listener, but failed: %#v", err)
-		}
-
-		fd, err := li.Accept()
-		if err != nil {
-			t.Fatalf("Expected to accept connection, but failed: %#v", err)
-		}
-
-		buf := make([]byte, 512)
-		nr, err := fd.Read(buf)
-
-		// Create invalid response message to trigger error.
-		data := buf[0:nr]
-		for i := 0; i < 10; i++ {
-			data[i] = 63
-		}
-
-		_, err = fd.Write(data)
-		if err != nil {
-			t.Fatalf("Expected to write to socket, but failed: %#v", err)
-		}
-
-		return
-	}()
-
-	// Wait for unix socket to listen
-	time.Sleep(10 * time.Millisecond)
-
-	endpoint := "unix:///tmp/echo.sock"
-	u, _ := parseEndpoint(endpoint, false)
-	client := Client{
-		HTTPClient:             cleanhttp.DefaultClient(),
-		Dialer:                 &net.Dialer{},
-		endpoint:               endpoint,
-		endpointURL:            u,
-		SkipServerVersionCheck: true,
+		defer cleanup()
+		nativeSrvs = append(nativeSrvs, srv)
 	}
-
-	err := client.Ping()
-	if err == nil {
-		t.Fatal("Expected non nil error, got nil")
+	var tests = []struct {
+		srv           *httptest.Server
+		scheme        string
+		withTimeout   bool
+		withTLSServer bool
+		withTLSClient bool
+	}{
+		{srv: httptest.NewUnstartedServer(handler), scheme: "http"},
+		{srv: nativeSrvs[0], scheme: nativeProtocol},
+		{srv: httptest.NewUnstartedServer(handler), scheme: "http", withTimeout: true},
+		{srv: nativeSrvs[1], scheme: nativeProtocol, withTimeout: true},
+		{srv: httptest.NewUnstartedServer(handler), scheme: "https", withTLSServer: true, withTLSClient: true},
+		{srv: nativeSrvs[2], scheme: nativeProtocol, withTLSServer: false, withTLSClient: nativeProtocol == unixProtocol}, // TLS client only works with unix protocol
+	}
+	for _, tt := range tests {
+		reqs = nil
+		var client *Client
+		var err error
+		endpoint := tt.scheme + "://" + tt.srv.Listener.Addr().String()
+		if tt.withTLSServer {
+			tt.srv.StartTLS()
+		} else {
+			tt.srv.Start()
+		}
+		if tt.withTLSClient {
+			certPEMBlock, certErr := ioutil.ReadFile("testing/data/cert.pem")
+			if certErr != nil {
+				t.Fatal(certErr)
+			}
+			keyPEMBlock, certErr := ioutil.ReadFile("testing/data/key.pem")
+			if certErr != nil {
+				t.Fatal(certErr)
+			}
+			client, err = NewTLSClientFromBytes(endpoint, certPEMBlock, keyPEMBlock, nil)
+		} else {
+			client, err = NewClient(endpoint)
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		if tt.withTimeout {
+			client.SetTimeout(time.Minute)
+		}
+		n := 50
+		wg := sync.WaitGroup{}
+		var paths []string
+		errsCh := make(chan error, 3*n)
+		waiters := make(chan CloseWaiter, n)
+		for i := 0; i < n; i++ {
+			path := fmt.Sprintf("/%05d", i)
+			paths = append(paths, "GET"+path)
+			paths = append(paths, "POST"+path)
+			paths = append(paths, "HEAD"+path)
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, clientErr := client.do("GET", path, doOptions{})
+				if clientErr != nil {
+					errsCh <- clientErr
+				}
+				clientErr = client.stream("POST", path, streamOptions{})
+				if clientErr != nil {
+					errsCh <- clientErr
+				}
+				cw, clientErr := client.hijack("HEAD", path, hijackOptions{})
+				if clientErr != nil {
+					errsCh <- clientErr
+				} else {
+					waiters <- cw
+				}
+			}()
+		}
+		wg.Wait()
+		close(errsCh)
+		close(waiters)
+		for cw := range waiters {
+			cw.Wait()
+			cw.Close()
+		}
+		for err = range errsCh {
+			t.Error(err)
+		}
+		var reqPaths []string
+		for _, r := range reqs {
+			reqPaths = append(reqPaths, r.Method+r.URL.Path)
+		}
+		sort.Strings(paths)
+		sort.Strings(reqPaths)
+		if !reflect.DeepEqual(reqPaths, paths) {
+			t.Fatalf("expected server request paths to equal %v, got: %v", paths, reqPaths)
+		}
+		tt.srv.Close()
 	}
 }
 
@@ -511,8 +784,4 @@ type dumb struct {
 	Y      float64
 	Z      int     `qs:"zee"`
 	Person *person `qs:"p"`
-}
-
-type fakeEndpointURL struct {
-	Scheme string
 }

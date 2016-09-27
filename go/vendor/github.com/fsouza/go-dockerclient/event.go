@@ -1,4 +1,4 @@
-// Copyright 2015 go-dockerclient authors. All rights reserved.
+// Copyright 2014 go-dockerclient authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,19 +18,47 @@ import (
 	"time"
 )
 
-// APIEvents represents an event returned by the API.
+// APIEvents represents events coming from the Docker API
+// The fields in the Docker API changed in API version 1.22, and
+// events for more than images and containers are now fired off.
+// To maintain forward and backward compatibility, go-dockerclient
+// replicates the event in both the new and old format as faithfully as possible.
+//
+// For events that only exist in 1.22 in later, `Status` is filled in as
+// `"Type:Action"` instead of just `Action` to allow for older clients to
+// differentiate and not break if they rely on the pre-1.22 Status types.
+//
+// The transformEvent method can be consulted for more information about how
+// events are translated from new/old API formats
 type APIEvents struct {
-	Status string `json:"Status,omitempty" yaml:"Status,omitempty"`
-	ID     string `json:"ID,omitempty" yaml:"ID,omitempty"`
-	From   string `json:"From,omitempty" yaml:"From,omitempty"`
-	Time   int64  `json:"Time,omitempty" yaml:"Time,omitempty"`
+	// New API Fields in 1.22
+	Action string   `json:"action,omitempty"`
+	Type   string   `json:"type,omitempty"`
+	Actor  APIActor `json:"actor,omitempty"`
+
+	// Old API fields for < 1.22
+	Status string `json:"status,omitempty"`
+	ID     string `json:"id,omitempty"`
+	From   string `json:"from,omitempty"`
+
+	// Fields in both
+	Time     int64 `json:"time,omitempty"`
+	TimeNano int64 `json:"timeNano,omitempty"`
+}
+
+// APIActor represents an actor that accomplishes something for an event
+type APIActor struct {
+	ID         string            `json:"id,omitempty"`
+	Attributes map[string]string `json:"attributes,omitempty"`
 }
 
 type eventMonitoringState struct {
+	// `sync/atomic` expects the first word in an allocated struct to be 64-bit
+	// aligned on both ARM and x86-32. See https://goo.gl/zW7dgq for more details.
+	lastSeen int64
 	sync.RWMutex
 	sync.WaitGroup
 	enabled   bool
-	lastSeen  *int64
 	C         chan *APIEvents
 	errC      chan error
 	listeners []chan<- *APIEvents
@@ -50,8 +78,13 @@ var (
 	// exists.
 	ErrListenerAlreadyExists = errors.New("listener already exists for docker events")
 
+	// ErrTLSNotSupported is the error returned when the client does not support
+	// TLS (this applies to the Windows named pipe client).
+	ErrTLSNotSupported = errors.New("tls not supported by this client")
+
 	// EOFEvent is sent when the event listener receives an EOF error.
 	EOFEvent = &APIEvents{
+		Type:   "EOF",
 		Status: "EOF",
 	}
 )
@@ -67,11 +100,7 @@ func (c *Client) AddEventListener(listener chan<- *APIEvents) error {
 			return err
 		}
 	}
-	err = c.eventMonitor.addListener(listener)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.eventMonitor.addListener(listener)
 }
 
 // RemoveEventListener removes a listener from the monitor.
@@ -80,7 +109,7 @@ func (c *Client) RemoveEventListener(listener chan *APIEvents) error {
 	if err != nil {
 		return err
 	}
-	if len(c.eventMonitor.listeners) == 0 {
+	if c.eventMonitor.listernersCount() == 0 {
 		c.eventMonitor.disableEventMonitoring()
 	}
 	return nil
@@ -121,6 +150,12 @@ func (eventState *eventMonitoringState) closeListeners() {
 	eventState.listeners = nil
 }
 
+func (eventState *eventMonitoringState) listernersCount() int {
+	eventState.RLock()
+	defer eventState.RUnlock()
+	return len(eventState.listeners)
+}
+
 func listenerExists(a chan<- *APIEvents, list *[]chan<- *APIEvents) bool {
 	for _, b := range *list {
 		if b == a {
@@ -135,8 +170,7 @@ func (eventState *eventMonitoringState) enableEventMonitoring(c *Client) error {
 	defer eventState.Unlock()
 	if !eventState.enabled {
 		eventState.enabled = true
-		var lastSeenDefault = int64(0)
-		eventState.lastSeen = &lastSeenDefault
+		atomic.StoreInt64(&eventState.lastSeen, 0)
 		eventState.C = make(chan *APIEvents, 100)
 		eventState.errC = make(chan error, 1)
 		go eventState.monitorEvents(c)
@@ -199,11 +233,19 @@ func (eventState *eventMonitoringState) monitorEvents(c *Client) {
 
 func (eventState *eventMonitoringState) connectWithRetry(c *Client) error {
 	var retries int
-	var err error
-	for err = c.eventHijack(atomic.LoadInt64(eventState.lastSeen), eventState.C, eventState.errC); err != nil && retries < maxMonitorConnRetries; retries++ {
+	eventState.RLock()
+	eventChan := eventState.C
+	errChan := eventState.errC
+	eventState.RUnlock()
+	err := c.eventHijack(atomic.LoadInt64(&eventState.lastSeen), eventChan, errChan)
+	for ; err != nil && retries < maxMonitorConnRetries; retries++ {
 		waitTime := int64(retryInitialWaitTime * math.Pow(2, float64(retries)))
 		time.Sleep(time.Duration(waitTime) * time.Millisecond)
-		err = c.eventHijack(atomic.LoadInt64(eventState.lastSeen), eventState.C, eventState.errC)
+		eventState.RLock()
+		eventChan = eventState.C
+		errChan = eventState.errC
+		eventState.RUnlock()
+		err = c.eventHijack(atomic.LoadInt64(&eventState.lastSeen), eventChan, errChan)
 	}
 	return err
 }
@@ -240,8 +282,8 @@ func (eventState *eventMonitoringState) sendEvent(event *APIEvents) {
 func (eventState *eventMonitoringState) updateLastSeen(e *APIEvents) {
 	eventState.Lock()
 	defer eventState.Unlock()
-	if atomic.LoadInt64(eventState.lastSeen) < e.Time {
-		atomic.StoreInt64(eventState.lastSeen, e.Time)
+	if atomic.LoadInt64(&eventState.lastSeen) < e.Time {
+		atomic.StoreInt64(&eventState.lastSeen, e.Time)
 	}
 }
 
@@ -252,7 +294,7 @@ func (c *Client) eventHijack(startTime int64, eventChan chan *APIEvents, errChan
 	}
 	protocol := c.endpointURL.Scheme
 	address := c.endpointURL.Path
-	if protocol != "unix" {
+	if protocol != "unix" && protocol != "npipe" {
 		protocol = "tcp"
 		address = c.endpointURL.Host
 	}
@@ -261,7 +303,11 @@ func (c *Client) eventHijack(startTime int64, eventChan chan *APIEvents, errChan
 	if c.TLSConfig == nil {
 		dial, err = c.Dialer.Dial(protocol, address)
 	} else {
-		dial, err = tlsDialWithDialer(c.Dialer, protocol, address, c.TLSConfig)
+		netDialer, ok := c.Dialer.(*net.Dialer)
+		if !ok {
+			return ErrTLSNotSupported
+		}
+		dial, err = tlsDialWithDialer(netDialer, protocol, address, c.TLSConfig)
 	}
 	if err != nil {
 		return err
@@ -283,10 +329,12 @@ func (c *Client) eventHijack(startTime int64, eventChan chan *APIEvents, errChan
 			var event APIEvents
 			if err = decoder.Decode(&event); err != nil {
 				if err == io.EOF || err == io.ErrUnexpectedEOF {
-					if c.eventMonitor.isEnabled() {
+					c.eventMonitor.RLock()
+					if c.eventMonitor.enabled && c.eventMonitor.C == eventChan {
 						// Signal that we're exiting.
 						eventChan <- EOFEvent
 					}
+					c.eventMonitor.RUnlock()
 					break
 				}
 				errChan <- err
@@ -294,11 +342,50 @@ func (c *Client) eventHijack(startTime int64, eventChan chan *APIEvents, errChan
 			if event.Time == 0 {
 				continue
 			}
-			if !c.eventMonitor.isEnabled() {
+			if !c.eventMonitor.isEnabled() || c.eventMonitor.C != eventChan {
 				return
 			}
+			transformEvent(&event)
 			eventChan <- &event
 		}
 	}(res, conn)
 	return nil
+}
+
+// transformEvent takes an event and determines what version it is from
+// then populates both versions of the event
+func transformEvent(event *APIEvents) {
+	// if event version is <= 1.21 there will be no Action and no Type
+	if event.Action == "" && event.Type == "" {
+		event.Action = event.Status
+		event.Actor.ID = event.ID
+		event.Actor.Attributes = map[string]string{}
+		switch event.Status {
+		case "delete", "import", "pull", "push", "tag", "untag":
+			event.Type = "image"
+		default:
+			event.Type = "container"
+			if event.From != "" {
+				event.Actor.Attributes["image"] = event.From
+			}
+		}
+	} else {
+		if event.Status == "" {
+			if event.Type == "image" || event.Type == "container" {
+				event.Status = event.Action
+			} else {
+				// Because just the Status has been overloaded with different Types
+				// if an event is not for an image or a container, we prepend the type
+				// to avoid problems for people relying on actions being only for
+				// images and containers
+				event.Status = event.Type + ":" + event.Action
+			}
+		}
+		if event.ID == "" {
+			event.ID = event.Actor.ID
+		}
+		if event.From == "" {
+			event.From = event.Actor.Attributes["image"]
+		}
+	}
 }
