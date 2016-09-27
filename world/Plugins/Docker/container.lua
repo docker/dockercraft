@@ -52,9 +52,9 @@ end
 -- Container:destroy removes all blocks of the 
 -- container, it won't be visible on the map anymore
 function Container:destroy(running)
-	X = self.x+2
-	Y = GROUND_LEVEL+2
-	Z = self.z+2
+	local X = self.x+2
+	local Y = GROUND_LEVEL+2
+	local Z = self.z+2
 	LOG("Exploding at X:" .. X .. " Y:" .. Y .. " Z:" .. Z)
 	local World = cRoot:Get():GetDefaultWorld()
 	World:BroadcastSoundEffect("random.explode", X, Y, Z, 1, 1)
@@ -92,8 +92,8 @@ end
 -- orange otherwise.
 function Container:display(running)
 
-	metaPrimaryColor = E_META_WOOL_LIGHTBLUE
-	metaSecondaryColor = E_META_WOOL_BLUE
+	local metaPrimaryColor = E_META_WOOL_LIGHTBLUE
+	local metaSecondaryColor = E_META_WOOL_BLUE
 
 	if running == false 
 	then
@@ -200,6 +200,8 @@ end
 -- Container:addGround creates ground blocks
 -- necessary to display the container
 function Container:addGround()
+	local y = GROUND_LEVEL
+
 	if GROUND_MIN_X > self.x - 2
 	then 
 		OLD_GROUND_MIN_X = GROUND_MIN_X

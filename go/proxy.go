@@ -207,12 +207,11 @@ func (d *Daemon) handleConn(conn net.Conn) {
 
 	for {
 		tcpMessage := <-d.tcpMessages
-		log.Println("tcpMessage:", string(tcpMessage))
+		log.Debug("tcpMessage:", string(tcpMessage))
 		_, err := conn.Write(tcpMessage)
 		if err != nil {
 			log.Fatal("conn write error:", err)
 		}
-		log.Println("written!")
 	}
 }
 

@@ -188,7 +188,7 @@ end
 
 --
 function WorldStarted(World)
-	local y = GROUND_LEVEL
+	y = GROUND_LEVEL
 	-- just enough to fit one container
 	-- then it should be dynamic
 	for x = GROUND_MIN_X, GROUND_MAX_X
