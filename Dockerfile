@@ -23,3 +23,4 @@ COPY ./docs/img/logo64x64.png logo.png
 
 COPY ./start.sh start.sh
 CMD ["/bin/sh", "/srv/start.sh"]
+EXPOSE 25565
