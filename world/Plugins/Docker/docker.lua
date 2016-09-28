@@ -1,3 +1,6 @@
+----------------------------------------
+-- GLOBALS
+----------------------------------------
 
 -- queue containing the updates that need to be applied to the minecraft world
 UpdateQueue = nil
@@ -5,10 +8,13 @@ UpdateQueue = nil
 Containers = {}
 -- 
 SignsToUpdate = {}
-
 -- as a lua array cannot contain nil values, we store references to this object
 -- in the "Containers" array to indicate that there is no container at an index
 EmptyContainerSpace = {}
+
+----------------------------------------
+-- FUNCTIONS
+----------------------------------------
 
 -- Tick is triggered by cPluginManager.HOOK_TICK
 function Tick(TimeDelta)
@@ -38,12 +44,11 @@ function Initialize(Plugin)
 
 	cPluginManager.BindCommand("/docker", "*", DockerCommand, " - docker CLI commands")
 
-	Plugin:AddWebTab("Docker",HandleRequest_Docker)
-
 	-- make all players admin
 	cRankManager:SetDefaultRank("Admin")
 
-	
+	cNetwork:Connect("127.0.0.1",25566,TCP_CLIENT)
+
 	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
 	return true
@@ -146,8 +151,8 @@ function updateContainer(id,name,imageRepo,imageTag,state)
 
 	-- if container isn't already displayed, we see if there's an empty space
 	-- in the world to display the container
-	x = CONTAINER_START_X
-	index = -1
+	local x = CONTAINER_START_X
+	local index = -1
 
 	for i=1, table.getn(Containers)
 	do
@@ -161,7 +166,7 @@ function updateContainer(id,name,imageRepo,imageTag,state)
 		x = x + CONTAINER_OFFSET_X			
 	end
 
-	container = NewContainer()
+	local container = NewContainer()
 	container:init(x,CONTAINER_START_Z)
 	container:setInfos(id,name,imageRepo,imageTag,state == CONTAINER_RUNNING)
 	container:addGround()
@@ -177,12 +182,12 @@ end
 
 --
 function WorldStarted(World)
-	y = GROUND_LEVEL
+	local y = GROUND_LEVEL
 	-- just enough to fit one container
 	-- then it should be dynamic
-	for x= GROUND_MIN_X, GROUND_MAX_X
+	for x = GROUND_MIN_X, GROUND_MAX_X
 	do
-		for z=GROUND_MIN_Z,GROUND_MAX_Z
+		for z = GROUND_MIN_Z, GROUND_MAX_Z
 		do
 			setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
 		end
@@ -193,11 +198,7 @@ end
 function PlayerJoined(Player)
 	-- enable flying
 	Player:SetCanFly(true)
-
-	-- refresh containers
 	LOG("player joined")
-	r = os.execute("dockercraft containers")
-	LOG("executed: dockercraft containers -> " .. tostring(r))
 end
 
 -- 
@@ -208,7 +209,7 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 	-- lever
 	if BlockType == 69
 	then
-		containerID = getStartStopLeverContainer(BlockX,BlockZ)
+		local containerID = getStartStopLeverContainer(BlockX,BlockZ)
 		LOG("Using lever associated with container ID: " .. containerID)
 
 		if containerID ~= ""
@@ -217,11 +218,11 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 			if BlockMeta == 1
 			then
 				Player:SendMessage("docker stop " .. string.sub(containerID,1,8))
-				r = os.execute("dockercraft exec?cmd=docker+stop+" .. containerID)
+				SendTCPMessage("docker",{"stop",containerID},0)
 			-- start
 			else 
 				Player:SendMessage("docker start " .. string.sub(containerID,1,8))
-				os.execute("dockercraft exec?cmd=docker+start+" .. containerID)
+				SendTCPMessage("docker",{"start",containerID},0)
 			end
 		else
 			LOG("WARNING: no docker container ID attached to this lever")
@@ -231,14 +232,14 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 	-- stone button
 	if BlockType == 77
 	then
-		containerID, running = getRemoveButtonContainer(BlockX,BlockZ)
+		local containerID, running = getRemoveButtonContainer(BlockX,BlockZ)
 
 		if running
 		then
 			Player:SendMessage("A running container can't be removed.")
 		else 
 			Player:SendMessage("docker rm " .. string.sub(containerID,1,8))
-			os.execute("dockercraft exec?cmd=docker+rm+" .. containerID)
+			SendTCPMessage("docker",{"rm",containerID},0)
 		end
 	end
 end
@@ -256,7 +257,6 @@ end
 
 
 function DockerCommand(Split, Player)
-
 	if table.getn(Split) > 0
 	then
 
@@ -273,14 +273,8 @@ function DockerCommand(Split, Player)
 					then
 						table.insert(Split,3,"-d")
 					end
-
-					EntireCommand = table.concat(Split, "+")
-					-- remove '/' at the beginning
-					command = string.sub(EntireCommand, 2, -1)
-					
-					r = os.execute("dockercraft exec?cmd=" .. command)
-
-					LOG("executed: " .. command .. " -> " .. tostring(r))
+					table.remove(Split,1)
+					SendTCPMessage("docker",Split,0)
 				end
 			end
 		end
@@ -289,102 +283,6 @@ function DockerCommand(Split, Player)
 	return true
 end
 
-
-
-function HandleRequest_Docker(Request)
-	
-	content = "[dockerclient]"
-
-	if Request.PostParams["action"] ~= nil then
-
-		action = Request.PostParams["action"]
-
-		-- receiving informations about one container
-		
-		if action == "containerInfos"
-		then
-			LOG("EVENT - containerInfos")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-			running = Request.PostParams["running"]
-
-			-- LOG("containerInfos running: " .. running)
-
-			state = CONTAINER_STOPPED
-			if running == "true" then
-				state = CONTAINER_RUNNING
-			end
-
-			updateContainer(id,name,imageRepo,imageTag,state)
-		end
-
-		if action == "startContainer"
-		then
-			LOG("EVENT - startContainer")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-
-			updateContainer(id,name,imageRepo,imageTag,CONTAINER_RUNNING)
-		end
-
-		if action == "createContainer"
-		then
-			LOG("EVENT - createContainer")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-
-			updateContainer(id,name,imageRepo,imageTag,CONTAINER_CREATED)
-		end
-
-		if action == "stopContainer"
-		then
-			LOG("EVENT - stopContainer")
-
-			name = Request.PostParams["name"]
-			imageRepo = Request.PostParams["imageRepo"]
-			imageTag = Request.PostParams["imageTag"]
-			id = Request.PostParams["id"]
-
-			updateContainer(id,name,imageRepo,imageTag,CONTAINER_STOPPED)
-		end
-
-		if action == "destroyContainer"
-		then
-			LOG("EVENT - destroyContainer")
-			id = Request.PostParams["id"]
-			destroyContainer(id)
-		end
-
-		if action == "stats"
-		then
-			id = Request.PostParams["id"]
-			cpu = Request.PostParams["cpu"]
-			ram = Request.PostParams["ram"]
-
-			updateStats(id,ram,cpu)
-		end
-
-
-		content = content .. "{action:\"" .. action .. "\"}"
-
-	else
-		content = content .. "{error:\"action requested\"}"
-
-	end
-
-	content = content .. "[/dockerclient]"
-
-	return content
-end
 
 function OnPlayerFoodLevelChange(Player, NewFoodLevel)
 	-- Don't allow the player to get hungry
@@ -404,7 +302,7 @@ end
 
 function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers, Favicon)
 	-- Change Server Description
-	ServerDescription = "A Docker client for Minecraft"
+	local serverDescription = "A Docker client for Minecraft"
 	-- Change favicon
 	if cFile:IsFile("/srv/logo.png") then
 		local FaviconData = cFile:ReadWholeFile("/srv/logo.png")
@@ -412,7 +310,7 @@ function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers
 			Favicon = Base64Encode(FaviconData)
 		end
 	end
-	return false, ServerDescription, OnlinePlayers, MaxPlayers, Favicon
+	return false, serverDescription, OnlinePlayers, MaxPlayers, Favicon
 end				
 
 -- Make it sunny all the time!

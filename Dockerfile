@@ -1,4 +1,4 @@
-FROM golang:1.6
+FROM golang:1.7.1
 
 ENV DOCKER_VERSION 1.12.1
 
@@ -21,6 +21,9 @@ RUN ln -s /srv/cuberite_server/Cuberite /usr/bin/cuberite
 COPY ./world world
 COPY ./docs/img/logo64x64.png logo.png
 
-COPY ./start.sh start.sh
-CMD ["/bin/sh", "/srv/start.sh"]
 EXPOSE 25565
+
+COPY ./start.sh start.sh
+
+CMD ["/bin/sh", "/srv/start.sh"]
+
