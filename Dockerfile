@@ -9,8 +9,8 @@ RUN curl -sSL -o docker.tgz https://get.docker.com/builds/Linux/x86_64/docker-${
 	ln -s /bin/docker /bin/docker-${DOCKER_VERSION}
 
 # Copy Go code and install applications
-COPY ./go /go/src/dockercraft
-WORKDIR /go/src/dockercraft
+WORKDIR /go/src/github.com/docker/dockercraft
+COPY . .
 RUN go install
 
 # Download Cuberite server (Minecraft C++ server)
@@ -21,6 +21,9 @@ RUN ln -s /srv/cuberite_server/Cuberite /usr/bin/cuberite
 COPY ./world world
 COPY ./docs/img/logo64x64.png logo.png
 
-COPY ./start.sh start.sh
-CMD ["/bin/sh", "/srv/start.sh"]
 EXPOSE 25565
+
+COPY ./start.sh start.sh
+
+CMD ["/bin/sh", "/srv/start.sh"]
+
