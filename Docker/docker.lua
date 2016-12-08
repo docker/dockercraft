@@ -30,10 +30,8 @@ function Initialize(Plugin)
 
 	-- Hooks
 
-	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, WorldStarted);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, PlayerJoined);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, PlayerUsingBlock);
-	cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating);
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_FOOD_LEVEL_CHANGE, OnPlayerFoodLevelChange);
 	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage);
 	cPluginManager:AddHook(cPluginManager.HOOK_WEATHER_CHANGING, OnWeatherChanging);
@@ -181,20 +179,6 @@ function updateContainer(id,name,imageRepo,imageTag,state)
 end
 
 --
-function WorldStarted(World)
-	local y = GROUND_LEVEL
-	-- just enough to fit one container
-	-- then it should be dynamic
-	for x = GROUND_MIN_X, GROUND_MAX_X
-	do
-		for z = GROUND_MIN_Z, GROUND_MAX_Z
-		do
-			setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
-		end
-	end	
-end
-
---
 function PlayerJoined(Player)
 	-- enable flying
 	Player:SetCanFly(true)
@@ -242,17 +226,6 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 			SendTCPMessage("docker",{"rm",containerID},0)
 		end
 	end
-end
-
-
-function OnChunkGenerating(World, ChunkX, ChunkZ, ChunkDesc)
-	-- override the built-in chunk generator
-	-- to have it generate empty chunks only
-	ChunkDesc:SetUseDefaultBiomes(false)
-	ChunkDesc:SetUseDefaultComposition(false)
-	ChunkDesc:SetUseDefaultFinish(false)
-	ChunkDesc:SetUseDefaultHeight(false)
-	return true
 end
 
 

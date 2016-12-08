@@ -200,18 +200,26 @@ end
 -- Container:addGround creates ground blocks
 -- necessary to display the container
 function Container:addGround()
-	local y = GROUND_LEVEL
+  local y = GROUND_LEVEL
+  local max_x = GROUND_MAX_X
 
-	if GROUND_MIN_X > self.x - 2
-	then 
-		OLD_GROUND_MIN_X = GROUND_MIN_X
-		GROUND_MIN_X = self.x - 2
-		for x= GROUND_MIN_X, OLD_GROUND_MIN_X
-		do
-			for z=GROUND_MIN_Z,GROUND_MAX_Z
-			do
-				setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
-			end
-		end	
-	end
+  if GROUND_MIN_X > self.x - 2
+  then
+    max_x = GROUND_MIN_X
+    GROUND_MIN_X = self.x - 2
+    min_x = GROUND_MIN_X
+  end
+
+  local min_x = GROUND_MIN_X
+  for x= min_x, max_x
+  do
+    for z=GROUND_MIN_Z,GROUND_MAX_Z
+    do
+      setBlock(UpdateQueue,x,y,z,E_BLOCK_WOOL,E_META_WOOL_WHITE)
+      for sky=y+1,y+6
+      do
+        setBlock(UpdateQueue,x,sky,z,E_BLOCK_AIR,0)
+      end
+    end
+  end
 end
