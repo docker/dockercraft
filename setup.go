@@ -13,6 +13,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+const (
+	downloadURL   = "https://get.docker.com/builds/Linux/x86_64/docker-"
+	rcDownloadURL = "https://test.docker.com/builds/Linux/x86_64/docker-"
+)
+
 // GetDockerBinary ensures that we have the right version docker client
 // for communicating with the Docker Daemon
 func (d *Daemon) GetDockerBinary() error {
@@ -33,6 +38,12 @@ func (d *Daemon) GetDockerBinary() error {
 		}
 		defer out.Close()
 
+		// determine if we're using an RC build of docker
+		url := downloadURL
+		if strings.Contains(d.Version, "rc") {
+			url = rcDownloadURL
+		}
+
 		// the method of downloading it is different for version >= 1.11.0
 		// (in which case it is an archive containing multiple binaries)
 		versionComp, err := compareVersions(d.Version, "1.11.0")
@@ -40,12 +51,12 @@ func (d *Daemon) GetDockerBinary() error {
 			return err
 		}
 		if versionComp >= 0 {
-			err = getClient(out, "https://get.docker.com/builds/Linux/x86_64/docker-"+d.Version+".tgz", extractClient)
+			err = getClient(out, url+d.Version+".tgz", extractClient)
 			if err != nil {
 				return err
 			}
 		} else {
-			err = getClient(out, "https://get.docker.com/builds/Linux/x86_64/docker-"+d.Version, copyClient)
+			err = getClient(out, url+d.Version, copyClient)
 			if err != nil {
 				return err
 			}
