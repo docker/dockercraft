@@ -23,12 +23,12 @@ function NewUpdateQueue()
   -- of ticks (0 by default)
   function queue:newUpdate(updateType, x, y, z, blockID, meta, delay)
     if updateType ~= UPDATE_SET and updateType ~= UPDATE_DIG and updateType ~= UPDATE_SIGN
-      then
+    then
       return NewError(1,"NewUpdate: wrong update type")
     end
 
     if delay == nil
-      then
+    then
       delay = 0
     end
 
@@ -63,11 +63,11 @@ function NewUpdateQueue()
   -- is decremented, and the number of updates
   -- executed is not incremented.
   function queue:update(limit)
-    n = 0
+    local n = 0
     if self.current == nil
-      then
-        self.current = self:pop()
-      end
+    then
+      self.current = self:pop()
+    end
     while n < limit and self.current ~= nil
     do
       if self.current.delay == 0
@@ -75,7 +75,6 @@ function NewUpdateQueue()
         err = self.current:exec()
         if err ~= nil
         then
-          LOG("queue:update error: " .. err.message)
           break
         end
         n = n + 1
@@ -84,7 +83,7 @@ function NewUpdateQueue()
         self.current.delay = self.current.delay - 1
       end
     end
-  	return n
+    return n
   end
 
   function queue:push(value)
