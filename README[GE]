@@ -1,0 +1,123 @@
+# Dockercraft
+
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/logo.png?raw=true)
+
+Ein einfacher Minecraft Docker-Client, um Docker-Container zu visualisieren und zu verwalten.
+
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/dockercraft.gif?raw=true)
+
+[YouTube video](http://www.youtube.com/watch?v=eZDlJgJf55o)
+
+> WARNUNG: Bitte verwenden Sie Dockercraft nur auf Ihrem lokalen Rechner. Die Authentifizierung wird derzeit nicht unterst¸tzt. Jeder Spieler sollte als Root User betrachtet werden!
+
+## Wie Dockercraft ausgef¸hrt wird
+
+1. **Installieren Minecraft: [minecraft.net](https://minecraft.net)**
+
+	Der Minecraft-Client wurde nicht ge‰ndert, nur die offizielle Version erhalten.
+2. **Ziehen oder Dockercraft Bild bauen:** (ein offizielles Bild wird in K¸rze verf¸gbar sein)
+	```
+	docker pull gaetan/dockercraft
+	```
+	oder
+
+	```
+	git clone git@github.com:docker/dockercraft.git
+	docker build -t gaetan/dockercraft dockercraft
+	```
+3. **Dockercraft Container starten:**
+
+	```
+	docker run -t -i -d -p 25565:25565 \
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	--name dockercraft \
+	gaetan/dockercraft
+	```
+
+	Montage im
+	`/var/run/docker.sock` Innerhalb des containers ist notwendig Anfragen an die Docker Remote - API zu senden.
+Der Standard - Port f¸r einen Server ist Mine *25565* , wenn Sie eine andere bevorzugen: `-p <port>:25565`
+
+4. **÷ffnen Sie Minecraft > Multiplayer > Add Server**
+
+	Die Serveradresse ist die IP des Docker-Hosts. Sie müssen keinen Port angeben, wenn Sie die Standardeinstellung verwendet haben.
+
+	Wenn Sie Docker Maschine verwenden [Docker Machine](https://docs.docker.com/machine/install-machine/): `docker-machine ip <machine_name>`
+
+5. **Betrete den Server!**
+
+	Sie sollten mindestens einen Container in Ihrer Welt sehen, der derjenige ist, der Ihren Dockercraft-Server hostet.
+
+Sie kˆnnen starten, stoppen und Container entfernen, die mit Hebeln und Knˆpfen zusammenwirken. Einige Docker - Befehle werden auch direkt ¸ber Minecraft Chat - Fenster unterst¸tzt, die durch Dr¸cken der - `T`Taste (Standard) oder `/` Schl¸ssel.
+	
+> Ein Befehl beginnt immer mit ein `/`.
+> 
+> Wenn Sie die Eingabeaufforderung mit `/` Taste ˆffnen, wird es mit einem `/` Charakter vorgef¸llt, aber wenn Sie es mit dem `T` Schl¸ssel ˆffnet, wird es nicht vorgef¸llt und Sie werden eine `/` eingeben m¸ssen bevor Sie Ihren Docker Befehl eingeben.
+> 
+> Beispiel: `/docker run redis`.
+
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/landscape.png?raw=true)
+
+## Kommende Funktionen
+
+Dies ist nur der Anfang f¸r Dockercraft! Wir sollten in der Lage sein, viel mehr Docker-Funktionen zu unterst¸tzen wie:
+
+- Liste [Docker Maschinen](https://docs.docker.com/machine/)und Verwendung Portale , um zu sehen , was drin ist
+- Unterst¸tzung mehr Docker-Befehle
+- Display [Protokolle](https://docs.docker.com/v1.8/reference/commandline/logs/) (f¸r jeden Container, einem einfachen Knopfdruck)
+- Links darstellen
+- Docker Netzwerk
+- Docker-Volumes
+- ...
+
+Wenn Sie sich an Dockercraft Design interessieren, passieren Diskussionen  [in diese sicht](https://github.com/docker/dockercraft/issues/19).
+Auch wir verwenden [Magicavoxel](https://voxel.codeplex.com) um diese nette Prototypen zu tun:
+
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/voxelproto.jpg?raw=true)
+
+Hier finden Sie unsere Magicavoxel-Muster(![Dockercraft](https://github.com/docker/dockercraft/tree/master/docs/magicavoxel)).
+
+Um frische Nachrichten zu bekommen, folgen Sie unserem Twitter - Account: [@dockercraft](https://twitter.com/dockercraft).
+
+## Wie es funktioniert
+
+Der Minecraft-Client selbst bleibt unver‰ndert. Alle Operationen werden serverseitig durchgef¸hrt.
+
+Der Minecraft - Server den wir verwenden[http://cuberite.org](http://cuberite.org). Ein benutzerdefinierter Minecraft-kompatibler Spielserver, der in C ++ geschrieben wurde. [github repo](https://github.com/cuberite/cuberite)
+
+Dieser Server akzeptiert Plugins, Skripte in Lua geschrieben. Also haben wir einen f¸r Docker gemacht. (world/Plugins/Docker)
+
+Leider gibt es keine nette API, um mit diesen Plugins zu kommunizieren. Aber es gibt einen webadmin, und Plugins kˆnnen f¸r "webtabs" verantwortlich sein.
+
+```lua
+Plugin:AddWebTab("Docker",HandleRequest_Docker)
+```
+
+Basically it means the plugin can catch POST requests sent to `http://127.0.0.1:8080/webadmin/Docker/Docker`.
+
+### Goproxy
+
+Ereignisse von der Docker-Remote-API werden an das Lua-Plugin von einem kleinen D‰mon ¸bertragen (geschrieben in Go).(go/src/goproxy)
+
+```go
+func MCServerRequest(data url.Values, client *http.Client) {
+	req, _ := http.NewRequest("POST", "http://127.0.0.1:8080/webadmin/Docker/Docker", strings.NewReader(data.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth("admin", "admin")
+	client.Do(req)
+}
+```
+
+Die goproxy-Bin‰rdatei kann auch mit Parametern aus dem Lua-Plugin ausgef¸hrt werden, um Anfragen an den Daemon zu senden:
+
+```lua
+function PlayerJoined(Player)
+	-- refresh containers
+	r = os.execute("goproxy containers")
+end
+```
+## Mitwirken
+
+Wollen Sie auf Dockercraft hacken? [Docker Beitr‰ge Richtlinien](https://github.com/docker/docker/blob/master/CONTRIBUTING.md) gelten.
+
+![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/contribute.png?raw=true)
