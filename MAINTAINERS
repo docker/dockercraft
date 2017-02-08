@@ -12,7 +12,7 @@
 	[Org."Core maintainers"]
 		people = [
 			"aduermael",
-			"davetucker",
+			"dave-tucker",
 			"gdevillele",
 		]
 
@@ -29,9 +29,9 @@
 	Email = "adrien@docker.com"
 	GitHub = "aduermael"
 
-	[people.davetucker]
+	[people.dave-tucker]
 	Name = "Dave Tucker"
-	Email = "dave.tucker@docker.com"
+	Email = "dt@docker.com"
 	GitHub = "dave-tucker"
 
 	[people.gdevillele]
