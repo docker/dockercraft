@@ -6,6 +6,7 @@ PKG_NAME = github.com/${REPO_OWNER}/${REPO_NAME}
 IMAGE = golang:1.7.1
 IMAGE_NAME = dockercraft-dev
 CONTAINER_NAME = dockercraft-dev-container
+PACKAGES=$(shell go list ./... | grep -v vendor)
 
 all: test
 
@@ -22,15 +23,15 @@ install-deps:
 
 lint:
 	@echo "+ $@"
-	@test -z "$$(golint ./... | grep -v vendor/ | tee /dev/stderr)"
+	@test -z "$$(golint $(PACKAGES) | tee /dev/stderr)"
 
 fmt:
 	@echo "+ $@"
-	@test -z "$$(gofmt -s -l . | grep -v vendor/ | tee /dev/stderr)"
+	@test -z "$$(gofmt -s -l *.go | tee /dev/stderr)"
 
 vet:
 	@echo "+ $@"
-	@go vet .
+	go vet $(PACKAGES)
 
 build:
 	@echo "+ $@"
