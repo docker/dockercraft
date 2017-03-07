@@ -18,7 +18,7 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 
 	The Minecraft client hasn't been modified, just get the official release.
 
-2. **Pull or build Dockercraft image:** (an offical image will be available soon)
+2. **Pull or build Dockercraft image:** (an official image will be available soon)
 
 	```
 	docker pull gaetan/dockercraft
