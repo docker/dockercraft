@@ -19,7 +19,7 @@ TCP_CLIENT = {
   end,
 
   OnError = function (TCPConn, ErrorCode, ErrorMsg)
-    -- The specified error has occurred on the link
+    -- The specified error has occured on the link
     -- No other callback will be called for this link from now on
     -- For a client link being connected, this reports a connection error (destination unreachable etc.)
     -- It is an Undefined Behavior to send data to a_TCPLink in or after this callback
