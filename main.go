@@ -32,7 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	daemon.StartMonitoringEvents()
+	go daemon.StartMonitoringEvents()
 
 	daemon.Serve()
 }
