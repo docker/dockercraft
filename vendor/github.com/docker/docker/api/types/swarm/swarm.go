@@ -28,11 +28,12 @@ type JoinTokens struct {
 type Spec struct {
 	Annotations
 
-	Orchestration OrchestrationConfig `json:",omitempty"`
-	Raft          RaftConfig          `json:",omitempty"`
-	Dispatcher    DispatcherConfig    `json:",omitempty"`
-	CAConfig      CAConfig            `json:",omitempty"`
-	TaskDefaults  TaskDefaults        `json:",omitempty"`
+	Orchestration    OrchestrationConfig `json:",omitempty"`
+	Raft             RaftConfig          `json:",omitempty"`
+	Dispatcher       DispatcherConfig    `json:",omitempty"`
+	CAConfig         CAConfig            `json:",omitempty"`
+	TaskDefaults     TaskDefaults        `json:",omitempty"`
+	EncryptionConfig EncryptionConfig    `json:",omitempty"`
 }
 
 // OrchestrationConfig represents orchestration configuration.
@@ -53,6 +54,14 @@ type TaskDefaults struct {
 	LogDriver *Driver `json:",omitempty"`
 }
 
+// EncryptionConfig controls at-rest encryption of data and keys.
+type EncryptionConfig struct {
+	// AutoLockManagers specifies whether or not managers TLS keys and raft data
+	// should be encrypted at rest in such a way that they must be unlocked
+	// before the manager node starts up again.
+	AutoLockManagers bool
+}
+
 // RaftConfig represents raft configuration.
 type RaftConfig struct {
 	// SnapshotInterval is the number of log entries between snapshots.
@@ -60,7 +69,7 @@ type RaftConfig struct {
 
 	// KeepOldSnapshots is the number of snapshots to keep beyond the
 	// current snapshot.
-	KeepOldSnapshots uint64 `json:",omitempty"`
+	KeepOldSnapshots *uint64 `json:",omitempty"`
 
 	// LogEntriesForSlowFollowers is the number of log entries to keep
 	// around to sync up slow followers after a snapshot is created.
@@ -121,10 +130,12 @@ type ExternalCA struct {
 
 // InitRequest is the request used to init a swarm.
 type InitRequest struct {
-	ListenAddr      string
-	AdvertiseAddr   string
-	ForceNewCluster bool
-	Spec            Spec
+	ListenAddr       string
+	AdvertiseAddr    string
+	ForceNewCluster  bool
+	Spec             Spec
+	AutoLockManagers bool
+	Availability     NodeAvailability
 }
 
 // JoinRequest is the request used to join a swarm.
@@ -133,6 +144,13 @@ type JoinRequest struct {
 	AdvertiseAddr string
 	RemoteAddrs   []string
 	JoinToken     string // accept by secret
+	Availability  NodeAvailability
+}
+
+// UnlockRequest is the request used to unlock a swarm.
+type UnlockRequest struct {
+	// UnlockKey is the unlock key in ASCII-armored format.
+	UnlockKey string
 }
 
 // LocalNodeState represents the state of the local node.
@@ -147,6 +165,8 @@ const (
 	LocalNodeStateActive LocalNodeState = "active"
 	// LocalNodeStateError ERROR
 	LocalNodeStateError LocalNodeState = "error"
+	// LocalNodeStateLocked LOCKED
+	LocalNodeStateLocked LocalNodeState = "locked"
 )
 
 // Info represents generic information about swarm.
@@ -159,10 +179,10 @@ type Info struct {
 	Error            string
 
 	RemoteManagers []Peer
-	Nodes          int
-	Managers       int
+	Nodes          int `json:",omitempty"`
+	Managers       int `json:",omitempty"`
 
-	Cluster ClusterInfo
+	Cluster *ClusterInfo `json:",omitempty"`
 }
 
 // Peer represents a peer.
@@ -173,6 +193,7 @@ type Peer struct {
 
 // UpdateFlags contains flags for SwarmUpdate.
 type UpdateFlags struct {
-	RotateWorkerToken  bool
-	RotateManagerToken bool
+	RotateWorkerToken      bool
+	RotateManagerToken     bool
+	RotateManagerUnlockKey bool
 }

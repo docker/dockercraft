@@ -5,27 +5,29 @@ import (
 	"errors"
 	"net/url"
 
-	distreference "github.com/docker/distribution/reference"
+	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/reference"
 	"golang.org/x/net/context"
 )
 
 // ContainerCommit applies changes into a container and creates a new tagged image.
-func (cli *Client) ContainerCommit(ctx context.Context, container string, options types.ContainerCommitOptions) (types.ContainerCommitResponse, error) {
+func (cli *Client) ContainerCommit(ctx context.Context, container string, options types.ContainerCommitOptions) (types.IDResponse, error) {
 	var repository, tag string
 	if options.Reference != "" {
-		distributionRef, err := distreference.ParseNamed(options.Reference)
+		ref, err := reference.ParseNormalizedNamed(options.Reference)
 		if err != nil {
-			return types.ContainerCommitResponse{}, err
+			return types.IDResponse{}, err
 		}
 
-		if _, isCanonical := distributionRef.(distreference.Canonical); isCanonical {
-			return types.ContainerCommitResponse{}, errors.New("refusing to create a tag with a digest reference")
+		if _, isCanonical := ref.(reference.Canonical); isCanonical {
+			return types.IDResponse{}, errors.New("refusing to create a tag with a digest reference")
 		}
+		ref = reference.TagNameOnly(ref)
 
-		tag = reference.GetTagFromNamedRef(distributionRef)
-		repository = distributionRef.Name()
+		if tagged, ok := ref.(reference.Tagged); ok {
+			tag = tagged.Tag()
+		}
+		repository = reference.FamiliarName(ref)
 	}
 
 	query := url.Values{}
@@ -41,7 +43,7 @@ func (cli *Client) ContainerCommit(ctx context.Context, container string, option
 		query.Set("pause", "0")
 	}
 
-	var response types.ContainerCommitResponse
+	var response types.IDResponse
 	resp, err := cli.post(ctx, "/commit", query, options.Config, nil)
 	if err != nil {
 		return response, err

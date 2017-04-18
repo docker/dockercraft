@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
@@ -38,21 +39,18 @@ func (cli *Client) postHijacked(ctx context.Context, path string, query url.Valu
 		return types.HijackedResponse{}, err
 	}
 
-	req, err := cli.newRequest("POST", path, query, bodyEncoded, headers)
+	apiPath := cli.getAPIPath(path, query)
+	req, err := http.NewRequest("POST", apiPath, bodyEncoded)
 	if err != nil {
 		return types.HijackedResponse{}, err
 	}
-	req.Host = cli.addr
+	req = cli.addHeaders(req, headers)
 
+	req.Host = cli.addr
 	req.Header.Set("Connection", "Upgrade")
 	req.Header.Set("Upgrade", "tcp")
 
-	tlsConfig, err := resolveTLSConfig(cli.client.Transport)
-	if err != nil {
-		return types.HijackedResponse{}, err
-	}
-
-	conn, err := dial(cli.proto, cli.addr, tlsConfig)
+	conn, err := dial(cli.proto, cli.addr, resolveTLSConfig(cli.client.Transport))
 	if err != nil {
 		if strings.Contains(err.Error(), "connection refused") {
 			return types.HijackedResponse{}, fmt.Errorf("Cannot connect to the Docker daemon. Is 'docker daemon' running on this host?")
