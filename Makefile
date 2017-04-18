@@ -3,7 +3,7 @@
 REPO_NAME = dockercraft
 REPO_OWNER = docker
 PKG_NAME = github.com/${REPO_OWNER}/${REPO_NAME}
-IMAGE = golang:1.7.1
+IMAGE = golang:1.8
 IMAGE_NAME = dockercraft-dev
 CONTAINER_NAME = dockercraft-dev-container
 PACKAGES=$(shell go list ./... | grep -v vendor)
