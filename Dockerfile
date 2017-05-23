@@ -1,6 +1,6 @@
-FROM golang:1.7.1
+FROM golang:1.8
 
-ENV DOCKER_VERSION 1.12.1
+ENV DOCKER_VERSION 17.04.0-ce
 ENV CUBERITE_BUILD 630
 
 # Copy latest docker client(s)

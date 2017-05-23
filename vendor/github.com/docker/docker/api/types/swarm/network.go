@@ -31,7 +31,22 @@ type PortConfig struct {
 	TargetPort uint32 `json:",omitempty"`
 	// PublishedPort is the port on the swarm hosts
 	PublishedPort uint32 `json:",omitempty"`
+	// PublishMode is the mode in which port is published
+	PublishMode PortConfigPublishMode `json:",omitempty"`
 }
+
+// PortConfigPublishMode represents the mode in which the port is to
+// be published.
+type PortConfigPublishMode string
+
+const (
+	// PortConfigPublishModeIngress is used for ports published
+	// for ingress load balancing using routing mesh.
+	PortConfigPublishModeIngress PortConfigPublishMode = "ingress"
+	// PortConfigPublishModeHost is used for ports published
+	// for direct host level access on the host where the task is running.
+	PortConfigPublishModeHost PortConfigPublishMode = "host"
+)
 
 // PortConfigProtocol represents the protocol of a port.
 type PortConfigProtocol string
@@ -67,6 +82,7 @@ type NetworkSpec struct {
 	IPv6Enabled         bool         `json:",omitempty"`
 	Internal            bool         `json:",omitempty"`
 	Attachable          bool         `json:",omitempty"`
+	Ingress             bool         `json:",omitempty"`
 	IPAMOptions         *IPAMOptions `json:",omitempty"`
 }
 
@@ -93,10 +109,4 @@ type IPAMConfig struct {
 	Subnet  string `json:",omitempty"`
 	Range   string `json:",omitempty"`
 	Gateway string `json:",omitempty"`
-}
-
-// Driver represents a network driver.
-type Driver struct {
-	Name    string            `json:",omitempty"`
-	Options map[string]string `json:",omitempty"`
 }

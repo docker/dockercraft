@@ -54,7 +54,7 @@ type NodeDescription struct {
 	Engine    EngineDescription `json:",omitempty"`
 }
 
-// Platform represents the platfrom (Arch/OS).
+// Platform represents the platform (Arch/OS).
 type Platform struct {
 	Architecture string `json:",omitempty"`
 	OS           string `json:",omitempty"`
@@ -77,6 +77,7 @@ type PluginDescription struct {
 type NodeStatus struct {
 	State   NodeState `json:",omitempty"`
 	Message string    `json:",omitempty"`
+	Addr    string    `json:",omitempty"`
 }
 
 // Reachability represents the reachability of a node.
