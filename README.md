@@ -110,7 +110,7 @@ This is just the beginning for Dockercraft! We should be able to support a lot m
 - ...
 
 If you're interested about Dockercraft's design, discussions happen in [that issue](https://github.com/docker/dockercraft/issues/19).
-Also, we're using [Magicavoxel](https://voxel.codeplex.com) to do these nice prototypes:
+Also, we're using [Magicavoxel](https://ephtracy.github.io/) to do these nice prototypes:
 
 ![Dockercraft](https://github.com/docker/dockercraft/raw/master/docs/img/voxelproto.jpg?raw=true)
 
