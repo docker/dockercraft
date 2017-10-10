@@ -29,5 +29,5 @@ COPY ./config /srv/Server
 COPY ./docs/img/logo64x64.png /srv/Server/favicon.png
 COPY ./Docker /srv/Server/Plugins/Docker
 
-EXPOSE 25565
+EXPOSE 25565 8080
 ENTRYPOINT ["/srv/Server/start.sh"]
