@@ -32,8 +32,7 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 3. **Run Dockercraft container:**
 
 	```
-	docker run -t -i -d \
-	-p 25565:25565 -p 8080:8080 \
+	docker run -t -i -d -p 25565:25565 \
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	--name dockercraft \
 	gaetan/dockercraft
@@ -42,8 +41,6 @@ A simple Minecraft Docker client, to visualize and manage Docker containers.
 	Mounting `/var/run/docker.sock` inside the container is necessary to send requests to the Docker remote API.
 
 	The default port for a Minecraft server is *25565*, if you prefer a different one: `-p <port>:25565`
-
-	The default port for the webadmin interface is *8080*, if you prefer a different one: `-p <port>:8080`
 
 4. **Open Minecraft > Multiplayer > Add Server**
 
@@ -74,8 +71,7 @@ Dockercraft can be customised to use any of the [Biomes](https://github.com/cube
 
 You can pass these additional arguments to your `docker run` command:
 ```
-docker run -t -i -d \
-		-p 25565:25565 -p 8080:8080 \
+docker run -t -i -d -p 25565:25565 \
     -v /var/run/docker.sock:/var/run/docker.sock \
     --name dockercraft \
     gaetan/dockercraft <biome> <groundlevel> <sealevel> <finishers>
