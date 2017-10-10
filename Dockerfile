@@ -2,8 +2,8 @@ FROM alpine:3.6 AS wget
 RUN apk add --no-cache ca-certificates wget tar
 
 FROM wget AS docker
-ARG DOCKER_VERSION=17.04.0-ce
-RUN wget -qO- https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION}.tgz | \
+ARG DOCKER_VERSION=17.09.0-ce
+RUN wget -qO- https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz | \
   tar -xvz --strip-components=1 -C /bin
 
 FROM wget AS cuberite
@@ -18,6 +18,8 @@ COPY . .
 RUN go install
 
 FROM debian:jessie
+RUN apt-get update  
+RUN apt-get install -y ca-certificates
 COPY --from=dockercraft /go/bin/dockercraft /bin
 COPY --from=docker /bin/docker /bin
 COPY --from=cuberite /srv /srv
