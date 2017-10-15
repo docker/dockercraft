@@ -123,4 +123,3 @@ function updateSign(queue,x,y,z,line1,line2,line3,line4,delay)
   meta = {line1=line1,line2=line2,line3=line3,line4=line4}
   queue:newUpdate(UPDATE_SIGN, x, y, z, nil, meta, delay)
 end
-

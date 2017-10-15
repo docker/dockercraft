@@ -290,4 +290,3 @@ end
 function OnWeatherChanging(World, Weather)
   return true, wSunny
 end
-
