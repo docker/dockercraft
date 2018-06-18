@@ -176,6 +176,25 @@ function updateContainer(id,name,imageRepo,imageTag,state)
   else
     Containers[index] = container
   end
+
+  -- update hack
+  -- when new containers are started, all old containers dissappear
+  -- they're still running, but for some reason stop being displayed until they're updated
+  -- this forces them to re-render in world
+  LOG("New container detected: Refreshing all...")
+  for i=1, table.getn(Containers)
+  do
+    LOG("Refreshing container '" .. Containers[i].name .. "'")
+
+    -- Display
+    Containers[i]:display(Containers[i].running)
+
+    -- YES WE NEED TO DO IT TWICE
+    -- The signs don't display correctly on first re-render
+    -- Do it again to make signs work
+    -- Look don't ask me why, but it works so ¯\_(ツ)_/¯
+    Containers[i]:display(Containers[i].running)
+  end
 end
 
 --
@@ -290,4 +309,3 @@ end
 function OnWeatherChanging(World, Weather)
   return true, wSunny
 end
-

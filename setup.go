@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	downloadURL   = "https://get.docker.com/builds/Linux/x86_64/docker-"
+	downloadURL   = "https://download.docker.com/linux/static/stable/x86_64/docker-"
 	rcDownloadURL = "https://test.docker.com/builds/Linux/x86_64/docker-"
 )
 
