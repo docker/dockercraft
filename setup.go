@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -107,6 +107,7 @@ func compareVersions(v1 string, v2 string) (comp int, err error) {
 }
 
 func getClient(out *os.File, URL string, cp copier) error {
+	log.Infof("fetching %s", URL)
 	resp, err := http.Get(URL)
 	if err != nil {
 		return err
@@ -123,10 +124,10 @@ func copyClient(out *os.File, resp *http.Response) error {
 
 func extractClient(out *os.File, resp *http.Response) error {
 	gr, err := gzip.NewReader(resp.Body)
-	defer gr.Close()
 	if err != nil {
 		return err
 	}
+	defer gr.Close()
 
 	tr := tar.NewReader(gr)
 	for {
