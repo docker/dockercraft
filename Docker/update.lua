@@ -39,10 +39,10 @@ function NewUpdateQueue()
     function update:exec()
       if self.op == UPDATE_SET
       then
-        cRoot:Get():GetDefaultWorld():SetBlock(self.x,self.y,self.z,self.blockID,self.meta)
+        cRoot:Get():GetDefaultWorld():SetBlock(Vector3i(self.x, self.y, self.z),self.blockID,self.meta)
       elseif self.op == UPDATE_DIG
       then
-        cRoot:Get():GetDefaultWorld():DigBlock(self.x,self.y,self.z)
+        cRoot:Get():GetDefaultWorld():DigBlock(Vector3i(self.x,self.y,self.z))
       elseif self.op == UPDATE_SIGN
       then
         cRoot:Get():GetDefaultWorld():SetSignLines(self.x,self.y,self.z,self.meta.line1,self.meta.line2,self.meta.line3,self.meta.line4)

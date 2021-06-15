@@ -13,11 +13,11 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
+	log "github.com/sirupsen/logrus"
 )
 
 // TCPMessage defines what a message that can be
@@ -90,7 +90,7 @@ type CPUStats struct {
 // Init initializes a Daemon
 func (d *Daemon) Init() error {
 	var err error
-	d.Client, err = client.NewEnvClient()
+	d.Client, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,9 @@ func (d *Daemon) Init() error {
 func (d *Daemon) Serve() {
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp", ":25566")
-
+	if err != nil {
+		panic(err)
+	}
 	ln, err := net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
 		log.Fatalln("listen tcp error:", err)
@@ -322,7 +324,7 @@ func (d *Daemon) eventCallback(event events.Message) {
 
 	default:
 		// Ignoring
-		log.Debug("Ignoring event: %s", event.Status)
+		log.Debugf("Ignoring event: %s", event.Status)
 	}
 }
 

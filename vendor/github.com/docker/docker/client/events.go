@@ -1,11 +1,10 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
+	"context"
 	"encoding/json"
 	"net/url"
 	"time"
-
-	"golang.org/x/net/context"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
@@ -91,6 +90,7 @@ func buildEventsQueryParams(cliVersion string, options types.EventsOptions) (url
 	}
 
 	if options.Filters.Len() > 0 {
+		//nolint:staticcheck // ignore SA1019 for old code
 		filterJSON, err := filters.ToParamWithVersion(cliVersion, options.Filters)
 		if err != nil {
 			return nil, err
